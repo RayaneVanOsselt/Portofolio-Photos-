@@ -11,11 +11,11 @@
 
 export const siteConfig = {
   /** Nom complet, utilisé dans les titres, metadata et e-mails. */
-  name: "Raï VO Capture 0808",
-  /** Les deux lignes du logo. */
+  name: "rayvo.captures0808",
+  /** Les deux lignes du logo (affichées telles quelles, en minuscules). */
   logo: {
-    primary: "Raï VO",
-    secondary: "Capture 0808",
+    primary: "rayvo.",
+    secondary: "captures0808",
     /** Initiales dessinées dans le monogramme (voir components/brand). */
     monogram: "RV",
   },
