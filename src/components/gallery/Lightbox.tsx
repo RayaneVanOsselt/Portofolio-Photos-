@@ -1,6 +1,6 @@
 "use client";
 
-import { SmartImage as Image } from "@/components/ui/SmartImage";
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { ArrowLeft, ArrowRight, Close, ZoomIn, ZoomOut } from "@/components/ui/Icons";
 import { useAnimatedDialog } from "@/hooks/useAnimatedDialog";

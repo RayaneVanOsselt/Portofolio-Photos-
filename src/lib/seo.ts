@@ -33,8 +33,15 @@ export function pageMetadata({ title, description = siteConfig.description, path
   };
 }
 
+/**
+ * URL absolue d'une page ou d'un fichier. Les pages prennent un « / » final
+ * (le site est exporté en dossiers : /portfolio/rugby/index.html).
+ */
 export function absoluteUrl(path: string) {
-  return `${siteConfig.url}${path.startsWith("/") ? path : `/${path}`}`;
+  let clean = path.startsWith("/") ? path : `/${path}`;
+  const isFile = /\.[a-z0-9]+$/i.test(clean.split(/[?#]/)[0]);
+  if (!isFile && !clean.endsWith("/") && !clean.includes("#")) clean = `${clean}/`;
+  return `${siteConfig.url}${clean}`;
 }
 
 /** Données structurées de l'activité (schema.org). */
@@ -48,7 +55,7 @@ export function businessJsonLd() {
     description: siteConfig.description,
     url: siteConfig.url,
     logo: absoluteUrl("/brand/monogram-light.svg"),
-    image: absoluteUrl("/opengraph-image"),
+    image: absoluteUrl("/opengraph-image.png"),
     ...(email ? { email } : {}),
     ...(phone ? { telephone: phone } : {}),
     ...(location ? { areaServed: location } : {}),

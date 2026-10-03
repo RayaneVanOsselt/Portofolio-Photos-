@@ -9,12 +9,15 @@
  * - Les photos sont triées par nom de fichier (préfixez 01-, 02-… pour l'ordre).
  * - Le texte alternatif (alt) est déduit du nom de fichier la première fois,
  *   puis conservé : vous pouvez le modifier dans le manifest, il ne sera pas écrasé.
+ * - Chaque photo est déclinée en WebP (640, 1080, 1600, 2400 px) dans
+ *   public/_photos/ : le site charge la taille adaptée à l'écran.
+ *   Les déclinaisons existantes et à jour ne sont pas recalculées.
  * - Les fichiers trop lourds sont signalés (le site les redimensionne, mais
  *   des originaux de plus de 3000 px ralentissent le premier affichage).
  */
 import { existsSync } from "node:fs";
-import { readdir, readFile, stat, writeFile } from "node:fs/promises";
-import { join, relative, sep } from "node:path";
+import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
+import { dirname, join, relative, sep } from "node:path";
 import sharp from "sharp";
 
 const ROOT = process.cwd();
@@ -22,6 +25,20 @@ const IMAGES_DIR = join(ROOT, "public", "images");
 const MANIFEST = join(ROOT, "src", "data", "photo-manifest.json");
 const EXTENSIONS = /\.(jpe?g|png|webp|avif)$/i;
 const MAX_RECOMMENDED = 3000;
+// Déclinaisons WebP servies au navigateur (voir src/lib/image-loader.ts — mêmes valeurs).
+const VARIANT_WIDTHS = [640, 1080, 1600, 2400];
+const VARIANTS_DIR = join(ROOT, "public", "_photos");
+
+/** Génère les déclinaisons WebP d'une photo si elles manquent ou sont plus anciennes que l'original. */
+async function writeVariants(fullPath, rel, sourceTime) {
+  const base = rel.replace(EXTENSIONS, "");
+  for (const width of VARIANT_WIDTHS) {
+    const target = join(VARIANTS_DIR, `${base}-${width}.webp`);
+    if (existsSync(target) && (await stat(target)).mtimeMs >= sourceTime) continue;
+    await mkdir(dirname(target), { recursive: true });
+    await sharp(fullPath).rotate().resize({ width, withoutEnlargement: true }).webp({ quality: 78 }).toFile(target);
+  }
+}
 
 async function walk(dir) {
   if (!existsSync(dir)) return [];
@@ -66,7 +83,8 @@ for (const fullPath of files) {
   const blur = await sharp(fullPath).rotate().resize(16, 16, { fit: "inside" }).webp({ quality: 40 }).toBuffer();
 
   const src = `/images/${rel}`;
-  const { size } = await stat(fullPath);
+  const { size, mtimeMs } = await stat(fullPath);
+  await writeVariants(fullPath, rel, mtimeMs);
   if (Math.max(width, height) > MAX_RECOMMENDED || size > 3_000_000) {
     warnings.push(`${rel} — ${width}×${height}, ${(size / 1e6).toFixed(1)} Mo (conseillé : ≤ ${MAX_RECOMMENDED}px, ≤ 3 Mo)`);
   }

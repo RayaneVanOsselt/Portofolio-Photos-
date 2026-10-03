@@ -1,6 +1,6 @@
 "use client";
 
-import { SmartImage as Image } from "@/components/ui/SmartImage";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
@@ -43,7 +43,7 @@ export function SearchDialog({ open, onClose, index }: Props) {
       event.preventDefault();
       const target = shown[activeIndex];
       if (target) go(target.href);
-      else if (query.trim()) go(`/search?q=${encodeURIComponent(query.trim())}`);
+      else if (query.trim()) go(`/search/?q=${encodeURIComponent(query.trim())}`);
     }
   };
 
@@ -59,11 +59,11 @@ export function SearchDialog({ open, onClose, index }: Props) {
       <div className="search-panel mx-auto mt-[max(4.5rem,10vh)] w-[calc(100%-2*var(--gutter))] max-w-2xl overflow-hidden rounded-[var(--radius-lg)] bg-deep">
         <form
           role="search"
-          action="/search"
+          action={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/search/`}
           className="flex items-center gap-3 border-b border-line px-5"
           onSubmit={(event) => {
             event.preventDefault();
-            if (query.trim()) go(`/search?q=${encodeURIComponent(query.trim())}`);
+            if (query.trim()) go(`/search/?q=${encodeURIComponent(query.trim())}`);
           }}
         >
           <Search size={20} className="shrink-0 text-silver" />
@@ -134,7 +134,7 @@ export function SearchDialog({ open, onClose, index }: Props) {
             <Kbd>↑</Kbd> <Kbd>↓</Kbd> naviguer · <Kbd>Entrée</Kbd> ouvrir · <Kbd>Échap</Kbd> fermer
           </span>
           {query.trim() ? (
-            <Link href={`/search?q=${encodeURIComponent(query.trim())}`} onClick={onClose} className="inline-flex items-center gap-2 text-platinum">
+            <Link href={`/search/?q=${encodeURIComponent(query.trim())}`} onClick={onClose} className="inline-flex items-center gap-2 text-platinum">
               Tous les résultats <ArrowRight size={14} />
             </Link>
           ) : null}

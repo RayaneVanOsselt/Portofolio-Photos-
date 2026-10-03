@@ -33,7 +33,7 @@ export default function LegalNoticePage() {
         },
         {
           title: "Hébergement",
-          body: <p>Le site est hébergé par [NOM DE L&apos;HÉBERGEUR — ex. Vercel Inc.], [ADRESSE DE L&apos;HÉBERGEUR].</p>,
+          body: <p>Le site est hébergé par GitHub, Inc. (service GitHub Pages), 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.</p>,
         },
         {
           title: "Propriété intellectuelle",

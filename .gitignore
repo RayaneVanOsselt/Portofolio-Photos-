@@ -45,3 +45,6 @@ next-env.d.ts
 
 # outils locaux
 .claude/settings.local.json
+
+# déclinaisons WebP générées par npm run photos
+/public/_photos/

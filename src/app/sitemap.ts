@@ -21,3 +21,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     page("/legal", 0.2, "yearly"),
   ];
 }
+
+export const dynamic = "force-static";

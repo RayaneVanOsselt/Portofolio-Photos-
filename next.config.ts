@@ -1,30 +1,29 @@
 import type { NextConfig } from "next";
 
+/**
+ * Site 100 % statique, publié sur GitHub Pages.
+ *
+ * `npm run build` produit le dossier `out/` (HTML, CSS, JS, images) : c'est
+ * lui — et lui seul — qui est mis en ligne par la GitHub Action
+ * (.github/workflows/deploy.yml). Aucun serveur n'est nécessaire.
+ *
+ * NEXT_PUBLIC_BASE_PATH : sous-dossier de publication, ex. "/Portofolio-Photos-"
+ * pour https://<utilisateur>.github.io/Portofolio-Photos-/. Vide en local
+ * ou avec un domaine personnalisé. Renseigné automatiquement par la GitHub Action.
+ */
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 const nextConfig: NextConfig = {
+  output: "export",
+  basePath,
+  trailingSlash: true,
   images: {
-    formats: ["image/avif", "image/webp"],
-    // 75 : galeries ; 90 : lightbox (plein écran).
-    qualities: [75, 90],
-    deviceSizes: [640, 828, 1080, 1280, 1600, 1920, 2560],
-    remotePatterns: [
-      // Photos temporaires (Unsplash) — peut être supprimé une fois les vraies photos en place.
-      { protocol: "https", hostname: "images.unsplash.com" },
-    ],
+    // Pas de serveur d'images : chaque photo est déclinée à l'avance en WebP
+    // (npm run photos) et ce chargeur choisit la bonne taille.
+    loader: "custom",
+    loaderFile: "./src/lib/image-loader.ts",
   },
   poweredByHeader: false,
-  async headers() {
-    return [
-      {
-        source: "/(.*)",
-        headers: [
-          { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "X-Frame-Options", value: "SAMEORIGIN" },
-          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
-        ],
-      },
-    ];
-  },
 };
 
 export default nextConfig;

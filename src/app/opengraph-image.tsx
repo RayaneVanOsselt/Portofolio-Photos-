@@ -10,3 +10,5 @@ export const contentType = "image/png";
 export default function Image() {
   return renderOgImage({ kicker: "Photographe sportif", title: "Hockey · Rugby · Football", photo: getPhotoById(homeContent.hero.photoId) });
 }
+
+export const dynamic = "force-static";

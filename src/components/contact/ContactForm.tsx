@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { submitContact, type ContactState } from "@/app/contact/actions";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
 import { Check, ChevronDown } from "@/components/ui/Icons";
 import { siteConfig } from "@/config/site";
@@ -17,54 +16,71 @@ import {
   type ContactValues,
   type FieldErrors,
 } from "@/lib/contact/schema";
+import { submitContact } from "@/lib/contact/submit";
 
 const EMPTY: ContactValues = Object.fromEntries(CONTACT_FIELDS.map((f) => [f, ""])) as ContactValues;
 
+/** Délai minimal entre l'affichage du formulaire et l'envoi (les robots remplissent instantanément). */
+const MIN_FILL_TIME_MS = 2500;
+
+type Status = { kind: "idle" } | { kind: "sending" } | { kind: "success"; simulated?: boolean } | { kind: "error"; message: string };
+
 export function ContactForm({ initialProjectType = "" }: { initialProjectType?: string }) {
-  const [state, formAction, pending] = useActionState<ContactState, FormData>(submitContact, { status: "idle" });
+  const [status, setStatus] = useState<Status>({ kind: "idle" });
   const [values, setValues] = useState<ContactValues>(() => ({
     ...EMPTY,
     projectType: PROJECT_TYPES.some((t) => t.value === initialProjectType) ? initialProjectType : "",
   }));
-  const [clientErrors, setClientErrors] = useState<FieldErrors>({});
+  const [errors, setErrors] = useState<FieldErrors>({});
   const [attempted, setAttempted] = useState(false);
-  const [dismissedSuccess, setDismissedSuccess] = useState<ContactState | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const startedAtRef = useRef<HTMLInputElement>(null);
+  const honeypotRef = useRef<HTMLInputElement>(null);
+  const startedAt = useRef(0);
 
-  // Horodatage anti-robot posé côté client (le HTML statique n'en contient pas).
+  // Horodatage anti-robot, remis à zéro à chaque nouveau formulaire.
   useEffect(() => {
-    if (startedAtRef.current) startedAtRef.current.value = String(Date.now());
-  }, [dismissedSuccess]);
+    if (status.kind === "idle") startedAt.current = Date.now();
+  }, [status.kind]);
 
-  const serverErrors = state.status === "invalid" ? state.errors : {};
-  const errors: FieldErrors = { ...serverErrors, ...clientErrors };
-  const showSuccess = state.status === "success" && dismissedSuccess !== state;
+  const pending = status.kind === "sending";
 
   const update = (field: ContactField, value: string) => {
     const next = { ...values, [field]: value };
     setValues(next);
-    if (attempted || clientErrors[field]) setClientErrors((e) => ({ ...e, [field]: validateField(field, readValues(next)) }));
+    if (attempted || errors[field]) setErrors((e) => ({ ...e, [field]: validateField(field, readValues(next)) }));
   };
 
   const onBlur = (field: ContactField) => {
     if (!values[field] && !attempted) return;
-    setClientErrors((e) => ({ ...e, [field]: validateField(field, readValues(values)) }));
+    setErrors((e) => ({ ...e, [field]: validateField(field, readValues(values)) }));
   };
 
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (pending) return;
     setAttempted(true);
-    const found = validateContact(readValues(values));
-    setClientErrors(found);
+    const clean = readValues(values);
+    const found = validateContact(clean);
+    setErrors(found);
     if (Object.keys(found).length) {
-      event.preventDefault();
       const first = CONTACT_FIELDS.find((f) => found[f]);
       formRef.current?.querySelector<HTMLElement>(`[name="${first}"]`)?.focus();
+      return;
     }
+
+    // Robot probable (champ piège rempli ou envoi instantané) : on simule un succès sans rien envoyer.
+    if (honeypotRef.current?.value || Date.now() - startedAt.current < MIN_FILL_TIME_MS) {
+      setStatus({ kind: "success" });
+      return;
+    }
+
+    setStatus({ kind: "sending" });
+    const result = await submitContact(clean);
+    setStatus(result.ok ? { kind: "success", simulated: result.simulated } : { kind: "error", message: result.message });
   };
 
   // Après un succès, le formulaire est remplacé par une confirmation.
-  if (showSuccess) {
+  if (status.kind === "success") {
     return (
       <div role="status" className="success-in flex min-h-[32rem] flex-col justify-center">
         <span className="grid size-14 place-items-center rounded-[var(--radius-sm)] bg-phosphor text-ink">
@@ -75,9 +91,9 @@ export function ContactForm({ initialProjectType = "" }: { initialProjectType?: 
           Merci pour <span className="t-serif text-phosphor">votre message.</span>
         </h2>
         <p className="mt-6 max-w-md t-lead text-silver">Je reviens vers vous dès que possible.</p>
-        {state.status === "success" && state.simulated ? (
+        {status.simulated ? (
           <p className="mt-6 rounded-[var(--radius-sm)] border border-dashed border-phosphor/50 p-4 t-small text-phosphor">
-            Mode développement : l&apos;e-mail a été affiché dans le terminal au lieu d&apos;être envoyé. Renseignez RESEND_API_KEY, EMAIL_TO et EMAIL_FROM pour l&apos;envoi réel.
+            Mode développement : le message a été affiché dans la console du navigateur au lieu d&apos;être envoyé. Renseignez NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY pour l&apos;envoi réel.
           </p>
         ) : null}
         <div className="mt-10 flex flex-wrap gap-3">
@@ -86,8 +102,8 @@ export function ContactForm({ initialProjectType = "" }: { initialProjectType?: 
             onClick={() => {
               setValues(EMPTY);
               setAttempted(false);
-              setClientErrors({});
-              setDismissedSuccess(state);
+              setErrors({});
+              setStatus({ kind: "idle" });
             }}
           >
             Envoyer un autre message
@@ -103,20 +119,19 @@ export function ContactForm({ initialProjectType = "" }: { initialProjectType?: 
   const errorCount = Object.values(errors).filter(Boolean).length;
 
   return (
-    <form ref={formRef} action={formAction} onSubmit={onSubmit} noValidate aria-describedby="form-status" className="grid gap-x-6 gap-y-8 sm:grid-cols-2">
+    <form ref={formRef} method="post" onSubmit={onSubmit} noValidate aria-describedby="form-status" className="grid gap-x-6 gap-y-8 sm:grid-cols-2">
       {/* Anti-spam : champ piège invisible + horodatage */}
       <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
         <label htmlFor="website">Ne pas remplir ce champ</label>
-        <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" defaultValue="" />
+        <input ref={honeypotRef} id="website" name="website" type="text" tabIndex={-1} autoComplete="off" defaultValue="" />
       </div>
-      <input ref={startedAtRef} type="hidden" name="startedAt" defaultValue="" />
 
       <div id="form-status" aria-live="polite" className="sm:col-span-2 empty:hidden">
-        {state.status === "error" ? (
+        {status.kind === "error" ? (
           <div role="alert" className="rounded-[var(--radius-sm)] border border-danger/40 bg-danger/10 p-4 t-small text-mist">
             <p className="font-medium text-platinum">Une erreur est survenue.</p>
             <p className="mt-1 text-silver">
-              {state.message}
+              {status.message}
               {siteConfig.contact.email ? (
                 <>
                   {" "}
