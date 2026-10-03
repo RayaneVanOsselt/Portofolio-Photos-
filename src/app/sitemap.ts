@@ -1,19 +1,33 @@
 import type { MetadataRoute } from "next";
-import { getAllCategoryPaths, getProjects } from "@/lib/portfolio";
-import { absoluteUrl } from "@/lib/seo";
+import { getCategories, getCategoryPhotos, getProjects } from "@/lib/portfolio";
+import { absoluteUrl, photoUrl } from "@/lib/seo";
+import type { Photo } from "@/lib/types";
 
+/**
+ * Plan du site pour Google, avec les images de chaque page (Google Images).
+ * Régénéré à chaque publication : la date de mise à jour est celle du build.
+ */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const page = (path: string, priority: number, changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] = "monthly") => ({
+  const lastModified = new Date();
+  type Freq = MetadataRoute.Sitemap[number]["changeFrequency"];
+
+  const page = (path: string, priority: number, changeFrequency: Freq = "monthly", photos: Photo[] = []) => ({
     url: absoluteUrl(path),
+    lastModified,
     changeFrequency,
     priority,
+    // Seules vos propres photos sont déclarées (pas les photos temporaires d'Unsplash).
+    ...(photos.some((p) => !p.credit) ? { images: photos.filter((p) => !p.credit).slice(0, 50).map(photoUrl) } : {}),
   });
 
+  const categories = getCategories();
+  const allCategories = categories.flatMap((c) => [c, ...c.children]);
+
   return [
-    page("/", 1, "weekly"),
-    page("/portfolio", 0.9, "weekly"),
-    ...getAllCategoryPaths().map((path) => page(`/portfolio/${path.join("/")}`, path.length === 1 ? 0.8 : 0.7, "weekly")),
-    ...getProjects().map((p) => page(p.href, 0.6)),
+    page("/", 1, "weekly", categories.map((c) => c.cover)),
+    page("/portfolio", 0.9, "weekly", categories.map((c) => c.cover)),
+    ...allCategories.map((c) => page(c.href, c.parent ? 0.7 : 0.8, "weekly", getCategoryPhotos(c))),
+    ...getProjects().map((p) => page(p.href, 0.6, "monthly", p.photos)),
     page("/about", 0.7),
     page("/services", 0.7),
     page("/contact", 0.8),

@@ -19,7 +19,7 @@ function buildProjects(categoryByPath: Map<string, Category>): Project[] {
     if (!category) {
       throw new Error(`Projet « ${input.slug} » : catégorie inconnue « ${input.category} » (voir src/data/categories.ts).`);
     }
-    const photos = getFolderPhotos(input.folder);
+    const photos = getFolderPhotos(input.folder).map((photo) => withContextAlt(photo, category));
     return {
       ...input,
       href: `/project/${input.slug}`,
@@ -28,6 +28,19 @@ function buildProjects(categoryByPath: Map<string, Category>): Project[] {
       cover: photos[0] ?? EMPTY_PHOTO,
     };
   });
+}
+
+/**
+ * Texte alternatif enrichi (accessibilité + Google Images) : pour vos photos,
+ * l'équipe et la compétition sont ajoutées si elles n'y figurent pas déjà.
+ * Ex. « Mêlée en touche » → « Mêlée en touche — Rugby ».
+ */
+function withContextAlt(photo: Photo, category: Category): Photo {
+  if (photo.credit) return photo; // photos temporaires : texte d'origine
+  const context = category.parent ? `${category.title}, ${category.parent.title}` : category.title;
+  const plain = (v: string) => v.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  if (plain(photo.alt).includes(plain(category.title))) return photo;
+  return { ...photo, alt: `${photo.alt} — ${context}` };
 }
 
 // -------------------------------------------------------------- categories

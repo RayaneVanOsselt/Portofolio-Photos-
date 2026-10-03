@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CategoryView } from "@/components/portfolio/CategoryView";
-import { getCategories, getCategoryByPath } from "@/lib/portfolio";
-import { pageMetadata } from "@/lib/seo";
+import { getCategories, getCategoryByPath, getCategoryProjects } from "@/lib/portfolio";
+import { categoryDescription, categoryTitle, pageMetadata } from "@/lib/seo";
 
 export const dynamicParams = false;
 
@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: PageProps<"/portfolio/[catego
   const category = getCategoryByPath([slug]);
   if (!category) return {};
   return pageMetadata({
-    title: `${category.title} — Photographie sportive`,
-    description: `${category.intro} ${category.kicker}.`,
+    title: categoryTitle(category),
+    description: categoryDescription(category, getCategoryProjects(category).length),
     path: category.href,
   });
 }

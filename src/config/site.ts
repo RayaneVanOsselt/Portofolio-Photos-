@@ -26,7 +26,7 @@ export const siteConfig = {
     "Photographe sportif — hockey, rugby et football. Reportages de match, portraits d'équipe et contenus pour clubs, au plus près du jeu.",
   /** Langue du contenu (attribut html lang + Open Graph). */
   locale: "fr_BE",
-  language: "fr",
+  language: "fr-BE",
 
   /** URL publique — définie via NEXT_PUBLIC_SITE_URL. */
   url: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "http://localhost:3000",
@@ -47,6 +47,19 @@ export const siteConfig = {
     linkedin: "" as string,
     facebook: "" as string,
     youtube: "" as string,
+  },
+
+  /** Référencement (SEO). */
+  seo: {
+    /**
+     * Ville ou région où vous travaillez, ex. "Bruxelles" ou "Bruxelles et Brabant wallon".
+     * Ajoutée aux titres, descriptions et données structurées : c'est ce qui vous fait
+     * apparaître sur « photographe sportif <ville> ». Laisser vide si non souhaité.
+     */
+    area: "" as string,
+    /** Codes de vérification (Google Search Console, Bing Webmaster Tools). */
+    googleSiteVerification: "" as string,
+    bingSiteVerification: "" as string,
   },
 
   /** Vidéo d'arrière-plan du hero (fichier dans /public), sinon null. */

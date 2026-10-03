@@ -4,6 +4,7 @@ import { Gallery } from "@/components/gallery/Gallery";
 import { MetaList, PageIntro } from "@/components/layout/PageIntro";
 import { ClosingCta } from "@/components/sections/ClosingCta";
 import { PhotoRequestBand } from "@/components/sections/PhotoRequestBand";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { ArrowLink } from "@/components/ui/Button";
 import { ArrowUpRight } from "@/components/ui/Icons";
 import { PhotoImage } from "@/components/ui/PhotoImage";
@@ -11,6 +12,7 @@ import { SectionLabel } from "@/components/ui/SectionLabel";
 import { getCategoryProjects, getCategoryTrail, getNextCategory } from "@/lib/portfolio";
 import type { Category } from "@/lib/types";
 import { formatDate, pad } from "@/lib/utils";
+import { categorySummary, collectionJsonLd, inArea, sportLabel } from "@/lib/seo";
 import { CategoryTiles } from "./CategoryTiles";
 
 /** Page d'une rubrique ou d'une sous-rubrique (équipe). */
@@ -87,7 +89,21 @@ export function CategoryView({ category }: { category: Category }) {
         ))}
       </section>
 
+      {/* Texte de référencement : uniquement des faits issus des données du portfolio */}
+      <section aria-labelledby="category-about-title" className="container-wide pb-[var(--section-space-sm)]">
+        <div className="grid gap-4 border-t border-line pt-8 md:grid-cols-12">
+          <h2 id="category-about-title" className="t-caption text-silver md:col-span-3">
+            {category.title} en bref
+          </h2>
+          <p className="max-w-2xl t-small text-silver md:col-span-8 md:col-start-5">
+            {categorySummary(category, projects.length)} {category.intro} Chaque image peut être agrandie, partagée ou demandée en haute définition
+            {inArea ? ` — photographe sportif${inArea}, spécialisé en ${sportLabel(category)}` : ""}.
+          </p>
+        </div>
+      </section>
+
       <PhotoRequestBand context={category.title} />
+      <JsonLd data={collectionJsonLd(category, projects)} />
       <NextCategory category={next} />
       <ClosingCta />
     </>

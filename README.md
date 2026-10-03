@@ -107,6 +107,24 @@ Le monogramme dessiné (initiales « RV ») se trouve dans `src/components/brand
 Toujours dans `src/config/site.ts` → `contact` (e-mail public, téléphone, zone) et `socials` (URL complètes).
 Une valeur vide masque l'élément en production ; en développement, une étiquette « À configurer » le signale. Même principe pour les chiffres clés et les références de la page À propos (`src/data/content.ts`) : rien n'est inventé, rien n'est affiché tant que ce n'est pas renseigné.
 
+## 7 bis. Référencement (SEO)
+
+Déjà en place automatiquement :
+- titres et descriptions uniques par page, avec le mot-clé en premier (« Red Lions (FIH Pro League) — photos hockey ») ;
+- un texte factuel par rubrique (nombre de photos, équipes, séries, sport) ;
+- données structurées Google : site, activité de photographe et prestations, fil d'Ariane, galeries de photos ;
+- **licence des images** : vos propres photos sont déclarées avec auteur, copyright et lien « Obtenir cette image » (vers le formulaire de demande) — Google Images peut afficher le badge « Licence » ;
+- plan du site (`/sitemap.xml`) avec les images de chaque page, `robots.txt`, liens canoniques, images de partage ;
+- texte alternatif des photos complété automatiquement avec l'équipe et la compétition.
+
+À faire de votre côté (dans `src/config/site.ts` → `seo`) :
+1. **`area`** : votre ville ou région (ex. `"Bruxelles"`). Elle est ajoutée aux titres et descriptions — c'est ce qui vous fait remonter sur « photographe sportif Bruxelles ».
+2. **Google Search Console** (<https://search.google.com/search-console>) : ajoutez la propriété « Préfixe d'URL » avec l'adresse du site, choisissez la méthode « Balise HTML », copiez uniquement le code du `content="…"` dans `googleSiteVerification`, publiez, puis validez. Soumettez ensuite `sitemap.xml`.
+3. Idem pour **Bing Webmaster Tools** avec `bingSiteVerification` (optionnel).
+4. Donnez à vos photos des **noms de fichiers et textes alternatifs descriptifs** (« red-lions-but-van-aubel.jpg » plutôt que « IMG_1234.jpg »).
+5. Renseignez dates et lieux de vos séries dans `src/data/projects.ts`, et écrivez de vraies descriptions : plus il y a de texte utile, mieux c'est.
+6. Ajoutez vos réseaux (Instagram…) : ils sont reliés au site dans les données Google.
+
 ## 8. Configuration du formulaire de contact (Web3Forms)
 
 Le site étant statique (sans serveur), les messages sont transmis par **Web3Forms**, un service gratuit conçu pour ce cas.

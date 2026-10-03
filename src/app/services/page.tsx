@@ -8,12 +8,12 @@ import { PhotoImage } from "@/components/ui/PhotoImage";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { services } from "@/data/services";
 import { getPhotoById } from "@/lib/portfolio";
-import { pageMetadata } from "@/lib/seo";
+import { inArea, pageMetadata } from "@/lib/seo";
 import { pad } from "@/lib/utils";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Services",
-  description: "Couverture de match, portraits d'équipe, contenus pour clubs et partenaires, événements sportifs. Devis sur demande.",
+  title: `Services photo sport${inArea} — matchs, équipes, clubs`,
+  description: `Couverture de match, portraits d'équipe, contenus pour clubs et partenaires, événements sportifs. Photographe sportif${inArea}, devis sur demande.`,
   path: "/services",
 });
 

@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import { Parallax } from "@/components/effects/Parallax";
 import { ButtonLink } from "@/components/ui/Button";
 import { siteConfig } from "@/config/site";
+import { inArea } from "@/lib/seo";
 import type { Photo } from "@/lib/types";
 
 type Props = {
@@ -62,7 +63,7 @@ export function Hero({ photo, eyebrow, primaryCta, secondaryCta }: Props) {
               {secondaryRest ? <span className="ml-[0.08em]">{secondaryRest}</span> : null}
             </span>
           </span>
-          <span className="sr-only"> — {siteConfig.tagline}</span>
+          <span className="sr-only"> — Photographe sportif{inArea} : hockey, rugby et football</span>
         </h1>
 
         <div className="mt-8 flex flex-col gap-8 border-t border-line-strong pt-6 md:mt-10 md:flex-row md:items-center md:justify-between">
