@@ -1,0 +1,64 @@
+/**
+ * Textes des pages. Tout ce qui est entre crochets [ … ] est un emplacement
+ * réservé à remplacer par le vrai contenu — rien n'a été inventé.
+ *
+ * Les références aux photos utilisent leur identifiant (voir src/data/photos.ts).
+ * Si un identifiant n'existe plus (ex. photos temporaires remplacées),
+ * une photo du portfolio est utilisée automatiquement à la place.
+ */
+
+export const homeContent = {
+  hero: {
+    photoId: "ph-1680010090687-6a5e4fe855b8",
+    eyebrow: "Photographe sportif — Hockey / Rugby / Football",
+    primaryCta: { label: "Découvrir le travail", href: "/portfolio" },
+    secondaryCta: { label: "Me contacter", href: "/contact" },
+  },
+  intro: {
+    label: "Approche",
+    statement: "Des images qui capturent l'instant où le match *bascule* — l'effort, le geste, l'émotion.",
+    body: "[VOTRE PHRASE D'INTRODUCTION — qui vous êtes, ce que vous photographiez, pour qui.]",
+  },
+  selectedProjectSlug: "red-lions-serie-01",
+  closing: {
+    label: "Travaillons ensemble",
+    title: "Créons quelque *chose*.",
+    body: "Un match, une saison, un événement ou un projet de club : parlons-en.",
+  },
+};
+
+export const aboutContent = {
+  portraitId: "ph-1777304012262-594db955dce9",
+  wideId: "ph-1780509459807-d47e3571cc99",
+  intro: "[VOTRE PRÉSENTATION — deux ou trois phrases authentiques : qui vous êtes, d'où vous venez, ce qui vous a amené à la photo de sport.]",
+  approach: [
+    { title: "Ma manière de travailler", body: "[COMMENT VOUS TRAVAILLEZ — préparation, placement au bord du terrain, échanges avec le club.]" },
+    { title: "Ma vision", body: "[VOTRE VISION — ce que vous cherchez à montrer dans une image de sport.]" },
+    { title: "La lumière", body: "[VOTRE APPROCHE DE LA LUMIÈRE — projecteurs, matchs en journée, salles, contre-jours.]" },
+    { title: "Les personnes", body: "[VOTRE RAPPORT AUX JOUEURS, STAFFS ET SUPPORTERS.]" },
+    { title: "Les événements", body: "[VOTRE APPROCHE DES ÉVÉNEMENTS ET DES GRANDS RENDEZ-VOUS.]" },
+    { title: "Mon objectif", body: "[VOTRE OBJECTIF PHOTOGRAPHIQUE.]" },
+  ],
+  values: [
+    { title: "Authenticité", body: "Montrer le jeu tel qu'il est, sans mise en scène." },
+    { title: "Créativité", body: "Chercher l'angle, la lumière et le moment que personne n'attend." },
+    { title: "Précision", body: "Anticiper l'action pour être prêt à la fraction de seconde." },
+    { title: "Émotion", body: "Garder la trace de ce que le match a fait ressentir." },
+  ],
+  /**
+   * Chiffres clés : laisser `value` à null tant qu'ils ne sont pas connus.
+   * Les chiffres null sont masqués en production (jamais de faux chiffres).
+   */
+  stats: [
+    { label: "Années d'expérience", value: null as string | null },
+    { label: "Matchs couverts", value: null as string | null },
+    { label: "Clubs & partenaires", value: null as string | null },
+  ],
+  /** Clubs, médias, partenaires : à compléter avec de vraies références uniquement. */
+  clients: [] as string[],
+};
+
+export const contactContent = {
+  title: "Parlons de votre *projet*.",
+  intro: "Match, saison, événement, portraits ou contenus pour votre club : décrivez votre besoin, je vous réponds rapidement.",
+};

@@ -1,0 +1,82 @@
+/**
+ * Configuration centrale du site.
+ *
+ * Tout ce qui concerne l'identité (nom, signature, coordonnées, réseaux)
+ * est défini ici. Modifier ce fichier suffit pour renommer le site :
+ * logo, metadata, footer, e-mails et images sociales se mettent à jour.
+ *
+ * Une valeur vide ("") signifie « pas encore fournie » : l'élément est
+ * masqué en production et signalé comme « à configurer » en développement.
+ */
+
+export const siteConfig = {
+  /** Nom complet, utilisé dans les titres, metadata et e-mails. */
+  name: "Raï VO Capture 0808",
+  /** Les deux lignes du logo. */
+  logo: {
+    primary: "Raï VO",
+    secondary: "Capture 0808",
+    /** Initiales dessinées dans le monogramme (voir components/brand). */
+    monogram: "RV",
+  },
+  /** Signature affichée sous le nom. */
+  tagline: "Photography / Visual Stories",
+  /** Description par défaut (SEO, partage). */
+  description:
+    "Photographe sportif — hockey, rugby et football. Reportages de match, portraits d'équipe et contenus pour clubs, au plus près du jeu.",
+  /** Langue du contenu (attribut html lang + Open Graph). */
+  locale: "fr_BE",
+  language: "fr",
+
+  /** URL publique — définie via NEXT_PUBLIC_SITE_URL. */
+  url: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "http://localhost:3000",
+
+  contact: {
+    /** Adresse affichée publiquement sur le site (pas forcément EMAIL_TO). */
+    email: "" as string,
+    /** Format international conseillé, ex. "+32 470 00 00 00". */
+    phone: "" as string,
+    /** Ville / zone d'intervention, ex. "Bruxelles, Belgique". */
+    location: "" as string,
+  },
+
+  /** Réseaux sociaux : URL complète. Laisser vide pour masquer. */
+  socials: {
+    instagram: "" as string,
+    tiktok: "" as string,
+    linkedin: "" as string,
+    facebook: "" as string,
+    youtube: "" as string,
+  },
+
+  /** Vidéo d'arrière-plan du hero (fichier dans /public), sinon null. */
+  heroVideo: null as null | { src: string; type: string },
+} as const;
+
+export type SocialKey = keyof typeof siteConfig.socials;
+
+export const socialLabels: Record<SocialKey, string> = {
+  instagram: "Instagram",
+  tiktok: "TikTok",
+  linkedin: "LinkedIn",
+  facebook: "Facebook",
+  youtube: "YouTube",
+};
+
+/** Réseaux renseignés, dans l'ordre de déclaration. */
+export function getSocialLinks() {
+  return (Object.keys(siteConfig.socials) as SocialKey[])
+    .filter((key) => siteConfig.socials[key])
+    .map((key) => ({ key, label: socialLabels[key], href: siteConfig.socials[key] }));
+}
+
+/** Navigation principale. Le méga-menu Portfolio est généré depuis data/categories. */
+export const mainNav = [
+  { label: "Accueil", href: "/" },
+  { label: "Portfolio", href: "/portfolio", hasMegaMenu: true },
+  { label: "À propos", href: "/about" },
+  { label: "Services", href: "/services" },
+  { label: "Contact", href: "/contact" },
+] as const;
+
+export const isDev = process.env.NODE_ENV !== "production";
