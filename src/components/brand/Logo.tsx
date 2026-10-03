@@ -23,7 +23,7 @@ export function Logo({ variant = "horizontal", className = "" }: Props) {
     return (
       <span className={`inline-flex items-center gap-2.5 ${className}`}>
         <Monogram className="size-7 shrink-0" />
-        <span className="text-[0.8125rem] font-medium uppercase tracking-[0.14em]">
+        <span className="text-[0.9375rem] font-medium tracking-[-0.01em]">
           {primary}
           <span className="sr-only"> {secondary}</span>
         </span>
@@ -35,7 +35,7 @@ export function Logo({ variant = "horizontal", className = "" }: Props) {
     <span className={`inline-flex items-center gap-3 ${className}`}>
       <Monogram className="size-9 shrink-0" />
       <span className="flex flex-col whitespace-nowrap leading-none">
-        <span className="text-[0.9375rem] font-medium uppercase tracking-[0.14em]">{primary}</span>
+        <span className="text-[1.0625rem] font-medium tracking-[-0.01em]">{primary}</span>
         <span className="mt-1.5 text-[0.625rem] uppercase tracking-[0.32em] opacity-70">{secondary}</span>
       </span>
     </span>

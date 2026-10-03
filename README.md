@@ -1,4 +1,4 @@
-# Raï VO Capture 0808 — Portfolio photographique
+# rayvo.captures0808 — Portfolio photographique
 
 Portfolio de photographie sportive (hockey, rugby, football), publié comme **site statique sur GitHub Pages**. Le code est écrit avec Next.js 16, React 19, TypeScript et Tailwind CSS v4 ; une GitHub Action le compile et ne met en ligne que le site final (HTML, CSS, images).
 Direction artistique inspirée de la référence *Auros* : canevas sarcelle abyssal, typographie grotesque en graisse 500, labels en capitales espacées, aucune ombre, profondeur par surfaces.

@@ -85,6 +85,30 @@ export const ChevronDown = (p: IconProps) => (
   </Base>
 );
 
+export const Camera = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M3.5 7.5h4l1.5-2.5h6l1.5 2.5h4v11h-17z" />
+    <circle cx="12" cy="13" r="3.5" />
+  </Base>
+);
+export const Clock = (p: IconProps) => (
+  <Base {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M12 7.5V12l3 2" />
+  </Base>
+);
+export const PageIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M6 3.5h8l4 4v13H6z" />
+    <path d="M14 3.5v4h4M9 12h6M9 15.5h6" />
+  </Base>
+);
+export const CornerDownLeft = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M19 5v7H6M10 8l-4 4 4 4" />
+  </Base>
+);
+
 /* --- Réseaux sociaux --------------------------------------------------- */
 
 export const Instagram = (p: IconProps) => (

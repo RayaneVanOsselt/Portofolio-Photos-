@@ -78,7 +78,7 @@ export async function renderOgImage({ kicker, title, photo }: { kicker: string; 
               <path d={MONOGRAM_PATHS.letters} />
             </svg>
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <span style={{ fontSize: 24, fontWeight: 500, letterSpacing: 3.5, textTransform: "uppercase" }}>{siteConfig.logo.primary}</span>
+              <span style={{ fontSize: 28, fontWeight: 500, letterSpacing: -0.3 }}>{siteConfig.logo.primary}</span>
               <span style={{ fontSize: 14, letterSpacing: 4.5, textTransform: "uppercase", color: "#bbc7c6", marginTop: 4 }}>{siteConfig.logo.secondary}</span>
             </div>
           </div>

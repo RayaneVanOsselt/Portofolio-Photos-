@@ -24,7 +24,8 @@ export function Hero({ photo, eyebrow, primaryCta, secondaryCta }: Props) {
   const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
   const withBase = (src: string) => (src.startsWith("/") ? `${base}${src}` : src);
   const { primary, secondary } = siteConfig.logo;
-  const [secondaryWord, ...secondaryRest] = secondary.split(" ");
+  // « captures0808 » → « captures » en serif + « 0808 ».
+  const [, secondaryWord = secondary, secondaryRest = ""] = secondary.match(/^(\D+?)\s*(\d*)$/) ?? [];
 
   return (
     <section aria-labelledby="hero-title" className="grain relative isolate flex h-[100svh] min-h-[36rem] flex-col justify-end overflow-hidden bg-deep">
@@ -57,7 +58,8 @@ export function Hero({ photo, eyebrow, primaryCta, secondaryCta }: Props) {
           </span>
           <span className="line-mask">
             <span style={delay(580)}>
-              <span className="t-serif font-normal tracking-[-0.03em] text-phosphor">{secondaryWord}</span> {secondaryRest.join(" ")}
+              <span className="t-serif font-normal tracking-[-0.03em] text-phosphor">{secondaryWord}</span>
+              {secondaryRest ? <span className="ml-[0.08em]">{secondaryRest}</span> : null}
             </span>
           </span>
           <span className="sr-only"> — {siteConfig.tagline}</span>

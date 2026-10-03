@@ -50,3 +50,34 @@ export function searchItems(items: SearchItem[], query: string, limit = 12): Sea
     .slice(0, limit)
     .map((s) => s.item);
 }
+
+/**
+ * Plages [début, fin[ du texte d'origine qui correspondent aux mots recherchés
+ * (insensible aux accents et à la casse) — pour surligner les résultats.
+ */
+export function matchRanges(text: string, query: string): [number, number][] {
+  const tokens = normalize(query).split(" ").filter(Boolean);
+  if (!tokens.length) return [];
+  // Normalisation caractère par caractère : les positions restent alignées sur le texte d'origine.
+  const folded = Array.from(text, (c) =>
+    c.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, " ").charAt(0) || " ",
+  ).join("");
+  const ranges: [number, number][] = [];
+  for (const token of tokens) {
+    let from = 0;
+    let at: number;
+    while ((at = folded.indexOf(token, from)) !== -1) {
+      ranges.push([at, at + token.length]);
+      from = at + token.length;
+    }
+  }
+  ranges.sort((a, b) => a[0] - b[0]);
+  return ranges.reduce<[number, number][]>((merged, r) => {
+    const last = merged.at(-1);
+    if (last && r[0] <= last[1]) last[1] = Math.max(last[1], r[1]);
+    else merged.push([...r]);
+    return merged;
+  }, []);
+}
+
+export const SEARCH_TYPES: SearchItem["type"][] = ["Rubrique", "Équipe", "Série", "Service", "Page"];
