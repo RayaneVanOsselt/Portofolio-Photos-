@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { PhotoImage } from "@/components/ui/PhotoImage";
 import { composeGallery, flexFor, sizesFor, type GalleryRow } from "@/lib/gallery-layout";
 import type { Photo } from "@/lib/types";
@@ -16,6 +16,8 @@ export type GalleryItem = {
 };
 
 type Props = {
+  /** Identifiant unique sur la page : sert aux liens permanents (#photo-<id>-<n>). */
+  id: string;
   items: GalleryItem[];
   /** Libellé accessible de la galerie. */
   label: string;
@@ -23,9 +25,38 @@ type Props = {
   priorityCount?: number;
 };
 
-export function Gallery({ items, label, priorityCount = 0 }: Props) {
+export function Gallery({ id, items, label, priorityCount = 0 }: Props) {
   const rows = useMemo(() => composeGallery(items.map((item) => item.photo)), [items]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const hashPrefix = `#photo-${id}-`;
+  // Tant que le lien d'arrivée n'a pas été lu, on ne touche pas à l'adresse.
+  const hashRead = useRef(false);
+
+  // Lien permanent : /page/#photo-<id>-3 ouvre directement la 3e photo.
+  useEffect(() => {
+    const fromHash = () => {
+      hashRead.current = true;
+      if (!location.hash.startsWith(hashPrefix)) return;
+      const n = Number(location.hash.slice(hashPrefix.length));
+      if (Number.isInteger(n) && n >= 1 && n <= items.length) setOpenIndex(n - 1);
+    };
+    const timer = window.setTimeout(fromHash, 0);
+    window.addEventListener("hashchange", fromHash);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("hashchange", fromHash);
+    };
+  }, [hashPrefix, items.length]);
+
+  // L'adresse suit la photo affichée, sans créer d'entrée d'historique.
+  useEffect(() => {
+    if (!hashRead.current) return;
+    const url = `${location.pathname}${location.search}`;
+    if (openIndex !== null) history.replaceState(history.state, "", `${url}${hashPrefix}${openIndex + 1}`);
+    else if (location.hash.startsWith(hashPrefix)) history.replaceState(history.state, "", url);
+  }, [openIndex, hashPrefix]);
+
+  const permalink = useCallback((index: number) => `${location.origin}${location.pathname}${location.search}${hashPrefix}${index + 1}`, [hashPrefix]);
 
   if (!items.length) {
     return <p className="t-small text-silver">Les photos de cette série arrivent bientôt.</p>;
@@ -38,7 +69,7 @@ export function Gallery({ items, label, priorityCount = 0 }: Props) {
           <Row key={`${r}-${row.items[0]}`} row={row} items={items} total={items.length} priorityCount={priorityCount} onOpen={setOpenIndex} />
         ))}
       </div>
-      <Lightbox items={items} index={openIndex} onClose={() => setOpenIndex(null)} onChange={setOpenIndex} />
+      <Lightbox items={items} permalink={permalink} index={openIndex} onClose={() => setOpenIndex(null)} onChange={setOpenIndex} />
     </>
   );
 }

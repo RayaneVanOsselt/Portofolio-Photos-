@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Gallery } from "@/components/gallery/Gallery";
 import { MetaList, PageIntro } from "@/components/layout/PageIntro";
 import { ClosingCta } from "@/components/sections/ClosingCta";
+import { PhotoRequestBand } from "@/components/sections/PhotoRequestBand";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { ArrowLeft, ArrowRight } from "@/components/ui/Icons";
 import { siteConfig } from "@/config/site";
@@ -56,8 +57,10 @@ export default async function ProjectPage({ params }: PageProps<"/project/[slug]
       />
 
       <section aria-label={`Photos — ${project.title}`} className="container-wide pb-[var(--section-space)]">
-        <Gallery items={project.photos.map((photo) => ({ photo, title: project.title, context }))} label={`Photos — ${project.title}`} priorityCount={2} />
+        <Gallery id={project.slug} items={project.photos.map((photo) => ({ photo, title: project.title, context }))} label={`Photos — ${project.title}`} priorityCount={2} />
       </section>
+
+      <PhotoRequestBand context={project.title} />
 
       <nav aria-label="Autres séries" className="container-wide grid border-y border-line md:grid-cols-2">
         <AdjacentLink project={previous} direction="previous" />

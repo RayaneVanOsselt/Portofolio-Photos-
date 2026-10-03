@@ -3,6 +3,7 @@ import { Parallax } from "@/components/effects/Parallax";
 import { Gallery } from "@/components/gallery/Gallery";
 import { MetaList, PageIntro } from "@/components/layout/PageIntro";
 import { ClosingCta } from "@/components/sections/ClosingCta";
+import { PhotoRequestBand } from "@/components/sections/PhotoRequestBand";
 import { ArrowLink } from "@/components/ui/Button";
 import { ArrowUpRight } from "@/components/ui/Icons";
 import { PhotoImage } from "@/components/ui/PhotoImage";
@@ -78,6 +79,7 @@ export function CategoryView({ category }: { category: Category }) {
               </div>
             </header>
             <Gallery
+              id={project.slug}
               items={project.photos.map((photo) => ({ photo, title: project.title, context: trail.map((c) => c.title).join(" · ") }))}
               label={`Photos — ${project.title}`}
             />
@@ -85,6 +87,7 @@ export function CategoryView({ category }: { category: Category }) {
         ))}
       </section>
 
+      <PhotoRequestBand context={category.title} />
       <NextCategory category={next} />
       <ClosingCta />
     </>

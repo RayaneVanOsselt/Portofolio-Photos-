@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
-import { ArrowRight, ArrowUpRight, Close, CornerDownLeft, Search } from "@/components/ui/Icons";
+import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { ArrowRight, ArrowUpRight, Close, Search } from "@/components/ui/Icons";
 import { useAnimatedDialog } from "@/hooks/useAnimatedDialog";
 import { SEARCH_TYPES, searchItems, type SearchItem } from "@/lib/search";
 import { Highlight, Thumb } from "./SearchParts";
@@ -208,13 +208,10 @@ export function SearchDialog({ open, onClose, index }: Props) {
           <button
             type="button"
             onClick={close}
-            className="-mr-1 grid size-10 shrink-0 place-items-center rounded-[var(--radius-sm)] text-silver transition-colors hover:bg-kelp hover:text-platinum sm:hidden"
+            className="-mr-1 grid size-10 shrink-0 place-items-center rounded-[var(--radius-sm)] text-silver transition-colors hover:bg-kelp hover:text-platinum"
             aria-label="Fermer la recherche"
           >
             <Close size={20} />
-          </button>
-          <button type="button" onClick={close} className="hidden shrink-0 sm:block" aria-label="Fermer la recherche">
-            <Kbd>Échap</Kbd>
           </button>
         </form>
 
@@ -307,27 +304,14 @@ export function SearchDialog({ open, onClose, index }: Props) {
 
         {/* Pied */}
         <div className="hidden shrink-0 items-center justify-between gap-4 border-t border-line bg-abyss/60 px-6 py-3 text-[0.6875rem] text-silver sm:flex">
-          <span className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5">
-              <Kbd>↑</Kbd>
-              <Kbd>↓</Kbd> naviguer
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Kbd>↵</Kbd> ouvrir
-            </span>
-            {trimmed && allResults.length ? (
-              <span className="flex items-center gap-1.5">
-                <Kbd>Tab</Kbd> filtrer
-              </span>
-            ) : null}
-          </span>
+          <span>{trimmed && allResults.length ? `${allResults.length} résultat${allResults.length > 1 ? "s" : ""}` : "Hockey · Rugby · Football"}</span>
           {trimmed && allResults.length ? (
             <button type="button" onClick={showAll} className="group flex items-center gap-2 font-medium tracking-[0.04em] text-platinum">
               Voir les {allResults.length} résultats
               <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
             </button>
           ) : (
-            <span>{index.length} pages indexées</span>
+            <span>Tout le portfolio, en un seul endroit</span>
           )}
         </div>
       </div>
@@ -377,7 +361,7 @@ function Row({ entry, id, query, recent, active, onHover, onSelect }: ItemProps 
         {item.type}
       </span>
       <span className={`grid size-7 shrink-0 place-items-center rounded-[4px] transition-opacity ${active ? "bg-phosphor text-ink opacity-100" : "opacity-0"}`} aria-hidden>
-        <CornerDownLeft size={14} />
+        <ArrowUpRight size={14} />
       </span>
     </Link>
   );
@@ -445,8 +429,4 @@ function EmptyState({ query, categories, onPick, onClose }: { query: string; cat
       </p>
     </div>
   );
-}
-
-function Kbd({ children }: { children: ReactNode }) {
-  return <kbd className="inline-grid min-w-6 place-items-center rounded-[4px] border border-line bg-kelp/60 px-1.5 py-0.5 font-sans text-[0.625rem] font-medium text-mist">{children}</kbd>;
 }

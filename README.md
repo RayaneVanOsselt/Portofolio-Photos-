@@ -78,11 +78,17 @@ Sans clé Web3Forms **en local**, le formulaire fonctionne mais le message est a
 
 Le script crée aussi, pour chaque photo, des versions WebP légères (640 à 2400 px, dans `public/_photos/`, non commitées) : le navigateur charge la taille adaptée à l'écran, et les images hors écran sont chargées de façon différée. `npm run dev` et `npm run build` lancent ce script automatiquement. Un dossier rempli remplace aussitôt les photos temporaires correspondantes.
 
+**Réglages de prise de vue** : le boîtier, l'objectif, la focale, l'ouverture, la vitesse et l'ISO sont lus automatiquement dans vos fichiers (EXIF) et affichés dans la visionneuse. La position GPS n'est jamais lue, et les versions mises en ligne ne contiennent aucune métadonnée. Exportez vos photos depuis Lightroom en conservant les métadonnées « Tout sauf les informations de localisation » pour en profiter.
+
 **Nouvelle série (nouveau match)** : créez un sous-dossier, par ex. `public/images/portfolio/fih-pro-league/red-lions/2026-03-belgique-pays-bas/`, lancez `npm run photos`, puis ajoutez une entrée dans `src/data/projects.ts` avec `folder: "portfolio/fih-pro-league/red-lions/2026-03-belgique-pays-bas"`.
 
 **Photo du hero, de la page À propos, des services** : indiquez l'identifiant de la photo dans `src/data/content.ts` et `src/data/services.ts`. L'identifiant d'une photo locale est `dossier/fichier`, par ex. `portfolio/rugby/01-melee.jpg`. Si un identifiant n'existe pas, une photo du portfolio est utilisée.
 
 Une fois toutes les photos temporaires remplacées, vous pouvez supprimer `src/data/placeholder-photos.ts` (et son import dans `src/data/photos.ts`) ainsi que le cas Unsplash dans `src/lib/image-loader.ts`.
+
+### Visionneuse et demandes de photos
+
+Chaque photo possède un lien permanent (`…/#photo-<série>-<numéro>`) : il peut être partagé (bouton « Partager ») et rouvre directement la photo. Le bouton « Demander cette photo » ouvre le formulaire de contact pré-rempli (type « Demande d'une photo », numéro et lien de l'image) : pratique pour les joueurs, parents et clubs. Un encart « Vous êtes sur une photo ? » rappelle cette possibilité en bas des pages de rubriques et de séries.
 
 ## 5. Ajouter ou modifier des rubriques
 

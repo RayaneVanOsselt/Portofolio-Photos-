@@ -109,6 +109,22 @@ export const CornerDownLeft = (p: IconProps) => (
   </Base>
 );
 
+export const Share = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M12 15V3.5M7.5 8 12 3.5 16.5 8M5 12.5v8h14v-8" />
+  </Base>
+);
+export const Expand = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" />
+  </Base>
+);
+export const Shrink = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5" />
+  </Base>
+);
+
 /* --- Réseaux sociaux --------------------------------------------------- */
 
 export const Instagram = (p: IconProps) => (

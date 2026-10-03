@@ -6,6 +6,7 @@ import { services } from "@/data/services";
 
 export const PROJECT_TYPES = [
   ...services.map((s) => ({ value: s.slug, label: s.title })),
+  { value: "demande-photo", label: "Demande d'une photo (joueur, parent, club)" },
   { value: "autre", label: "Autre projet" },
 ] as const;
 

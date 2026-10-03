@@ -25,11 +25,12 @@ const MIN_FILL_TIME_MS = 2500;
 
 type Status = { kind: "idle" } | { kind: "sending" } | { kind: "success"; simulated?: boolean } | { kind: "error"; message: string };
 
-export function ContactForm({ initialProjectType = "" }: { initialProjectType?: string }) {
+export function ContactForm({ initialProjectType = "", initialMessage = "" }: { initialProjectType?: string; initialMessage?: string }) {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const [values, setValues] = useState<ContactValues>(() => ({
     ...EMPTY,
     projectType: PROJECT_TYPES.some((t) => t.value === initialProjectType) ? initialProjectType : "",
+    message: initialMessage,
   }));
   const [errors, setErrors] = useState<FieldErrors>({});
   const [attempted, setAttempted] = useState(false);

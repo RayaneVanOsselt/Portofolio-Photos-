@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { SearchDialog } from "@/components/search/SearchDialog";
 import { ButtonLink } from "@/components/ui/Button";
@@ -14,8 +14,6 @@ import { isActivePath } from "@/lib/utils";
 import { MegaMenu } from "./MegaMenu";
 import { MobileMenu } from "./MobileMenu";
 
-const noopSubscribe = () => () => {};
-
 type Props = { portfolioNav: NavCategory[]; searchIndex: SearchItem[] };
 
 export function Header({ portfolioNav, searchIndex }: Props) {
@@ -24,12 +22,6 @@ export function Header({ portfolioNav, searchIndex }: Props) {
   const [megaOpen, setMegaOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  // Raccourci affiché selon le système (⌘ sur Mac, Ctrl ailleurs).
-  const shortcut = useSyncExternalStore(
-    noopSubscribe,
-    () => (/Mac|iPhone|iPad/.test(navigator.userAgent) ? "⌘ K" : "Ctrl K"),
-    () => "Ctrl K",
-  );
   const hoverTimer = useRef<number | undefined>(undefined);
   const megaButtonRef = useRef<HTMLButtonElement>(null);
   const focusMegaOnOpen = useRef(false);
@@ -176,17 +168,14 @@ export function Header({ portfolioNav, searchIndex }: Props) {
                 closeMega();
                 setSearchOpen(true);
               }}
-              className="group flex h-11 items-center gap-3 rounded-[var(--radius-sm)] px-3 text-silver transition-[color,border-color,background-color] duration-300 hover:text-platinum lg:h-10 lg:w-48 lg:border lg:border-line lg:bg-[rgb(237_255_254/0.04)] lg:pr-2 lg:hover:border-line-strong lg:hover:bg-[rgb(237_255_254/0.07)] xl:w-64"
-              aria-label={`Rechercher (raccourci : ${shortcut})`}
+              className="group flex h-11 items-center gap-3 rounded-[var(--radius-sm)] px-3 text-silver transition-[color,border-color,background-color] duration-300 hover:text-platinum lg:h-10 lg:w-48 lg:border lg:border-line lg:bg-[rgb(237_255_254/0.04)] lg:pr-3 lg:hover:border-line-strong lg:hover:bg-[rgb(237_255_254/0.07)] xl:w-64"
+              aria-label="Rechercher sur le site"
               aria-haspopup="dialog"
             >
               <Search size={17} className="shrink-0" />
               <span className="hidden flex-1 truncate text-left text-[0.8125rem] text-silver/80 transition-colors group-hover:text-silver lg:inline">
                 Rechercher<span className="hidden xl:inline"> une équipe, un match…</span>
               </span>
-              <kbd className="hidden shrink-0 rounded-[4px] border border-line bg-kelp/60 px-1.5 py-0.5 font-sans text-[0.625rem] font-medium text-mist lg:inline">
-                {shortcut}
-              </kbd>
             </button>
 
             <span className="hidden xl:block">

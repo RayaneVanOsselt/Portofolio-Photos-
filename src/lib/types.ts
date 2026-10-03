@@ -9,6 +9,8 @@ export type Photo = {
   color?: string;
   /** Mini-aperçu flou (généré par `npm run photos`). */
   blurDataURL?: string;
+  /** Réglages de prise de vue (lus par `npm run photos`), sans aucune donnée GPS. */
+  exif?: { camera?: string; lens?: string; focal?: string; aperture?: string; shutter?: string; iso?: string; date?: string };
   /** Crédit — uniquement pour les photos temporaires. */
   credit?: { name: string; url: string };
 };
