@@ -67,7 +67,7 @@ function FilterableGalleryView({ filters, items, active, onSelect }: Props & { a
       <p className="sr-only" aria-live="polite">
         {shown.length} photos affichées
       </p>
-      <Gallery key={active} items={shown} label="Toutes les photos du portfolio" />
+      <Gallery key={active} id={`portfolio-${active}`} items={shown} label="Toutes les photos du portfolio" />
     </div>
   );
 }

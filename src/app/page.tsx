@@ -12,9 +12,13 @@ import { aboutContent, homeContent } from "@/data/content";
 import { services } from "@/data/services";
 import { toIndexEntries } from "@/lib/index-entries";
 import { getCategories, getFeaturedProjects, getPhotoById, getProjectBySlug, getProjects } from "@/lib/portfolio";
-import { pageMetadata } from "@/lib/seo";
+import { homeTitle, inArea, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = pageMetadata({ title: "Photographe sportif", path: "/" });
+export const metadata: Metadata = pageMetadata({
+  title: homeTitle,
+  description: `Photographe sportif${inArea} : hockey sur gazon, rugby et football. Reportages de match, portraits d'équipe et contenus pour clubs, au plus près du jeu.`,
+  path: "/",
+});
 
 export default function HomePage() {
   const featured = getFeaturedProjects();

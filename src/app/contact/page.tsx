@@ -7,10 +7,10 @@ import { ArrowUpRight, socialIcons } from "@/components/ui/Icons";
 import { Todo } from "@/components/ui/Todo";
 import { getSocialLinks, siteConfig } from "@/config/site";
 import { contactContent } from "@/data/content";
-import { pageMetadata } from "@/lib/seo";
+import { inArea, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Contact",
+  title: `Contact & devis — photographe sportif${inArea}`,
   description: "Une demande de devis, un match, une saison ou un événement à couvrir ? Envoyez votre demande, je vous réponds rapidement.",
   path: "/contact",
 });

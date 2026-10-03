@@ -9,7 +9,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { siteConfig } from "@/config/site";
 import { getPortfolioNav } from "@/lib/navigation";
 import { buildSearchIndex } from "@/lib/search-index";
-import { businessJsonLd } from "@/lib/seo";
+import { businessJsonLd, homeTitle, websiteJsonLd } from "@/lib/seo";
 import "./globals.css";
 
 const interTight = Inter_Tight({
@@ -27,24 +27,32 @@ const instrumentSerif = Instrument_Serif({
   display: "swap",
 });
 
+const { googleSiteVerification, bingSiteVerification } = siteConfig.seo;
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
-  title: { default: `${siteConfig.name} — Photographe sportif`, template: `${siteConfig.name} — %s` },
+  title: { default: `${homeTitle} | ${siteConfig.name}`, template: `%s | ${siteConfig.name}` },
   description: siteConfig.description,
   applicationName: siteConfig.name,
   authors: [{ name: siteConfig.name }],
   creator: siteConfig.name,
+  publisher: siteConfig.name,
+  category: "photography",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     siteName: siteConfig.name,
     locale: siteConfig.locale,
     url: "/",
-    title: `${siteConfig.name} — Photographe sportif`,
+    title: `${homeTitle} | ${siteConfig.name}`,
     description: siteConfig.description,
   },
   twitter: { card: "summary_large_image" },
   formatDetection: { telephone: false, email: false, address: false },
+  verification: {
+    ...(googleSiteVerification ? { google: googleSiteVerification } : {}),
+    ...(bingSiteVerification ? { other: { "msvalidate.01": bingSiteVerification } } : {}),
+  },
 };
 
 export const viewport: Viewport = {
@@ -83,6 +91,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
         <RevealObserver />
         <CustomCursor />
+        <JsonLd data={websiteJsonLd()} />
         <JsonLd data={businessJsonLd()} />
       </body>
     </html>

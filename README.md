@@ -78,11 +78,17 @@ Sans clé Web3Forms **en local**, le formulaire fonctionne mais le message est a
 
 Le script crée aussi, pour chaque photo, des versions WebP légères (640 à 2400 px, dans `public/_photos/`, non commitées) : le navigateur charge la taille adaptée à l'écran, et les images hors écran sont chargées de façon différée. `npm run dev` et `npm run build` lancent ce script automatiquement. Un dossier rempli remplace aussitôt les photos temporaires correspondantes.
 
+**Réglages de prise de vue** : le boîtier, l'objectif, la focale, l'ouverture, la vitesse et l'ISO sont lus automatiquement dans vos fichiers (EXIF) et affichés dans la visionneuse. La position GPS n'est jamais lue, et les versions mises en ligne ne contiennent aucune métadonnée. Exportez vos photos depuis Lightroom en conservant les métadonnées « Tout sauf les informations de localisation » pour en profiter.
+
 **Nouvelle série (nouveau match)** : créez un sous-dossier, par ex. `public/images/portfolio/fih-pro-league/red-lions/2026-03-belgique-pays-bas/`, lancez `npm run photos`, puis ajoutez une entrée dans `src/data/projects.ts` avec `folder: "portfolio/fih-pro-league/red-lions/2026-03-belgique-pays-bas"`.
 
 **Photo du hero, de la page À propos, des services** : indiquez l'identifiant de la photo dans `src/data/content.ts` et `src/data/services.ts`. L'identifiant d'une photo locale est `dossier/fichier`, par ex. `portfolio/rugby/01-melee.jpg`. Si un identifiant n'existe pas, une photo du portfolio est utilisée.
 
 Une fois toutes les photos temporaires remplacées, vous pouvez supprimer `src/data/placeholder-photos.ts` (et son import dans `src/data/photos.ts`) ainsi que le cas Unsplash dans `src/lib/image-loader.ts`.
+
+### Visionneuse et demandes de photos
+
+Chaque photo possède un lien permanent (`…/#photo-<série>-<numéro>`) : il peut être partagé (bouton « Partager ») et rouvre directement la photo. Le bouton « Demander cette photo » ouvre le formulaire de contact pré-rempli (type « Demande d'une photo », numéro et lien de l'image) : pratique pour les joueurs, parents et clubs. Un encart « Vous êtes sur une photo ? » rappelle cette possibilité en bas des pages de rubriques et de séries.
 
 ## 5. Ajouter ou modifier des rubriques
 
@@ -100,6 +106,24 @@ Le monogramme dessiné (initiales « RV ») se trouve dans `src/components/brand
 
 Toujours dans `src/config/site.ts` → `contact` (e-mail public, téléphone, zone) et `socials` (URL complètes).
 Une valeur vide masque l'élément en production ; en développement, une étiquette « À configurer » le signale. Même principe pour les chiffres clés et les références de la page À propos (`src/data/content.ts`) : rien n'est inventé, rien n'est affiché tant que ce n'est pas renseigné.
+
+## 7 bis. Référencement (SEO)
+
+Déjà en place automatiquement :
+- titres et descriptions uniques par page, avec le mot-clé en premier (« Red Lions (FIH Pro League) — photos hockey ») ;
+- un texte factuel par rubrique (nombre de photos, équipes, séries, sport) ;
+- données structurées Google : site, activité de photographe et prestations, fil d'Ariane, galeries de photos ;
+- **licence des images** : vos propres photos sont déclarées avec auteur, copyright et lien « Obtenir cette image » (vers le formulaire de demande) — Google Images peut afficher le badge « Licence » ;
+- plan du site (`/sitemap.xml`) avec les images de chaque page, `robots.txt`, liens canoniques, images de partage ;
+- texte alternatif des photos complété automatiquement avec l'équipe et la compétition.
+
+À faire de votre côté (dans `src/config/site.ts` → `seo`) :
+1. **`area`** : votre ville ou région (ex. `"Bruxelles"`). Elle est ajoutée aux titres et descriptions — c'est ce qui vous fait remonter sur « photographe sportif Bruxelles ».
+2. **Google Search Console** (<https://search.google.com/search-console>) : ajoutez la propriété « Préfixe d'URL » avec l'adresse du site, choisissez la méthode « Balise HTML », copiez uniquement le code du `content="…"` dans `googleSiteVerification`, publiez, puis validez. Soumettez ensuite `sitemap.xml`.
+3. Idem pour **Bing Webmaster Tools** avec `bingSiteVerification` (optionnel).
+4. Donnez à vos photos des **noms de fichiers et textes alternatifs descriptifs** (« red-lions-but-van-aubel.jpg » plutôt que « IMG_1234.jpg »).
+5. Renseignez dates et lieux de vos séries dans `src/data/projects.ts`, et écrivez de vraies descriptions : plus il y a de texte utile, mieux c'est.
+6. Ajoutez vos réseaux (Instagram…) : ils sont reliés au site dans les données Google.
 
 ## 8. Configuration du formulaire de contact (Web3Forms)
 

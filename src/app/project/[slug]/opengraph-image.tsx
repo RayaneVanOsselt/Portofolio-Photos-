@@ -3,7 +3,7 @@ import { getProjectBySlug, getProjects } from "@/lib/portfolio";
 
 export const size = OG_SIZE;
 export const contentType = "image/png";
-export const alt = "Série photo";
+export const alt = "Aperçu de la série — photos de sport par rayvo.captures0808";
 
 export function generateStaticParams() {
   return getProjects().map((p) => ({ slug: p.slug }));

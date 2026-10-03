@@ -1,14 +1,17 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { ArrowLeft, ArrowRight, Close, ZoomIn, ZoomOut } from "@/components/ui/Icons";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Close, Expand, Share, Shrink, ZoomIn, ZoomOut } from "@/components/ui/Icons";
 import { useAnimatedDialog } from "@/hooks/useAnimatedDialog";
 import { pad } from "@/lib/utils";
 import type { GalleryItem } from "./Gallery";
 
 type Props = {
   items: GalleryItem[];
+  /** Lien permanent de la photo affichée (partage, demande de photo). */
+  permalink: (index: number) => string;
   index: number | null;
   onClose: () => void;
   onChange: (index: number) => void;
@@ -16,7 +19,7 @@ type Props = {
 
 const SWIPE_THRESHOLD = 50;
 
-export function Lightbox({ items, index, onClose, onChange }: Props) {
+export function Lightbox({ items, permalink, index, onClose, onChange }: Props) {
   const open = index !== null;
   const dialogRef = useAnimatedDialog(open, onClose, 400);
   // Garde la dernière image affichée pendant l'animation de fermeture.
@@ -27,6 +30,21 @@ export function Lightbox({ items, index, onClose, onChange }: Props) {
   const pointerType = useRef("mouse");
   const swiped = useRef(false);
   const stageRef = useRef<HTMLDivElement>(null);
+  const stripRef = useRef<HTMLDivElement>(null);
+  const [copied, setCopied] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
+
+  // Plein écran : on suit l'état réel (la touche Échap du navigateur le quitte aussi).
+  useEffect(() => {
+    const onChange = () => setFullscreen(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
+
+  // La vignette active reste visible dans le bandeau.
+  useEffect(() => {
+    stripRef.current?.querySelector(`[data-thumb="${index}"]`)?.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
+  }, [index]);
 
   if (index !== null && index !== shownIndex) {
     setDirection(index > shownIndex ? 1 : -1);
@@ -45,8 +63,30 @@ export function Lightbox({ items, index, onClose, onChange }: Props) {
 
   const close = useCallback(() => {
     setZoom(null);
+    if (document.fullscreenElement) void document.exitFullscreen();
     onClose();
   }, [onClose]);
+
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) void document.exitFullscreen();
+    else void dialogRef.current?.requestFullscreen?.().catch(() => {});
+  };
+
+  const share = async () => {
+    const url = permalink(shownIndex);
+    const title = items[shownIndex]?.title ?? document.title;
+    try {
+      if (navigator.share && window.matchMedia("(pointer: coarse)").matches) {
+        await navigator.share({ title, url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2200);
+    } catch {
+      /* partage annulé par l'utilisateur */
+    }
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -61,6 +101,8 @@ export function Lightbox({ items, index, onClose, onChange }: Props) {
   const item = items[shownIndex];
   if (!item) return null;
   const { photo } = item;
+  const exifLine = photo.exif ? [photo.exif.camera, photo.exif.lens, photo.exif.focal, photo.exif.aperture, photo.exif.shutter, photo.exif.iso].filter(Boolean).join("  ·  ") : "";
+  const requestHref = `/contact/?photo=${encodeURIComponent(`n°${shownIndex + 1} — ${item.title ?? photo.alt}`)}&lien=${encodeURIComponent(open ? permalink(shownIndex) : "")}`;
   const neighbours = count > 1 ? [items[(shownIndex + 1) % count], items[(shownIndex - 1 + count) % count]] : [];
 
   const toggleZoom = (clientX?: number, clientY?: number) => {
@@ -115,6 +157,26 @@ export function Lightbox({ items, index, onClose, onChange }: Props) {
             <span className="text-silver"> / {pad(count)}</span>
           </p>
           <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={share}
+              className="flex h-11 items-center gap-2 rounded-[var(--radius-sm)] px-3 text-silver transition-colors hover:bg-kelp hover:text-platinum"
+              aria-label="Partager cette photo"
+            >
+              {copied ? <Check size={18} className="text-phosphor" /> : <Share size={18} />}
+              <span className="hidden t-caption sm:inline" aria-live="polite">
+                {copied ? "Lien copié" : "Partager"}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={toggleFullscreen}
+              className="hidden size-11 place-items-center rounded-[var(--radius-sm)] text-silver transition-colors hover:bg-kelp hover:text-platinum md:grid"
+              aria-label={fullscreen ? "Quitter le plein écran" : "Plein écran"}
+              aria-pressed={fullscreen}
+            >
+              {fullscreen ? <Shrink size={20} /> : <Expand size={20} />}
+            </button>
             <button
               type="button"
               onClick={() => toggleZoom()}
@@ -193,11 +255,34 @@ export function Lightbox({ items, index, onClose, onChange }: Props) {
           ) : null}
         </div>
 
+        {/* Bandeau de vignettes */}
+        {count > 1 ? (
+          <div ref={stripRef} className="lightbox-chrome hidden gap-2 overflow-x-auto px-[var(--gutter)] pt-4 [scrollbar-width:none] md:flex [&::-webkit-scrollbar]:hidden" aria-label="Toutes les photos de la série">
+            {items.map((it, i) => (
+              <button
+                key={it.photo.id}
+                type="button"
+                data-thumb={i}
+                onClick={() => onChange(i)}
+                aria-label={`Afficher la photo ${i + 1}`}
+                aria-current={i === shownIndex}
+                className={`relative h-14 shrink-0 overflow-hidden rounded-[4px] transition-[opacity,outline-color] duration-300 outline-offset-2 ${
+                  i === shownIndex ? "opacity-100 outline outline-1 outline-phosphor" : "opacity-45 outline-transparent hover:opacity-90"
+                }`}
+                style={{ aspectRatio: `${it.photo.width} / ${it.photo.height}`, backgroundColor: it.photo.color }}
+              >
+                {open ? <Image src={it.photo.src} alt="" fill sizes="100px" className="object-cover" /> : null}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
         {/* Légende */}
-        <div className="lightbox-chrome flex min-h-20 items-end justify-between gap-6 px-[var(--gutter)] pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+        <div className="lightbox-chrome flex min-h-20 items-end justify-between gap-6 px-[var(--gutter)] pt-4 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
           <div id="lightbox-caption" className="min-w-0">
             {item.title ? <p className="truncate text-[0.9375rem] font-medium text-platinum">{item.title}</p> : null}
             <p className="truncate t-small text-silver">{item.context ?? photo.alt}</p>
+            {exifLine ? <p className="mt-1.5 hidden truncate font-mono text-[0.6875rem] tracking-[0.02em] text-silver/80 sm:block">{exifLine}</p> : null}
             {photo.credit ? (
               <p className="mt-1 t-caption text-silver/80">
                 Photo temporaire —{" "}
@@ -208,6 +293,17 @@ export function Lightbox({ items, index, onClose, onChange }: Props) {
               </p>
             ) : null}
           </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <Link
+              href={requestHref}
+              className="group hidden h-12 items-center gap-3 rounded-[var(--radius-sm)] bg-[image:var(--gradient-aurora)] px-5 t-label text-ink sm:inline-flex"
+            >
+              Demander cette photo
+              <ArrowUpRight className="transition-transform duration-500 group-hover:rotate-45" />
+            </Link>
+            <Link href={requestHref} className="grid size-12 place-items-center rounded-[var(--radius-sm)] bg-[image:var(--gradient-aurora)] text-ink sm:hidden" aria-label="Demander cette photo">
+              <ArrowUpRight size={20} />
+            </Link>
           {count > 1 ? (
             <div className="flex shrink-0 gap-2 md:hidden">
               <button type="button" onClick={() => go(-1)} className="grid size-12 place-items-center rounded-[var(--radius-sm)] bg-kelp text-platinum" aria-label="Photo précédente">
@@ -218,6 +314,7 @@ export function Lightbox({ items, index, onClose, onChange }: Props) {
               </button>
             </div>
           ) : null}
+          </div>
         </div>
       </div>
     </dialog>

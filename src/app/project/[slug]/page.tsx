@@ -4,11 +4,11 @@ import { notFound } from "next/navigation";
 import { Gallery } from "@/components/gallery/Gallery";
 import { MetaList, PageIntro } from "@/components/layout/PageIntro";
 import { ClosingCta } from "@/components/sections/ClosingCta";
+import { PhotoRequestBand } from "@/components/sections/PhotoRequestBand";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { ArrowLeft, ArrowRight } from "@/components/ui/Icons";
-import { siteConfig } from "@/config/site";
 import { getAdjacentProjects, getCategoryTrail, getProjectBySlug, getProjects } from "@/lib/portfolio";
-import { absoluteUrl, pageMetadata } from "@/lib/seo";
+import { inArea, pageMetadata, projectJsonLd, sportLabel } from "@/lib/seo";
 import type { Project } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: PageProps<"/project/[slug]">)
   const where = getCategoryTrail(project.category).map((c) => c.title).join(" · ");
   return pageMetadata({
     title: project.title,
-    description: `Série photo ${project.title} — ${where}. ${project.photos.length} photos.`,
+    description: `Série photo ${project.title} (${where}) : ${project.photos.length} photos de ${sportLabel(project.category)}${project.location ? ` à ${project.location}` : ""}. Photographe sportif${inArea}.`,
     path: project.href,
   });
 }
@@ -56,8 +56,10 @@ export default async function ProjectPage({ params }: PageProps<"/project/[slug]
       />
 
       <section aria-label={`Photos — ${project.title}`} className="container-wide pb-[var(--section-space)]">
-        <Gallery items={project.photos.map((photo) => ({ photo, title: project.title, context }))} label={`Photos — ${project.title}`} priorityCount={2} />
+        <Gallery id={project.slug} items={project.photos.map((photo) => ({ photo, title: project.title, context }))} label={`Photos — ${project.title}`} priorityCount={2} />
       </section>
+
+      <PhotoRequestBand context={project.title} />
 
       <nav aria-label="Autres séries" className="container-wide grid border-y border-line md:grid-cols-2">
         <AdjacentLink project={previous} direction="previous" />
@@ -67,23 +69,7 @@ export default async function ProjectPage({ params }: PageProps<"/project/[slug]
       <div className="h-[var(--section-space-sm)]" />
       <ClosingCta />
 
-      <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@type": "ImageGallery",
-          name: project.title,
-          description: project.description,
-          url: absoluteUrl(project.href),
-          author: { "@id": absoluteUrl("/#business") },
-          ...(project.date ? { dateCreated: project.date } : {}),
-          image: project.photos.slice(0, 10).map((photo) => ({
-            "@type": "ImageObject",
-            contentUrl: photo.src.startsWith("http") ? photo.src : absoluteUrl(photo.src),
-            description: photo.alt,
-            creator: { "@type": "Organization", name: photo.credit ? photo.credit.name : siteConfig.name },
-          })),
-        }}
-      />
+      <JsonLd data={projectJsonLd(project)} />
     </>
   );
 }

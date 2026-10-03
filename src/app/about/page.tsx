@@ -9,12 +9,12 @@ import { Todo } from "@/components/ui/Todo";
 import { isDev, siteConfig } from "@/config/site";
 import { aboutContent } from "@/data/content";
 import { getPhotoById } from "@/lib/portfolio";
-import { pageMetadata } from "@/lib/seo";
+import { inArea, pageMetadata } from "@/lib/seo";
 import { pad } from "@/lib/utils";
 
 export const metadata: Metadata = pageMetadata({
-  title: "À propos",
-  description: `Le photographe derrière ${siteConfig.name} : approche, vision et valeurs.`,
+  title: `À propos — photographe sportif${inArea}`,
+  description: `Le photographe derrière ${siteConfig.name} : approche, vision et valeurs. Photographie de hockey, rugby et football${inArea}.`,
   path: "/about",
 });
 

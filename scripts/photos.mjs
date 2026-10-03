@@ -12,12 +12,17 @@
  * - Chaque photo est déclinée en WebP (640, 1080, 1600, 2400 px) dans
  *   public/_photos/ : le site charge la taille adaptée à l'écran.
  *   Les déclinaisons existantes et à jour ne sont pas recalculées.
+ * - Les réglages de prise de vue (boîtier, objectif, focale, ouverture,
+ *   vitesse, ISO) sont lus dans les données EXIF et affichés dans la
+ *   visionneuse. La localisation GPS n'est jamais lue ni publiée, et les
+ *   versions WebP mises en ligne ne contiennent aucune métadonnée.
  * - Les fichiers trop lourds sont signalés (le site les redimensionne, mais
  *   des originaux de plus de 3000 px ralentissent le premier affichage).
  */
 import { existsSync } from "node:fs";
 import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import { dirname, join, relative, sep } from "node:path";
+import exifReader from "exif-reader";
 import sharp from "sharp";
 
 const ROOT = process.cwd();
@@ -37,6 +42,30 @@ async function writeVariants(fullPath, rel, sourceTime) {
     if (existsSync(target) && (await stat(target)).mtimeMs >= sourceTime) continue;
     await mkdir(dirname(target), { recursive: true });
     await sharp(fullPath).rotate().resize({ width, withoutEnlargement: true }).webp({ quality: 78 }).toFile(target);
+  }
+}
+
+/** Réglages de prise de vue lisibles (sans GPS). Undefined si absents. */
+function readExif(buffer) {
+  if (!buffer) return undefined;
+  try {
+    const { Image: img = {}, Photo: shot = {} } = exifReader(buffer);
+    const make = img.Make?.trim();
+    const model = img.Model?.trim();
+    const iso = Array.isArray(shot.ISOSpeedRatings) ? shot.ISOSpeedRatings[0] : shot.ISOSpeedRatings;
+    const exif = {
+      camera: model ? (make && !model.toLowerCase().startsWith(make.toLowerCase().split(" ")[0]) ? `${make} ${model}` : model) : make,
+      lens: shot.LensModel?.trim() || undefined,
+      focal: shot.FocalLength ? `${Math.round(shot.FocalLength)} mm` : undefined,
+      aperture: shot.FNumber ? `f/${Number(shot.FNumber.toFixed(1))}` : undefined,
+      shutter: shot.ExposureTime ? (shot.ExposureTime >= 1 ? `${shot.ExposureTime} s` : `1/${Math.round(1 / shot.ExposureTime)} s`) : undefined,
+      iso: iso ? `ISO ${iso}` : undefined,
+      date: shot.DateTimeOriginal instanceof Date ? shot.DateTimeOriginal.toISOString().slice(0, 10) : undefined,
+    };
+    const clean = Object.fromEntries(Object.entries(exif).filter(([, v]) => v));
+    return Object.keys(clean).length ? clean : undefined;
+  } catch {
+    return undefined;
   }
 }
 
@@ -97,6 +126,7 @@ for (const fullPath of files) {
     alt: previousAlt.get(src) ?? altFromFilename(file),
     color: hex,
     blurDataURL: `data:image/webp;base64,${blur.toString("base64")}`,
+    exif: readExif(meta.exif),
   });
 }
 

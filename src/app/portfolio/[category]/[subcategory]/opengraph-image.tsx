@@ -3,7 +3,7 @@ import { getCategories, getCategoryByPath } from "@/lib/portfolio";
 
 export const size = OG_SIZE;
 export const contentType = "image/png";
-export const alt = "Équipe du portfolio";
+export const alt = "Aperçu de l’équipe — photos de sport par rayvo.captures0808";
 
 export function generateStaticParams() {
   return getCategories().flatMap((c) => c.children.map((child) => ({ category: c.slug, subcategory: child.slug })));

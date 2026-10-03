@@ -5,11 +5,11 @@ import { FilterableGallery } from "@/components/portfolio/FilterableGallery";
 import { ClosingCta } from "@/components/sections/ClosingCta";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { getAllPhotoEntries, getCategories, getProjects } from "@/lib/portfolio";
-import { pageMetadata } from "@/lib/seo";
+import { inArea, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Portfolio",
-  description: "Hockey, rugby et football : toutes les séries photo, classées par compétition et par équipe.",
+  title: "Portfolio photo sport — hockey, rugby, football",
+  description: `Toutes les photos de match : ${getCategories().map((c) => c.title).join(", ")}. Séries classées par compétition et par équipe. Photographe sportif${inArea}.`,
   path: "/portfolio",
 });
 

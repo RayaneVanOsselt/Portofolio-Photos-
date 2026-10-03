@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CategoryView } from "@/components/portfolio/CategoryView";
-import { getCategories, getCategoryByPath } from "@/lib/portfolio";
-import { pageMetadata } from "@/lib/seo";
+import { getCategories, getCategoryByPath, getCategoryProjects } from "@/lib/portfolio";
+import { categoryDescription, categoryTitle, pageMetadata } from "@/lib/seo";
 
 export const dynamicParams = false;
 
@@ -13,10 +13,10 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/portfolio/[category]/[subcategory]">): Promise<Metadata> {
   const { category: parent, subcategory } = await params;
   const category = getCategoryByPath([parent, subcategory]);
-  if (!category?.parent) return {};
+  if (!category) return {};
   return pageMetadata({
-    title: `${category.title} — ${category.parent.title}`,
-    description: `${category.intro} Photographie sportive — ${category.parent.title}.`,
+    title: categoryTitle(category),
+    description: categoryDescription(category, getCategoryProjects(category).length),
     path: category.href,
   });
 }
