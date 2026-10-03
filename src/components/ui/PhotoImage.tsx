@@ -1,4 +1,4 @@
-import { SmartImage as Image } from "@/components/ui/SmartImage";
+import Image from "next/image";
 import type { CSSProperties } from "react";
 import type { Photo } from "@/lib/types";
 

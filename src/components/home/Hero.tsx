@@ -1,4 +1,4 @@
-import { SmartImage as Image } from "@/components/ui/SmartImage";
+import Image from "next/image";
 import type { CSSProperties } from "react";
 import { Parallax } from "@/components/effects/Parallax";
 import { ButtonLink } from "@/components/ui/Button";
@@ -20,6 +20,9 @@ const delay = (ms: number) => ({ "--delay": `${ms}ms` }) as CSSProperties;
  */
 export function Hero({ photo, eyebrow, primaryCta, secondaryCta }: Props) {
   const video = siteConfig.heroVideo;
+  // Fichiers de /public : le sous-dossier de publication doit être ajouté à la main.
+  const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+  const withBase = (src: string) => (src.startsWith("/") ? `${base}${src}` : src);
   const { primary, secondary } = siteConfig.logo;
   const [secondaryWord, ...secondaryRest] = secondary.split(" ");
 
@@ -29,8 +32,8 @@ export function Hero({ photo, eyebrow, primaryCta, secondaryCta }: Props) {
         <Parallax strength={70} className="absolute inset-x-0 -top-20 -bottom-20">
           <div className="anim-hero-image absolute inset-0">
             {video ? (
-              <video className="h-full w-full object-cover" autoPlay muted loop playsInline poster={photo.src} aria-hidden>
-                <source src={video.src} type={video.type} />
+              <video className="h-full w-full object-cover" autoPlay muted loop playsInline poster={withBase(photo.src)} aria-hidden>
+                <source src={withBase(video.src)} type={video.type} />
               </video>
             ) : (
               <Image src={photo.src} alt={photo.alt} fill preload fetchPriority="high" sizes="100vw" className="object-cover" />

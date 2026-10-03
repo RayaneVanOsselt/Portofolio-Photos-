@@ -1,6 +1,6 @@
 # Raï VO Capture 0808 — Portfolio photographique
 
-Portfolio de photographie sportive (hockey, rugby, football) : Next.js 16 (App Router), React 19, TypeScript et Tailwind CSS v4.
+Portfolio de photographie sportive (hockey, rugby, football), publié comme **site statique sur GitHub Pages**. Le code est écrit avec Next.js 16, React 19, TypeScript et Tailwind CSS v4 ; une GitHub Action le compile et ne met en ligne que le site final (HTML, CSS, images).
 Direction artistique inspirée de la référence *Auros* : canevas sarcelle abyssal, typographie grotesque en graisse 500, labels en capitales espacées, aucune ombre, profondeur par surfaces.
 
 > ⚠️ **Photos temporaires.** En attendant vos images, le site affiche des photos libres de droits issues d'Unsplash (signalées « Photo temporaire » dans la visionneuse). Elles disparaissent automatiquement dès que vos photos sont ajoutées (voir §4). **Ne mettez pas le site en ligne avec ces photos.**
@@ -27,24 +27,22 @@ Le site est disponible sur <http://localhost:3000>.
 | Commande            | Rôle                                                          |
 | ------------------- | ------------------------------------------------------------- |
 | `npm run dev`       | Serveur de développement                                      |
-| `npm run build`     | Build de production (vérifie aussi les types)                 |
-| `npm run start`     | Sert le build de production                                   |
+| `npm run build`     | Compile le site statique dans `out/` (indexe aussi les photos) |
 | `npm run lint`      | ESLint                                                        |
 | `npm run typecheck` | Vérification TypeScript                                       |
 | `npm run photos`    | Indexe les photos de `public/images/` (dimensions, couleurs…) |
 
 ## 3. Variables d'environnement
 
-Dans `.env.local` (jamais commité) :
+En ligne, tout est fourni automatiquement par la GitHub Action. En local, dans `.env.local` (jamais commité) :
 
-| Variable               | Rôle                                                                                         |
-| ---------------------- | -------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL` | URL publique, sans `/` final — canonical, sitemap, Open Graph                                |
-| `RESEND_API_KEY`       | Clé API Resend (secrète, utilisée uniquement côté serveur)                                   |
-| `EMAIL_TO`             | Adresse(s) qui reçoivent les demandes — plusieurs : séparées par des virgules                |
-| `EMAIL_FROM`           | Expéditeur d'un domaine vérifié chez Resend, ex. `Raï VO Capture 0808 <contact@domaine.be>` |
+| Variable                           | Rôle                                                                              |
+| ---------------------------------- | --------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`             | URL publique, sans `/` final — canonical, sitemap, partages                       |
+| `NEXT_PUBLIC_BASE_PATH`            | Sous-dossier de publication (ex. `/Portofolio-Photos-`) — vide en local           |
+| `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` | Clé Web3Forms du formulaire de contact (voir §8)                                  |
 
-Sans ces trois variables **en développement**, le formulaire fonctionne mais l'e-mail est affiché dans le terminal au lieu d'être envoyé (un bandeau le signale après l'envoi). **En production**, le visiteur voit un message d'erreur l'invitant à vous écrire directement.
+Sans clé Web3Forms **en local**, le formulaire fonctionne mais le message est affiché dans la console du navigateur. **En ligne**, le visiteur voit un message l'invitant à vous écrire directement.
 
 ## 4. Ajouter des photographies
 
@@ -78,13 +76,13 @@ Sans ces trois variables **en développement**, le formulaire fonctionne mais l'
 
    Le script génère `src/data/photo-manifest.json` (dimensions, orientation, couleur dominante, aperçu flou). Le texte alternatif (`alt`) est déduit du nom de fichier : **modifiez-le dans le manifest** pour le rendre descriptif (accessibilité et SEO) ; il est conservé aux lancements suivants.
 
-Le site convertit automatiquement en AVIF/WebP, génère toutes les tailles utiles (`srcset`) et charge les images hors écran de façon différée. Un dossier rempli remplace aussitôt les photos temporaires correspondantes.
+Le script crée aussi, pour chaque photo, des versions WebP légères (640 à 2400 px, dans `public/_photos/`, non commitées) : le navigateur charge la taille adaptée à l'écran, et les images hors écran sont chargées de façon différée. `npm run dev` et `npm run build` lancent ce script automatiquement. Un dossier rempli remplace aussitôt les photos temporaires correspondantes.
 
 **Nouvelle série (nouveau match)** : créez un sous-dossier, par ex. `public/images/portfolio/fih-pro-league/red-lions/2026-03-belgique-pays-bas/`, lancez `npm run photos`, puis ajoutez une entrée dans `src/data/projects.ts` avec `folder: "portfolio/fih-pro-league/red-lions/2026-03-belgique-pays-bas"`.
 
 **Photo du hero, de la page À propos, des services** : indiquez l'identifiant de la photo dans `src/data/content.ts` et `src/data/services.ts`. L'identifiant d'une photo locale est `dossier/fichier`, par ex. `portfolio/rugby/01-melee.jpg`. Si un identifiant n'existe pas, une photo du portfolio est utilisée.
 
-Une fois toutes les photos temporaires remplacées, vous pouvez supprimer `src/data/placeholder-photos.ts` (et son import dans `src/data/photos.ts`) ainsi que l'entrée `images.unsplash.com` de `next.config.ts`.
+Une fois toutes les photos temporaires remplacées, vous pouvez supprimer `src/data/placeholder-photos.ts` (et son import dans `src/data/photos.ts`) ainsi que le cas Unsplash dans `src/lib/image-loader.ts`.
 
 ## 5. Ajouter ou modifier des rubriques
 
@@ -103,37 +101,40 @@ Le monogramme dessiné (initiales « RV ») se trouve dans `src/components/brand
 Toujours dans `src/config/site.ts` → `contact` (e-mail public, téléphone, zone) et `socials` (URL complètes).
 Une valeur vide masque l'élément en production ; en développement, une étiquette « À configurer » le signale. Même principe pour les chiffres clés et les références de la page À propos (`src/data/content.ts`) : rien n'est inventé, rien n'est affiché tant que ce n'est pas renseigné.
 
-## 8. Configuration de l'e-mail (Resend)
+## 8. Configuration du formulaire de contact (Web3Forms)
 
-1. Créez un compte sur <https://resend.com>.
-2. Ajoutez et vérifiez votre domaine (enregistrements DNS fournis par Resend).
-3. Créez une clé API (permission « Sending access »).
-4. Renseignez `RESEND_API_KEY`, `EMAIL_TO` et `EMAIL_FROM` — en local dans `.env.local`, en production dans les variables d'environnement de l'hébergeur.
-5. Envoyez un message de test depuis `/contact`.
+Le site étant statique (sans serveur), les messages sont transmis par **Web3Forms**, un service gratuit conçu pour ce cas.
 
-Protections du formulaire : validation côté client **et** côté serveur (`src/lib/contact/schema.ts`), nettoyage des saisies, échappement HTML dans l'e-mail, champ piège (honeypot), délai minimal de remplissage, limitation à 5 envois / 10 min par IP (`src/lib/contact/rate-limit.ts`, en mémoire — voir le commentaire pour un stockage partagé). L'adresse du visiteur est placée en `Reply-To` : il suffit de répondre à l'e-mail reçu.
+1. Allez sur <https://web3forms.com>, saisissez l'adresse qui doit recevoir les demandes : vous recevez une **clé d'accès** par e-mail.
+2. Sur GitHub : **Settings → Secrets and variables → Actions → onglet Variables → New repository variable**
+   - Nom : `WEB3FORMS_ACCESS_KEY`
+   - Valeur : votre clé
+3. Relancez la publication (**Actions → Publier le site → Run workflow**) ou poussez un commit.
+4. Envoyez un message de test depuis la page Contact.
 
-Pour changer de fournisseur (Postmark, SendGrid, Mailgun…), seule `src/lib/email/send.ts` est à adapter.
+Cette clé est publique par conception : elle permet uniquement d'envoyer des messages vers **votre** adresse. L'adresse du visiteur est placée en réponse (`Reply-To`) : il suffit de répondre à l'e-mail reçu.
+
+Protections : validation des champs dans le navigateur (`src/lib/contact/schema.ts`), nettoyage des saisies, champ piège (honeypot), délai minimal de remplissage, et filtrage anti-spam côté Web3Forms. Pour changer de service (Formspree…), seule `src/lib/contact/submit.ts` est à adapter.
 
 ## 9. Build
 
 ```bash
 npm run lint
-npm run build
-npm run start   # test local du build de production
+npm run build      # → dossier out/, le site prêt à publier
 ```
 
-## 10. Déploiement
+## 10. Déploiement (GitHub Pages)
 
-**Vercel (recommandé)** : importez le dépôt sur <https://vercel.com/new>, ajoutez les variables d'environnement du §3, déployez.
+**Une seule fois** : sur GitHub, **Settings → Pages → Build and deployment → Source : « GitHub Actions »** (et non « Deploy from a branch »).
 
-**Autre hébergeur Node** : `npm run build` puis `npm run start` (port 3000 par défaut, `PORT=…` pour changer). L'optimisation d'images utilise `sharp`, déjà inclus.
+Ensuite, chaque mise à jour de la branche `main` publie automatiquement le site (onglet **Actions**, workflow « Publier le site », 1 à 2 minutes). Adresse : `https://<utilisateur>.github.io/<nom-du-dépôt>/`.
+
+**Domaine personnalisé** (ex. `raivocapture.be`) : renseignez-le dans Settings → Pages → Custom domain ; l'Action adapte automatiquement les adresses du site.
 
 Après la mise en ligne :
-- vérifiez `NEXT_PUBLIC_SITE_URL` (sitemap, canonical et partages en dépendent) ;
-- soumettez `https://votre-domaine/sitemap.xml` dans Google Search Console ;
-- testez le partage d'un lien (une image Open Graph est générée pour chaque rubrique, équipe et série) ;
-- complétez les pages `/privacy` et `/legal` (éléments entre crochets).
+- soumettez `…/sitemap.xml` dans Google Search Console ;
+- testez le partage d'un lien (une image de partage est générée pour chaque rubrique, équipe et série) ;
+- complétez les pages Confidentialité et Mentions légales (éléments entre crochets).
 
 ---
 
@@ -146,7 +147,6 @@ src/
 │   ├── portfolio/          Portfolio, rubriques, équipes (+ images OG)
 │   ├── project/[slug]/     Séries
 │   ├── about/ services/ contact/ search/ privacy/ legal/
-│   ├── contact/actions.ts  Server Action du formulaire
 │   ├── sitemap.ts robots.ts manifest.ts opengraph-image.tsx icon.svg …
 │   └── globals.css         Design system (tokens, typographie, animations)
 ├── components/
@@ -161,8 +161,10 @@ src/
 │   └── ui/                 Boutons, icônes, image, libellés
 ├── config/site.ts          ← nom, coordonnées, réseaux, navigation
 ├── data/                   ← rubriques, projets, services, textes, photos
-└── lib/                    Accès aux données, recherche, SEO, e-mail, validation
-scripts/photos.mjs          Indexation des photos
+└── lib/                    Accès aux données, recherche, SEO, formulaire, images
+scripts/photos.mjs          Indexation des photos + versions WebP
+scripts/finalize-export.mjs Finalisation de l'export statique
+.github/workflows/deploy.yml Publication automatique sur GitHub Pages
 ```
 
 ### Design system (extrait)

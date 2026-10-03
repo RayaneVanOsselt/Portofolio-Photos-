@@ -7,3 +7,5 @@ export default function robots(): MetadataRoute.Robots {
     sitemap: absoluteUrl("/sitemap.xml"),
   };
 }
+
+export const dynamic = "force-static";

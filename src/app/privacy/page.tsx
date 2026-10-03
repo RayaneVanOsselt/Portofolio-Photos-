@@ -57,7 +57,7 @@ export default function PrivacyPage() {
           title: "Destinataires",
           body: (
             <p>
-              Votre message est transmis par e-mail au photographe via le service d&apos;envoi transactionnel <strong>Resend</strong>. Vos données ne sont ni vendues, ni louées, ni cédées à des tiers.
+              Votre message est transmis par e-mail au photographe via le service de formulaires <strong>Web3Forms</strong>. Vos données ne sont ni vendues, ni louées, ni cédées à des tiers.
             </p>
           ),
         },
