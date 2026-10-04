@@ -1,9 +1,19 @@
 /**
- * Projets (séries / reportages). Chaque projet est rattaché à une rubrique
- * et lit ses photos dans public/images/portfolio/<folder>/.
+ * Galeries (séries / reportages). Chaque galerie est rattachée à une
+ * catégorie du portfolio et lit ses photos dans public/images/portfolio/<folder>/.
  *
- * Pour un nouveau match : créer le dossier, y déposer les photos,
- * lancer `npm run photos`, puis ajouter une entrée ci-dessous.
+ * Nouveau match : créer le dossier, y déposer les photos, lancer
+ * `npm run photos`, puis ajouter une entrée ci-dessous (la plus récente en haut
+ * n'est pas obligatoire : les listes sont triées par date).
+ *
+ * Champs utiles pour que vos clients retrouvent leurs photos en quelques secondes :
+ * - `date`     AAAA-MM-JJ — recherchable (« 3 octobre », « octobre 2026 », « 2026 »…)
+ * - `event`    type d'événement (« Match », « Tournoi », « Portraits »…)
+ * - `teams`    équipes, adversaires, personnes (« Union Saint-Gilloise U23 »…)
+ * - `location` lieu
+ *
+ * Galerie client privée : `private: true` + `accessCode: "CODE"` (+ `allowDownload: true`
+ * pour autoriser le téléchargement). Voir le README, § « Galeries privées ».
  *
  * Les textes entre crochets sont à compléter. `date` et `location`
  * restent à null tant qu'ils ne sont pas renseignés (rien n'est affiché).
@@ -21,6 +31,8 @@ export const projectInputs: ProjectInput[] = [
     description: TODO_DESCRIPTION,
     date: null,
     location: null,
+    event: "Match",
+    teams: ["Red Lions", "Belgique"],
     featured: true,
   },
   {
@@ -31,6 +43,8 @@ export const projectInputs: ProjectInput[] = [
     description: TODO_DESCRIPTION,
     date: null,
     location: null,
+    event: "Match",
+    teams: ["Red Panthers", "Belgique"],
     featured: true,
   },
   {
@@ -41,6 +55,8 @@ export const projectInputs: ProjectInput[] = [
     description: TODO_DESCRIPTION,
     date: null,
     location: null,
+    event: "Match",
+    teams: ["Pays-Bas"],
   },
   {
     slug: "dh-daring-serie-01",
@@ -50,6 +66,8 @@ export const projectInputs: ProjectInput[] = [
     description: TODO_DESCRIPTION,
     date: null,
     location: null,
+    event: "Match",
+    teams: ["Daring"],
     featured: true,
   },
   {
@@ -60,6 +78,8 @@ export const projectInputs: ProjectInput[] = [
     description: TODO_DESCRIPTION,
     date: null,
     location: null,
+    event: "Match",
+    teams: ["Léopold"],
   },
   {
     slug: "rugby-serie-01",
@@ -69,6 +89,7 @@ export const projectInputs: ProjectInput[] = [
     description: TODO_DESCRIPTION,
     date: null,
     location: null,
+    event: "Match",
     featured: true,
   },
   {
@@ -79,6 +100,8 @@ export const projectInputs: ProjectInput[] = [
     description: TODO_DESCRIPTION,
     date: null,
     location: null,
+    event: "Match",
+    teams: ["RWDM"],
     featured: true,
   },
   {
@@ -89,6 +112,8 @@ export const projectInputs: ProjectInput[] = [
     description: TODO_DESCRIPTION,
     date: null,
     location: null,
+    event: "Match",
+    teams: ["Wolvendael"],
   },
   {
     slug: "woluwe-h1-serie-01",
@@ -98,6 +123,8 @@ export const projectInputs: ProjectInput[] = [
     description: TODO_DESCRIPTION,
     date: null,
     location: null,
+    event: "Match",
+    teams: ["Woluwe"],
   },
   {
     slug: "daring-messieurs-1-serie-01",
@@ -107,6 +134,8 @@ export const projectInputs: ProjectInput[] = [
     description: TODO_DESCRIPTION,
     date: null,
     location: null,
+    event: "Match",
+    teams: ["Daring", "Messieurs 1"],
   },
   {
     slug: "daring-dames-1-serie-01",
@@ -116,6 +145,8 @@ export const projectInputs: ProjectInput[] = [
     description: TODO_DESCRIPTION,
     date: null,
     location: null,
+    event: "Match",
+    teams: ["Daring", "Dames 1"],
   },
   {
     slug: "daring-u19b1-serie-01",
@@ -125,5 +156,7 @@ export const projectInputs: ProjectInput[] = [
     description: TODO_DESCRIPTION,
     date: null,
     location: null,
+    event: "Match",
+    teams: ["Daring", "U19"],
   },
 ];

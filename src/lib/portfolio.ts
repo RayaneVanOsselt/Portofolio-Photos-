@@ -1,6 +1,10 @@
 /**
  * Couche d'accès aux données du portfolio.
  * Les composants ne lisent jamais src/data directement : ils passent par ici.
+ *
+ * Vocabulaire : une « catégorie » regroupe des galeries (compétition, club,
+ * équipe) ; une « galerie » (= projet / série) contient les photos d'un match
+ * ou d'un événement.
  */
 import { categoryTree } from "@/data/categories";
 import { getFolderPhotos } from "@/data/photos";
@@ -17,12 +21,15 @@ function buildProjects(categoryByPath: Map<string, Category>): Project[] {
   return projectInputs.map((input) => {
     const category = categoryByPath.get(input.category);
     if (!category) {
-      throw new Error(`Projet « ${input.slug} » : catégorie inconnue « ${input.category} » (voir src/data/categories.ts).`);
+      throw new Error(`Galerie « ${input.slug} » : catégorie inconnue « ${input.category} » (voir src/data/categories.ts).`);
+    }
+    if (input.private && !input.accessCode) {
+      throw new Error(`Galerie privée « ${input.slug} » : ajoutez un accessCode (voir src/data/projects.ts).`);
     }
     const photos = getFolderPhotos(input.folder).map((photo) => withContextAlt(photo, category));
     return {
       ...input,
-      href: `/project/${input.slug}`,
+      href: `/galeries/${input.slug}`,
       category,
       photos,
       cover: photos[0] ?? EMPTY_PHOTO,
@@ -38,9 +45,17 @@ function buildProjects(categoryByPath: Map<string, Category>): Project[] {
 function withContextAlt(photo: Photo, category: Category): Photo {
   if (photo.credit) return photo; // photos temporaires : texte d'origine
   const context = category.parent ? `${category.title}, ${category.parent.title}` : category.title;
-  const plain = (v: string) => v.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const plain = (v: string) => v.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
   if (plain(photo.alt).includes(plain(category.title))) return photo;
   return { ...photo, alt: `${photo.alt} — ${context}` };
+}
+
+/** Plus récentes d'abord ; les galeries sans date gardent l'ordre du fichier, après les datées. */
+function byDateDesc(a: Project, b: Project) {
+  if (a.date && b.date) return b.date.localeCompare(a.date);
+  if (a.date) return -1;
+  if (b.date) return 1;
+  return 0;
 }
 
 // -------------------------------------------------------------- categories
@@ -70,14 +85,16 @@ const categories = categoryTree.map((input) => resolveCategory(input, input.spor
 const allCategories = categories.flatMap((c) => [c, ...c.children]);
 const categoryByPath = new Map(allCategories.map((c) => [c.path.join("/"), c]));
 const projects = buildProjects(categoryByPath);
+/** Galeries visibles publiquement (listes, recherche, plan du site), les plus récentes d'abord. */
+const publicProjects = projects.filter((p) => !p.private).sort(byDateDesc);
 
-for (const project of projects) {
+for (const project of publicProjects) {
   const key = project.category.path.join("/");
   projectsByCategoryPath.set(key, [...(projectsByCategoryPath.get(key) ?? []), project]);
 }
 
-// Couverture + compteur, une fois les projets connus.
-// Une rubrique parente prend la couverture de sa dernière équipe,
+// Couverture + compteur, une fois les galeries connues.
+// Une catégorie parente prend la couverture de sa dernière équipe,
 // pour ne pas répéter celle de la première tuile.
 for (const category of allCategories) {
   const photos = getCategoryPhotos(category);
@@ -88,7 +105,7 @@ for (const category of allCategories) {
 
 // ------------------------------------------------------------------ public
 
-/** Rubriques principales, avec leurs sous-rubriques. */
+/** Catégories principales, avec leurs sous-catégories. */
 export function getCategories(): Category[] {
   return categories;
 }
@@ -101,7 +118,13 @@ export function getAllCategoryPaths(): string[][] {
   return allCategories.map((c) => c.path);
 }
 
+/** Galeries publiques, les plus récentes d'abord. */
 export function getProjects(): Project[] {
+  return publicProjects;
+}
+
+/** Toutes les galeries, privées comprises (génération des pages uniquement). */
+export function getAllProjects(): Project[] {
   return projects;
 }
 
@@ -109,10 +132,10 @@ export function getProjectBySlug(slug: string): Project | undefined {
   return projects.find((p) => p.slug === slug);
 }
 
-/** Projets d'une catégorie, sous-rubriques comprises. */
+/** Galeries publiques d'une catégorie, sous-catégories comprises. */
 export function getCategoryProjects(category: Category): Project[] {
   const own = projectsByCategoryPath.get(category.path.join("/")) ?? [];
-  return [...own, ...category.children.flatMap(getCategoryProjects)];
+  return [...own, ...category.children.flatMap(getCategoryProjects)].sort(byDateDesc);
 }
 
 export function getCategoryPhotos(category: Category): Photo[] {
@@ -120,14 +143,7 @@ export function getCategoryPhotos(category: Category): Photo[] {
 }
 
 export function getFeaturedProjects(): Project[] {
-  return projects.filter((p) => p.featured);
-}
-
-/** Toutes les photos, chacune avec son projet (pour le filtre du portfolio). */
-export function getAllPhotoEntries() {
-  return projects.flatMap((project) =>
-    project.photos.map((photo) => ({ photo, project, rootSlug: project.category.path[0] })),
-  );
+  return publicProjects.filter((p) => p.featured);
 }
 
 /** Dossiers de photos hors portfolio (page À propos, etc.). */
@@ -135,16 +151,11 @@ const SITE_FOLDERS = ["site/about"];
 
 /** Une photo par identifiant, sinon `fallback` ou la première du portfolio. */
 export function getPhotoById(id: string, fallback?: Photo): Photo {
-  const pool = [...projects.flatMap((p) => p.photos), ...SITE_FOLDERS.flatMap(getFolderPhotos)];
-  return pool.find((p) => p.id === id) ?? fallback ?? projects.find((p) => p.photos.length)?.cover ?? EMPTY_PHOTO;
+  const pool = [...publicProjects.flatMap((p) => p.photos), ...SITE_FOLDERS.flatMap(getFolderPhotos)];
+  return pool.find((p) => p.id === id) ?? fallback ?? publicProjects.find((p) => p.photos.length)?.cover ?? EMPTY_PHOTO;
 }
 
-/** Photos d'un dossier du site (ex. "site/about"), dans l'ordre des fichiers. */
-export function getSitePhotos(folder: (typeof SITE_FOLDERS)[number]): Photo[] {
-  return getFolderPhotos(folder);
-}
-
-/** Rubrique voisine, pour inviter à poursuivre la visite. */
+/** Catégorie voisine, pour inviter à poursuivre la visite. */
 export function getNextCategory(category: Category): Category {
   const siblings = category.parent ? category.parent.children : categories;
   const index = siblings.findIndex((c) => c.href === category.href);
@@ -152,15 +163,25 @@ export function getNextCategory(category: Category): Category {
   return siblings[(index + 1) % siblings.length];
 }
 
+/** Galeries voisines (publiques) — une galerie privée renvoie vers les plus récentes. */
 export function getAdjacentProjects(project: Project) {
-  const index = projects.findIndex((p) => p.slug === project.slug);
+  const index = publicProjects.findIndex((p) => p.slug === project.slug);
+  const count = publicProjects.length;
+  if (index === -1) return { previous: publicProjects[count - 1], next: publicProjects[0] };
   return {
-    previous: projects[(index - 1 + projects.length) % projects.length],
-    next: projects[(index + 1) % projects.length],
+    previous: publicProjects[(index - 1 + count) % count],
+    next: publicProjects[(index + 1) % count],
   };
 }
 
 /** Fil d'Ariane d'une catégorie (de la racine à elle-même). */
 export function getCategoryTrail(category: Category): Category[] {
   return category.parent ? [...getCategoryTrail(category.parent), category] : [category];
+}
+
+/** « FIH Pro League · Red Lions » */
+export function categoryContext(category: Category) {
+  return getCategoryTrail(category)
+    .map((c) => c.title)
+    .join(" · ");
 }
