@@ -787,3 +787,67 @@ dialog::backdrop {
     letter-spacing: 0.2em;
   }
 }
+
+/* ==========================================================================
+   Football — signature « Matchday » (discrète)
+   ========================================================================== */
+
+/* Point « en direct » à côté de MATCHDAY : une respiration lente, pas un clignotant. */
+@keyframes matchday-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(235 100 43 / 0.45);
+  }
+  60% {
+    box-shadow: 0 0 0 7px rgb(235 100 43 / 0);
+  }
+}
+.matchday-pulse {
+  animation: matchday-pulse 2.6s var(--ease-out-quart) infinite;
+}
+
+/* Photographie principale : un flash d'appareil photo, une seule fois. */
+@keyframes flash-pop {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes flash-image {
+  from {
+    opacity: 0;
+    scale: 1.04;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+.flash-in img {
+  animation: flash-image 1.4s var(--ease-out-expo) 0.35s both;
+}
+.flash-in::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 45%, #fff 0%, rgb(255 255 255 / 0.6) 40%, transparent 75%);
+  opacity: 0;
+  animation: flash-pop 0.9s var(--ease-out-quart) 0.35s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .matchday-pulse,
+  .flash-in img,
+  .flash-in::after {
+    animation: none;
+  }
+  .flash-in img {
+    opacity: 1;
+  }
+}

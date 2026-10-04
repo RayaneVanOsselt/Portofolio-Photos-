@@ -92,6 +92,7 @@ export function getSocialLinks() {
  */
 export const mainNav = [
   { label: "Portfolio", href: "/portfolio", hasMegaMenu: true },
+  { label: "Football", href: "/football" },
   { label: "Galeries", href: "/galeries" },
   { label: "Services", href: "/services" },
   { label: "À propos", href: "/about" },

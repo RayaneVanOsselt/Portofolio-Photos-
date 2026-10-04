@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AboutTeaser } from "@/components/home/AboutTeaser";
 import { CategoryIndex } from "@/components/home/CategoryIndex";
 import { FeaturedWork } from "@/components/home/FeaturedWork";
+import { FootballTeaser } from "@/components/football/FootballTeaser";
 import { Hero } from "@/components/home/Hero";
 import { ClosingCta } from "@/components/sections/ClosingCta";
 import { PhotoAccessBand } from "@/components/sections/PhotoAccessBand";
@@ -9,7 +10,7 @@ import { ArrowLink } from "@/components/ui/Button";
 import { SectionStamp } from "@/components/ui/SectionLabel";
 import { aboutContent, homeContent } from "@/data/content";
 import { toIndexEntries } from "@/lib/index-entries";
-import { categoryContext, getCategories, getFeaturedProjects, getPhotoById, getProjects } from "@/lib/portfolio";
+import { categoryContext, getCategories, getFeaturedProjects, getFootballProjects, getPhotoById, getProjects } from "@/lib/portfolio";
 import { homeTitle, inArea, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
@@ -41,6 +42,8 @@ export default function HomePage() {
       />
 
       <FeaturedWork projects={featured} />
+
+      <FootballTeaser projects={getFootballProjects()} />
 
       <section aria-labelledby="categories-title" className="container-wide pb-[var(--section-space)]">
         <SectionStamp id="categories-title" index="02" meta={`${categories.length} catégories`}>

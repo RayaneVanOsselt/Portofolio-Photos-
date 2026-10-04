@@ -163,6 +163,12 @@ export const Images = (p: IconProps) => (
   </Base>
 );
 
+export const Heart = ({ filled, ...p }: IconProps & { filled?: boolean }) => (
+  <Base {...p}>
+    <path d="M12 20s-7.5-4.6-7.5-10.1A4.4 4.4 0 0 1 12 7.2a4.4 4.4 0 0 1 7.5 2.7C19.5 15.4 12 20 12 20z" fill={filled ? "currentColor" : "none"} />
+  </Base>
+);
+
 /* --- Réseaux sociaux --------------------------------------------------- */
 
 export const Instagram = (p: IconProps) => (

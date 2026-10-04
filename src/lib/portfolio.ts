@@ -7,9 +7,9 @@
  * ou d'un événement.
  */
 import { categoryTree } from "@/data/categories";
-import { getFolderPhotos } from "@/data/photos";
+import { getFolderChapters, getFolderPhotos } from "@/data/photos";
 import { projectInputs } from "@/data/projects";
-import type { Category, CategoryInput, Photo, Project } from "@/lib/types";
+import type { Category, CategoryInput, Chapter, Photo, Project, ProjectInput } from "@/lib/types";
 
 const EMPTY_PHOTO: Photo = { id: "empty", src: "/brand/monogram-light.svg", width: 64, height: 64, alt: "" };
 
@@ -26,14 +26,70 @@ function buildProjects(categoryByPath: Map<string, Category>): Project[] {
     if (input.private && !input.accessCode) {
       throw new Error(`Galerie privée « ${input.slug} » : ajoutez un accessCode (voir src/data/projects.ts).`);
     }
-    const photos = getFolderPhotos(input.folder).map((photo) => withContextAlt(photo, category));
+    const { chapters: notes, ...rest } = input;
+    const chapters = buildChapters(input.folder, notes, projectFolders).map((chapter) => ({
+      ...chapter,
+      photos: chapter.photos.map((photo) => withContextAlt(photo, category)),
+    }));
+    const photos = chapters.length ? chapters.flatMap((c) => c.photos) : getFolderPhotos(input.folder).map((photo) => withContextAlt(photo, category));
     return {
-      ...input,
+      ...rest,
       href: `/galeries/${input.slug}`,
       category,
       photos,
+      chapters,
       cover: photos[0] ?? EMPTY_PHOTO,
     };
+  });
+}
+
+const projectFolders = new Set(projectInputs.map((p) => p.folder));
+
+/** Titres par défaut des chapitres les plus courants (le nom du dossier sinon). */
+const CHAPTER_TITLES: Record<string, string> = {
+  introduction: "Introduction",
+  "avant-match": "Avant-match",
+  arrivee: "Arrivée",
+  echauffement: "Échauffement",
+  "le-match": "Le match",
+  action: "Action",
+  "premiere-mi-temps": "Première mi-temps",
+  "mi-temps": "Mi-temps",
+  "seconde-mi-temps": "Seconde mi-temps",
+  ambiance: "Ambiance",
+  supporters: "Supporters",
+  tribunes: "Tribunes",
+  coulisses: "Coulisses",
+  vestiaire: "Vestiaire",
+  celebrations: "Célébrations",
+  "apres-match": "Après-match",
+  portraits: "Portraits",
+  entrainement: "Entraînement",
+};
+
+/**
+ * Chapitres d'un reportage, à partir des sous-dossiers « 01-avant-match/ »,
+ * « 02-action/ »… Les photos posées directement dans le dossier de la
+ * galerie ouvrent le récit (« Introduction »).
+ */
+function buildChapters(folder: string, notes: ProjectInput["chapters"], exclude: Set<string>): Chapter[] {
+  const folders = getFolderChapters(folder, exclude);
+  if (!folders.length) return [];
+  const intro = getFolderPhotos(folder);
+  const raw = [...(intro.length ? [{ name: "00-introduction", photos: intro }] : []), ...folders];
+  let start = 0;
+  return raw.map(({ name, photos }) => {
+    const slug = name.replace(/^\d+[-_ ]*/, "") || name;
+    const note = notes?.[slug];
+    const chapter: Chapter = {
+      slug,
+      title: note?.title ?? CHAPTER_TITLES[slug] ?? slug.replace(/[-_]+/g, " ").replace(/^./, (c) => c.toUpperCase()),
+      text: note?.text,
+      start,
+      photos,
+    };
+    start += photos.length;
+    return chapter;
   });
 }
 
@@ -177,6 +233,17 @@ export function getAdjacentProjects(project: Project) {
 /** Fil d'Ariane d'une catégorie (de la racine à elle-même). */
 export function getCategoryTrail(category: Category): Category[] {
   return category.parent ? [...getCategoryTrail(category.parent), category] : [category];
+}
+
+/** Galeries de football (matchs, entraînements, événements), les plus récentes d'abord. */
+export function getFootballProjects(): Project[] {
+  return publicProjects.filter((p) => p.category.sport === "football");
+}
+
+/** Nom d'équipe pour les grands titres (version courte si fournie). */
+export function teamShort(project: Project, side: "home" | "away") {
+  const m = project.match!;
+  return side === "home" ? (m.homeShort ?? m.home) : (m.awayShort ?? m.away);
 }
 
 /** « FIH Pro League · Red Lions » */

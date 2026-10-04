@@ -203,6 +203,27 @@ export function projectJsonLd(project: Project) {
     ...(project.date ? { dateCreated: project.date } : {}),
     ...(project.location ? { contentLocation: { "@type": "Place", name: project.location } } : {}),
     image: project.photos.map((photo) => imageObjectJsonLd(photo, `${project.title} — ${photo.alt}`)),
+    ...(project.match ? { about: sportsEventJsonLd(project) } : {}),
+  };
+}
+
+/** Le match photographié (schema.org SportsEvent) : équipes, date, stade, compétition. */
+function sportsEventJsonLd(project: Project) {
+  const match = project.match!;
+  const sport = { football: "Football", hockey: "Hockey sur gazon", rugby: "Rugby" }[project.category.sport];
+  return {
+    "@type": "SportsEvent",
+    name: `${match.home} – ${match.away}`,
+    sport,
+    ...(project.date ? { startDate: project.date } : {}),
+    ...(project.location ? { location: { "@type": "Place", name: project.location } } : {}),
+    ...(match.competition ? { superEvent: { "@type": "SportsEvent", name: match.competition } } : {}),
+    homeTeam: { "@type": "SportsTeam", name: match.home, sport },
+    awayTeam: { "@type": "SportsTeam", name: match.away, sport },
+    competitor: [
+      { "@type": "SportsTeam", name: match.home },
+      { "@type": "SportsTeam", name: match.away },
+    ],
   };
 }
 

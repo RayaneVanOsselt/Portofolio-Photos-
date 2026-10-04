@@ -24,12 +24,14 @@ export function MatchTicket({
   className?: string;
 }) {
   const trail = getCategoryTrail(project.category);
-  const from = trail[0].title;
-  const to = trail.length > 1 ? trail.at(-1)!.title : (project.teams?.find((t) => t !== from) ?? project.event ?? "Galerie");
+  const match = project.match;
+  // Match : « domicile → extérieur » ; sinon « compétition → équipe ».
+  const from = match ? (match.homeShort ?? match.home) : trail[0].title;
+  const to = match ? (match.awayShort ?? match.away) : trail.length > 1 ? trail.at(-1)!.title : (project.teams?.find((t) => t !== from) ?? project.event ?? "Galerie");
   const fields = [
     { label: "Date", value: project.date ? formatDateShort(project.date) : "—" },
-    { label: "Photos", value: pad(project.photos.length) },
-    { label: "Type", value: project.event ?? "Reportage" },
+    match?.score ? { label: "Score", value: `${match.score[0]}—${match.score[1]}` } : { label: "Photos", value: pad(project.photos.length) },
+    { label: "Type", value: match?.competition ?? project.event ?? "Reportage" },
     ...(project.location ? [{ label: "Lieu", value: project.location }] : []),
   ];
 
@@ -48,7 +50,7 @@ export function MatchTicket({
       {/* Itinéraire */}
       <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-6 md:px-7">
         <div className="min-w-0">
-          <p className="t-mono text-ash">Origine</p>
+          <p className="t-mono text-ash">{match ? "Domicile" : "Origine"}</p>
           <p className="mt-1 line-clamp-2 text-[0.8125rem] leading-tight font-medium tracking-[0.04em] text-linen uppercase">{from}</p>
         </div>
         <span aria-hidden className="flex items-center gap-1.5 text-flamingo">
@@ -57,7 +59,7 @@ export function MatchTicket({
           <span className="h-px w-4 bg-line-strong md:w-6" />
         </span>
         <div className="min-w-0 text-right">
-          <p className="t-mono text-ash">Destination</p>
+          <p className="t-mono text-ash">{match ? "Visiteur" : "Destination"}</p>
           <p className="mt-1 line-clamp-2 text-[0.8125rem] leading-tight font-medium tracking-[0.04em] text-linen uppercase">{to}</p>
         </div>
       </div>

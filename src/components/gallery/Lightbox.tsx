@@ -3,13 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Close, Download, Expand, Share, Shrink, ZoomIn, ZoomOut } from "@/components/ui/Icons";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Close, Download, Expand, Heart, Share, Shrink, ZoomIn, ZoomOut } from "@/components/ui/Icons";
 import { useAnimatedDialog } from "@/hooks/useAnimatedDialog";
 import { pad } from "@/lib/utils";
 import type { GalleryItem } from "./Gallery";
 
 type Props = {
   items: GalleryItem[];
+  /** Sélection du visiteur (cœur) : présente si la galerie la propose. */
+  favorite?: { has: (index: number) => boolean; toggle: (index: number) => void };
   /** Lien permanent de la photo affichée (partage, demande de photo). */
   permalink: (index: number) => string;
   index: number | null;
@@ -37,7 +39,7 @@ function originalUrl(src: string) {
  * naviguer, bas pour fermer), zoom au clic, plein écran, partage, lien
  * permanent, préchargement des voisines, demande de la photo en HD.
  */
-export function Lightbox({ items, permalink, index, onClose, onChange, allowDownload = false }: Props) {
+export function Lightbox({ items, favorite, permalink, index, onClose, onChange, allowDownload = false }: Props) {
   const open = index !== null;
   const dialogRef = useAnimatedDialog(open, onClose, 400);
   // Garde la dernière image affichée pendant l'animation de fermeture.
@@ -180,6 +182,18 @@ export function Lightbox({ items, permalink, index, onClose, onChange, allowDown
             {item.title ? <p className="hidden truncate t-small text-taupe md:block">{item.title}</p> : null}
           </div>
           <div className="flex items-center gap-1">
+            {favorite ? (
+              <button
+                type="button"
+                onClick={() => favorite.toggle(shownIndex)}
+                className={`${iconButton} flex w-auto items-center gap-2 px-3 ${favorite.has(shownIndex) ? "text-flamingo hover:text-flamingo" : ""}`}
+                aria-pressed={favorite.has(shownIndex)}
+                aria-label={favorite.has(shownIndex) ? "Retirer de ma sélection" : "Ajouter à ma sélection"}
+              >
+                <Heart size={18} filled={favorite.has(shownIndex)} />
+                <span className="hidden text-[0.8125rem] sm:inline">{favorite.has(shownIndex) ? "Sélectionnée" : "Sélectionner"}</span>
+              </button>
+            ) : null}
             <button type="button" onClick={share} className={`${iconButton} flex w-auto items-center gap-2 px-3`} aria-label="Partager cette photo">
               {copied ? <Check size={18} className="text-flamingo" /> : <Share size={18} />}
               <span className="hidden text-[0.8125rem] sm:inline" aria-live="polite">
