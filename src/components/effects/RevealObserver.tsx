@@ -6,9 +6,12 @@ import { useEffect } from "react";
  * Un seul IntersectionObserver pour tout le site : chaque élément portant
  * `data-reveal` reçoit la classe `is-visible` en entrant dans l'écran.
  * Un MutationObserver prend en charge les pages chargées par navigation client.
+ * Pose aussi la classe `hydrated` sur <html> (fondu des images au chargement).
  */
 export function RevealObserver() {
   useEffect(() => {
+    document.documentElement.classList.add("hydrated");
+
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {

@@ -20,7 +20,7 @@ export const siteConfig = {
     monogram: "RV",
   },
   /** Signature affichée sous le nom. */
-  tagline: "Photography / Visual Stories",
+  tagline: "Photographe sportif — Hockey · Rugby · Football",
   /** Description par défaut (SEO, partage). */
   description:
     "Photographe sportif — hockey, rugby et football. Reportages de match, portraits d'équipe et contenus pour clubs, au plus près du jeu.",
@@ -62,6 +62,9 @@ export const siteConfig = {
     bingSiteVerification: "" as string,
   },
 
+  /** Fuseau de l'heure affichée en direct dans le pied de page. */
+  timeZone: "Europe/Brussels",
+
   /** Vidéo d'arrière-plan du hero (fichier dans /public), sinon null. */
   heroVideo: null as null | { src: string; type: string },
 } as const;
@@ -83,13 +86,19 @@ export function getSocialLinks() {
     .map((key) => ({ key, label: socialLabels[key], href: siteConfig.socials[key] }));
 }
 
-/** Navigation principale. Le méga-menu Portfolio est généré depuis data/categories. */
+/**
+ * Navigation principale. Le méga-menu Portfolio est généré depuis data/categories.
+ * Le logo mène à l'accueil ; « Mes photos » (bouton orange) mène aux galeries.
+ */
 export const mainNav = [
-  { label: "Accueil", href: "/" },
   { label: "Portfolio", href: "/portfolio", hasMegaMenu: true },
-  { label: "À propos", href: "/about" },
+  { label: "Galeries", href: "/galeries" },
   { label: "Services", href: "/services" },
+  { label: "À propos", href: "/about" },
   { label: "Contact", href: "/contact" },
 ] as const;
+
+/** Accès aux photos : le parcours « je cherche mes photos », mis en avant partout. */
+export const photoAccess = { label: "Mes photos", href: "/galeries" } as const;
 
 export const isDev = process.env.NODE_ENV !== "production";

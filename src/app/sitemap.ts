@@ -26,8 +26,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     page("/", 1, "weekly", categories.map((c) => c.cover)),
     page("/portfolio", 0.9, "weekly", categories.map((c) => c.cover)),
+    page("/galeries", 0.9, "weekly", getProjects().map((p) => p.cover)),
     ...allCategories.map((c) => page(c.href, c.parent ? 0.7 : 0.8, "weekly", getCategoryPhotos(c))),
-    ...getProjects().map((p) => page(p.href, 0.6, "monthly", p.photos)),
+    // Galeries publiques uniquement (les galeries privées ne sont jamais listées).
+    ...getProjects().map((p) => page(p.href, 0.7, "monthly", p.photos)),
     page("/about", 0.7),
     page("/services", 0.7),
     page("/contact", 0.8),

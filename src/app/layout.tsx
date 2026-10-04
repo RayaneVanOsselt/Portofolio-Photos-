@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { Instrument_Serif, Inter_Tight } from "next/font/google";
-import { CustomCursor } from "@/components/effects/CustomCursor";
+import { Archivo, JetBrains_Mono, Poppins } from "next/font/google";
 import { RevealObserver } from "@/components/effects/RevealObserver";
-import { Monogram } from "@/components/brand/Monogram";
+import { ScrollTop } from "@/components/effects/ScrollTop";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -12,18 +11,26 @@ import { buildSearchIndex } from "@/lib/search-index";
 import { businessJsonLd, homeTitle, websiteJsonLd } from "@/lib/seo";
 import "./globals.css";
 
-const interTight = Inter_Tight({
-  variable: "--font-inter-tight",
+/** Texte, navigation, boutons (police secondaire de la charte). */
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["300", "400", "500", "600"],
   display: "swap",
 });
 
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
+/** Grands titres : Archivo étendu (axe de largeur), proche de la police principale de la charte. */
+const archivo = Archivo({
+  variable: "--font-archivo",
   subsets: ["latin"],
-  weight: "400",
-  style: "italic",
+  axes: ["wdth"],
+  display: "swap",
+});
+
+/** Tampons de section et métadonnées « billet ». */
+const jetbrains = JetBrains_Mono({
+  variable: "--font-jetbrains",
+  subsets: ["latin"],
   display: "swap",
 });
 
@@ -56,13 +63,18 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#012624",
+  themeColor: "#1d1e1c",
   colorScheme: "dark",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang={siteConfig.language} id="top" className={`${interTight.variable} ${instrumentSerif.variable}`} suppressHydrationWarning>
+    <html
+      lang={siteConfig.language}
+      id="top"
+      className={`${poppins.variable} ${archivo.variable} ${jetbrains.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         {/* Active les animations d'apparition uniquement si JavaScript tourne. */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
@@ -70,18 +82,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         <a
           href="#main"
-          className="sr-only z-[400] rounded-[var(--radius-sm)] bg-phosphor px-4 py-3 t-label text-ink focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+          className="sr-only z-[400] rounded-full bg-flamingo px-5 py-3 t-label text-ink focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
         >
           Aller au contenu
         </a>
-
-        {/* Rideau d'ouverture : ~1s, purement CSS, n'attend aucun chargement. */}
-        <div className="intro-curtain" aria-hidden>
-          <div className="flex flex-col items-center gap-5 text-platinum">
-            <Monogram className="size-14" strokeWidth={2} />
-            <span className="t-caption text-silver">{siteConfig.logo.secondary}</span>
-          </div>
-        </div>
 
         <Header portfolioNav={getPortfolioNav()} searchIndex={buildSearchIndex()} />
         <main id="main" tabIndex={-1} className="outline-none">
@@ -89,8 +93,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </main>
         <Footer />
 
+        <ScrollTop />
         <RevealObserver />
-        <CustomCursor />
         <JsonLd data={websiteJsonLd()} />
         <JsonLd data={businessJsonLd()} />
       </body>

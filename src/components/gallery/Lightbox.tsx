@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Close, Expand, Share, Shrink, ZoomIn, ZoomOut } from "@/components/ui/Icons";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Close, Download, Expand, Share, Shrink, ZoomIn, ZoomOut } from "@/components/ui/Icons";
 import { useAnimatedDialog } from "@/hooks/useAnimatedDialog";
 import { pad } from "@/lib/utils";
 import type { GalleryItem } from "./Gallery";
@@ -15,11 +15,29 @@ type Props = {
   index: number | null;
   onClose: () => void;
   onChange: (index: number) => void;
+  allowDownload?: boolean;
 };
 
 const SWIPE_THRESHOLD = 50;
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-export function Lightbox({ items, permalink, index, onClose, onChange }: Props) {
+/** Fichier d'origine d'une photo (téléchargement). */
+function originalUrl(src: string) {
+  if (src.startsWith("https://images.unsplash.com/")) {
+    const url = new URL(src);
+    url.searchParams.set("w", "2400");
+    url.searchParams.set("dl", "");
+    return url.toString();
+  }
+  return src.startsWith("/") ? `${BASE_PATH}${src}` : src;
+}
+
+/**
+ * Visionneuse plein écran : clavier (← → Échap), swipe (gauche/droite pour
+ * naviguer, bas pour fermer), zoom au clic, plein écran, partage, lien
+ * permanent, préchargement des voisines, demande de la photo en HD.
+ */
+export function Lightbox({ items, permalink, index, onClose, onChange, allowDownload = false }: Props) {
   const open = index !== null;
   const dialogRef = useAnimatedDialog(open, onClose, 400);
   // Garde la dernière image affichée pendant l'animation de fermeture.
@@ -36,9 +54,9 @@ export function Lightbox({ items, permalink, index, onClose, onChange }: Props) 
 
   // Plein écran : on suit l'état réel (la touche Échap du navigateur le quitte aussi).
   useEffect(() => {
-    const onChange = () => setFullscreen(Boolean(document.fullscreenElement));
-    document.addEventListener("fullscreenchange", onChange);
-    return () => document.removeEventListener("fullscreenchange", onChange);
+    const onFs = () => setFullscreen(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
   }, []);
 
   // La vignette active reste visible dans le bandeau.
@@ -104,6 +122,8 @@ export function Lightbox({ items, permalink, index, onClose, onChange }: Props) 
   const exifLine = photo.exif ? [photo.exif.camera, photo.exif.lens, photo.exif.focal, photo.exif.aperture, photo.exif.shutter, photo.exif.iso].filter(Boolean).join("  ·  ") : "";
   const requestHref = `/contact/?photo=${encodeURIComponent(`n°${shownIndex + 1} — ${item.title ?? photo.alt}`)}&lien=${encodeURIComponent(open ? permalink(shownIndex) : "")}`;
   const neighbours = count > 1 ? [items[(shownIndex + 1) % count], items[(shownIndex - 1 + count) % count]] : [];
+  // Sans propriété d'affichage : chaque bouton précise la sienne (grid, flex, hidden…).
+  const iconButton = "size-11 place-items-center rounded-full text-linen/85 transition-colors duration-300 hover:bg-wash-strong hover:text-linen";
 
   const toggleZoom = (clientX?: number, clientY?: number) => {
     if (zoom) return setZoom(null);
@@ -144,56 +164,36 @@ export function Lightbox({ items, permalink, index, onClose, onChange }: Props) 
       ref={dialogRef}
       aria-label="Visionneuse de photos"
       aria-describedby="lightbox-caption"
-      className="lightbox fixed inset-0 m-0 h-dvh max-h-none w-full max-w-none bg-transparent p-0 text-mist"
+      className="lightbox fixed inset-0 m-0 h-dvh max-h-none w-full max-w-none bg-transparent p-0 text-linen"
     >
-      <div className="lightbox-bg absolute inset-0 bg-deep" onClick={close} aria-hidden />
+      <div className="lightbox-bg absolute inset-0 bg-night" onClick={close} aria-hidden />
 
       <div className="relative flex h-full flex-col">
         {/* Barre supérieure */}
-        <div className="lightbox-chrome flex items-center justify-between gap-4 px-[var(--gutter)] py-4">
-          <p className="t-label t-tabular text-platinum" aria-live="polite">
-            <span className="sr-only">Photo </span>
-            {pad(shownIndex + 1)}
-            <span className="text-silver"> / {pad(count)}</span>
-          </p>
+        <div className="lightbox-chrome flex items-center justify-between gap-4 px-[var(--gutter)] py-3">
+          <div className="flex min-w-0 items-center gap-4">
+            <p className="t-mono text-linen" aria-live="polite">
+              <span className="sr-only">Photo </span>
+              <span className="text-flamingo">{pad(shownIndex + 1)}</span>
+              <span className="text-ash"> / {pad(count)}</span>
+            </p>
+            {item.title ? <p className="hidden truncate t-small text-taupe md:block">{item.title}</p> : null}
+          </div>
           <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={share}
-              className="flex h-11 items-center gap-2 rounded-[var(--radius-sm)] px-3 text-silver transition-colors hover:bg-kelp hover:text-platinum"
-              aria-label="Partager cette photo"
-            >
-              {copied ? <Check size={18} className="text-phosphor" /> : <Share size={18} />}
-              <span className="hidden t-caption sm:inline" aria-live="polite">
+            <button type="button" onClick={share} className={`${iconButton} flex w-auto items-center gap-2 px-3`} aria-label="Partager cette photo">
+              {copied ? <Check size={18} className="text-flamingo" /> : <Share size={18} />}
+              <span className="hidden text-[0.8125rem] sm:inline" aria-live="polite">
                 {copied ? "Lien copié" : "Partager"}
               </span>
             </button>
-            <button
-              type="button"
-              onClick={toggleFullscreen}
-              className="hidden size-11 place-items-center rounded-[var(--radius-sm)] text-silver transition-colors hover:bg-kelp hover:text-platinum md:grid"
-              aria-label={fullscreen ? "Quitter le plein écran" : "Plein écran"}
-              aria-pressed={fullscreen}
-            >
-              {fullscreen ? <Shrink size={20} /> : <Expand size={20} />}
+            <button type="button" onClick={toggleFullscreen} className={`${iconButton} hidden md:grid`} aria-label={fullscreen ? "Quitter le plein écran" : "Plein écran"} aria-pressed={fullscreen}>
+              {fullscreen ? <Shrink size={19} /> : <Expand size={19} />}
             </button>
-            <button
-              type="button"
-              onClick={() => toggleZoom()}
-              className="hidden size-11 place-items-center rounded-[var(--radius-sm)] text-silver transition-colors hover:bg-kelp hover:text-platinum sm:grid"
-              aria-label={zoom ? "Dézoomer" : "Zoomer"}
-              aria-pressed={Boolean(zoom)}
-            >
-              {zoom ? <ZoomOut size={20} /> : <ZoomIn size={20} />}
+            <button type="button" onClick={() => toggleZoom()} className={`${iconButton} hidden sm:grid`} aria-label={zoom ? "Dézoomer" : "Zoomer"} aria-pressed={Boolean(zoom)}>
+              {zoom ? <ZoomOut size={19} /> : <ZoomIn size={19} />}
             </button>
-            <button
-              type="button"
-              onClick={close}
-              data-autofocus
-              className="grid size-11 place-items-center rounded-[var(--radius-sm)] text-platinum transition-colors hover:bg-kelp"
-              aria-label="Fermer la visionneuse"
-            >
-              <Close size={22} />
+            <button type="button" onClick={close} data-autofocus className={`${iconButton} ml-1 grid border border-line-strong`} aria-label="Fermer la visionneuse">
+              <Close size={20} />
             </button>
           </div>
         </div>
@@ -219,10 +219,7 @@ export function Lightbox({ items, permalink, index, onClose, onChange }: Props) 
               key={photo.id}
               className="lightbox-image absolute inset-0"
               data-direction={direction}
-              style={{
-                transform: zoom ? "scale(2.2)" : undefined,
-                transformOrigin: zoom ? `${zoom.x}% ${zoom.y}%` : "50% 50%",
-              }}
+              style={{ transform: zoom ? "scale(2.2)" : undefined, transformOrigin: zoom ? `${zoom.x}% ${zoom.y}%` : "50% 50%" }}
             >
               <Image
                 src={photo.src}
@@ -257,7 +254,7 @@ export function Lightbox({ items, permalink, index, onClose, onChange }: Props) 
 
         {/* Bandeau de vignettes */}
         {count > 1 ? (
-          <div ref={stripRef} className="lightbox-chrome hidden gap-2 overflow-x-auto px-[var(--gutter)] pt-4 [scrollbar-width:none] md:flex [&::-webkit-scrollbar]:hidden" aria-label="Toutes les photos de la série">
+          <div ref={stripRef} className="lightbox-chrome hidden gap-1.5 overflow-x-auto px-[var(--gutter)] pt-4 [scrollbar-width:none] md:flex [&::-webkit-scrollbar]:hidden" aria-label="Toutes les photos de la galerie">
             {items.map((it, i) => (
               <button
                 key={it.photo.id}
@@ -266,8 +263,8 @@ export function Lightbox({ items, permalink, index, onClose, onChange }: Props) 
                 onClick={() => onChange(i)}
                 aria-label={`Afficher la photo ${i + 1}`}
                 aria-current={i === shownIndex}
-                className={`relative h-14 shrink-0 overflow-hidden rounded-[4px] transition-[opacity,outline-color] duration-300 outline-offset-2 ${
-                  i === shownIndex ? "opacity-100 outline outline-1 outline-phosphor" : "opacity-45 outline-transparent hover:opacity-90"
+                className={`relative h-14 shrink-0 overflow-hidden rounded-[var(--radius-xs)] outline-offset-2 transition-[opacity,outline-color] duration-300 ${
+                  i === shownIndex ? "opacity-100 outline-2 outline-flamingo outline-solid" : "opacity-40 outline-transparent hover:opacity-90"
                 }`}
                 style={{ aspectRatio: `${it.photo.width} / ${it.photo.height}`, backgroundColor: it.photo.color }}
               >
@@ -277,14 +274,14 @@ export function Lightbox({ items, permalink, index, onClose, onChange }: Props) 
           </div>
         ) : null}
 
-        {/* Légende */}
+        {/* Légende + actions */}
         <div className="lightbox-chrome flex min-h-20 items-end justify-between gap-6 px-[var(--gutter)] pt-4 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
           <div id="lightbox-caption" className="min-w-0">
-            {item.title ? <p className="truncate text-[0.9375rem] font-medium text-platinum">{item.title}</p> : null}
-            <p className="truncate t-small text-silver">{item.context ?? photo.alt}</p>
-            {exifLine ? <p className="mt-1.5 hidden truncate font-mono text-[0.6875rem] tracking-[0.02em] text-silver/80 sm:block">{exifLine}</p> : null}
+            {item.title ? <p className="truncate text-[0.9375rem] font-medium text-linen md:hidden">{item.title}</p> : null}
+            <p className="truncate t-small text-taupe">{item.context ?? photo.alt}</p>
+            {exifLine ? <p className="mt-1.5 hidden truncate t-mono text-ash sm:block">{exifLine}</p> : null}
             {photo.credit ? (
-              <p className="mt-1 t-caption text-silver/80">
+              <p className="mt-1 t-mono text-ash">
                 Photo temporaire —{" "}
                 <a href={photo.credit.url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
                   {photo.credit.name}
@@ -294,26 +291,35 @@ export function Lightbox({ items, permalink, index, onClose, onChange }: Props) 
             ) : null}
           </div>
           <div className="flex shrink-0 items-center gap-2">
+            {allowDownload ? (
+              <a
+                href={originalUrl(photo.src)}
+                download
+                className="grid size-12 place-items-center rounded-full bg-wash-strong text-linen transition-colors hover:bg-[rgb(231_231_216/0.16)] sm:flex sm:w-auto sm:gap-2.5 sm:px-5"
+                aria-label="Télécharger cette photo"
+              >
+                <Download size={18} />
+                <span className="hidden text-[0.9375rem] font-medium sm:inline">Télécharger</span>
+              </a>
+            ) : null}
             <Link
               href={requestHref}
-              className="group hidden h-12 items-center gap-3 rounded-[var(--radius-sm)] bg-[image:var(--gradient-aurora)] px-5 t-label text-ink sm:inline-flex"
+              className="group grid size-12 place-items-center rounded-full bg-flamingo text-ink transition-colors hover:bg-tango sm:flex sm:w-auto sm:gap-2.5 sm:px-5"
+              aria-label="Demander cette photo en haute définition"
             >
-              Demander cette photo
-              <ArrowUpRight className="transition-transform duration-500 group-hover:rotate-45" />
+              <span className="hidden text-[0.9375rem] font-medium sm:inline">Demander cette photo</span>
+              <ArrowUpRight size={18} className="transition-transform duration-500 group-hover:rotate-45" />
             </Link>
-            <Link href={requestHref} className="grid size-12 place-items-center rounded-[var(--radius-sm)] bg-[image:var(--gradient-aurora)] text-ink sm:hidden" aria-label="Demander cette photo">
-              <ArrowUpRight size={20} />
-            </Link>
-          {count > 1 ? (
-            <div className="flex shrink-0 gap-2 md:hidden">
-              <button type="button" onClick={() => go(-1)} className="grid size-12 place-items-center rounded-[var(--radius-sm)] bg-kelp text-platinum" aria-label="Photo précédente">
-                <ArrowLeft size={20} />
-              </button>
-              <button type="button" onClick={() => go(1)} className="grid size-12 place-items-center rounded-[var(--radius-sm)] bg-kelp text-platinum" aria-label="Photo suivante">
-                <ArrowRight size={20} />
-              </button>
-            </div>
-          ) : null}
+            {count > 1 ? (
+              <div className="flex shrink-0 gap-2 md:hidden">
+                <button type="button" onClick={() => go(-1)} className="grid size-12 place-items-center rounded-full border border-line-strong text-linen" aria-label="Photo précédente">
+                  <ArrowLeft size={20} />
+                </button>
+                <button type="button" onClick={() => go(1)} className="grid size-12 place-items-center rounded-full border border-line-strong text-linen" aria-label="Photo suivante">
+                  <ArrowRight size={20} />
+                </button>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
@@ -328,9 +334,9 @@ function NavButton({ side, onClick }: { side: "left" | "right"; onClick: () => v
       type="button"
       onClick={onClick}
       aria-label={side === "left" ? "Photo précédente" : "Photo suivante"}
-      className={`group absolute top-1/2 hidden -translate-y-1/2 md:grid ${side === "left" ? "left-4" : "right-4"} size-14 place-items-center rounded-[var(--radius-sm)] text-platinum transition-colors hover:bg-kelp`}
+      className={`lightbox-nav group absolute top-1/2 hidden -translate-y-1/2 md:grid ${side === "left" ? "left-5" : "right-5"} size-14 place-items-center rounded-full border border-line-strong text-linen transition-colors duration-300 hover:border-flamingo hover:bg-flamingo hover:text-ink`}
     >
-      <Icon size={24} className={`transition-transform duration-500 ease-[var(--ease-out-expo)] ${side === "left" ? "group-hover:-translate-x-1" : "group-hover:translate-x-1"}`} />
+      <Icon size={22} className={`transition-transform duration-500 ease-[var(--ease-out-expo)] ${side === "left" ? "group-hover:-translate-x-0.5" : "group-hover:translate-x-0.5"}`} />
     </button>
   );
 }

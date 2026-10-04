@@ -7,7 +7,7 @@ import { Logo } from "@/components/brand/Logo";
 import { SearchDialog } from "@/components/search/SearchDialog";
 import { ButtonLink } from "@/components/ui/Button";
 import { ChevronDown, Search } from "@/components/ui/Icons";
-import { mainNav, siteConfig } from "@/config/site";
+import { mainNav, photoAccess, siteConfig } from "@/config/site";
 import type { NavCategory } from "@/lib/navigation";
 import type { SearchItem } from "@/lib/search";
 import { isActivePath } from "@/lib/utils";
@@ -16,9 +16,14 @@ import { MobileMenu } from "./MobileMenu";
 
 type Props = { portfolioNav: NavCategory[]; searchIndex: SearchItem[] };
 
+/**
+ * Barre de navigation en verre dépoli : la photo du dessous reste visible.
+ * Elle s'efface quand on descend (les photos prennent tout l'écran) et
+ * revient dès qu'on remonte.
+ */
 export function Header({ portfolioNav, searchIndex }: Props) {
   const pathname = usePathname();
-  const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -32,12 +37,25 @@ export function Header({ portfolioNav, searchIndex }: Props) {
     document.querySelector<HTMLElement>("#mega-menu a")?.focus();
   }, [megaOpen]);
 
-  // En-tête compact dès que l'on quitte le haut de page.
+  // Masquée en descendant, visible en remontant (et toujours en haut de page).
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
+    let last = window.scrollY;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const y = window.scrollY;
+      if (Math.abs(y - last) < 6) return;
+      setHidden(y > last && y > 320);
+      last = y;
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   // Raccourcis : ⌘K / Ctrl+K et « / » ouvrent la recherche.
@@ -68,14 +86,15 @@ export function Header({ portfolioNav, searchIndex }: Props) {
     setMegaOpen(false);
   }, []);
 
-  const solid = scrolled || megaOpen;
+  const tucked = hidden && !megaOpen && !menuOpen && !searchOpen;
 
   return (
     <>
       <header
-        className="fixed inset-x-0 top-0 z-50"
+        className={`fixed inset-x-0 top-0 z-50 transition-transform duration-500 ease-[var(--ease-out-expo)] ${tucked ? "-translate-y-full" : "translate-y-0"}`}
         style={{ viewTransitionName: "site-header" }}
         onPointerLeave={(event) => event.pointerType === "mouse" && closeMegaSoon()}
+        onFocus={() => setHidden(false)}
         onBlur={(event) => {
           // Le focus quitte l'en-tête : on referme le panneau.
           if (megaOpen && !event.currentTarget.contains(event.relatedTarget as Node | null)) closeMega();
@@ -87,72 +106,59 @@ export function Header({ portfolioNav, searchIndex }: Props) {
           }
         }}
       >
-        {/* Fond : transparent sur le hero, verre sombre une fois en défilement */}
-        <div
-          aria-hidden
-          className={`absolute inset-0 border-b transition-[background-color,border-color,backdrop-filter] duration-500 ${
-            solid ? "border-line bg-abyss/85 backdrop-blur-xl" : "border-transparent bg-gradient-to-b from-deep/60 to-transparent"
-          }`}
-        />
+        <div aria-hidden className="glass absolute inset-0 border-b border-line" />
 
-        <div
-          className={`container-wide relative flex items-center justify-between gap-6 transition-[height] duration-500 ease-[var(--ease-out-expo)] ${
-            scrolled ? "h-16" : "h-20"
-          }`}
-        >
-          <Link
-            href="/"
-            className="anim-fade relative z-10 -m-2 p-2 text-platinum"
-            style={{ "--delay": "300ms" } as React.CSSProperties}
-            aria-label={`${siteConfig.name} — accueil`}
-            onClick={closeMega}
-          >
+        <div className="container-wide relative flex h-[var(--header-height)] items-center justify-between gap-6">
+          <Link href="/" className="relative z-10 -m-2 p-2 text-linen" aria-label={`${siteConfig.name} — accueil`} onClick={closeMega}>
             <Logo />
           </Link>
 
-          <nav aria-label="Navigation principale" className="anim-fade hidden lg:block" style={{ "--delay": "450ms" } as React.CSSProperties}>
-            <ul className="flex items-center gap-7 whitespace-nowrap xl:gap-9">
+          <nav aria-label="Navigation principale" className="absolute left-1/2 hidden -translate-x-1/2 lg:block">
+            <ul className="flex items-center gap-1 whitespace-nowrap">
               {mainNav.map((item) => {
                 const active = isActivePath(pathname, item.href);
+                const linkClass = `relative inline-flex h-10 items-center px-3 t-label transition-colors duration-300 ${
+                  active ? "text-linen" : "text-taupe hover:text-linen"
+                }`;
+                const dot = (
+                  <span
+                    aria-hidden
+                    className={`absolute bottom-1 left-1/2 size-1 -translate-x-1/2 rounded-full bg-flamingo transition-[opacity,transform] duration-300 ${
+                      active ? "scale-100 opacity-100" : "scale-0 opacity-0"
+                    }`}
+                  />
+                );
                 if ("hasMegaMenu" in item) {
                   return (
-                    <li key={item.href} className="flex items-center gap-1" onPointerEnter={(e) => e.pointerType === "mouse" && openMegaSoon()}>
-                      <Link
-                        href={item.href}
-                        aria-current={active ? "page" : undefined}
-                        className={`t-nav link-underline transition-colors ${active || megaOpen ? "text-platinum" : "text-silver hover:text-platinum"}`}
-                        onClick={closeMega}
-                      >
+                    <li key={item.href} className="flex items-center" onPointerEnter={(e) => e.pointerType === "mouse" && openMegaSoon()}>
+                      <Link href={item.href} aria-current={active ? "page" : undefined} className={`${linkClass} pr-1 ${megaOpen ? "text-linen" : ""}`} onClick={closeMega}>
                         {item.label}
+                        {dot}
                       </Link>
                       <button
                         ref={megaButtonRef}
                         type="button"
                         aria-expanded={megaOpen}
                         aria-controls="mega-menu"
-                        aria-label="Afficher les rubriques du portfolio"
+                        aria-label="Afficher les catégories du portfolio"
                         onClick={(event) => {
                           const opening = !megaOpen;
                           setMegaOpen(opening);
                           // Activation au clavier : le focus entre dans le panneau.
                           focusMegaOnOpen.current = opening && event.detail === 0;
                         }}
-                        className="-my-2 -mr-2 grid size-8 place-items-center text-silver transition-colors hover:text-platinum"
+                        className="grid size-8 place-items-center text-taupe transition-colors hover:text-linen"
                       >
-                        <ChevronDown size={14} className={`transition-transform duration-300 ${megaOpen ? "rotate-180" : ""}`} />
+                        <ChevronDown size={13} className={`transition-transform duration-300 ${megaOpen ? "rotate-180" : ""}`} />
                       </button>
                     </li>
                   );
                 }
                 return (
                   <li key={item.href} onPointerEnter={(e) => e.pointerType === "mouse" && closeMegaSoon()}>
-                    <Link
-                      href={item.href}
-                      aria-current={active ? "page" : undefined}
-                      className={`t-nav link-underline transition-colors ${active ? "text-platinum" : "text-silver hover:text-platinum"}`}
-                      onClick={closeMega}
-                    >
+                    <Link href={item.href} aria-current={active ? "page" : undefined} className={linkClass} onClick={closeMega}>
                       {item.label}
+                      {dot}
                     </Link>
                   </li>
                 );
@@ -160,53 +166,44 @@ export function Header({ portfolioNav, searchIndex }: Props) {
             </ul>
           </nav>
 
-          <div className="anim-fade relative z-10 flex items-center gap-1 sm:gap-3" style={{ "--delay": "550ms" } as React.CSSProperties}>
-            {/* Champ de recherche (ouvre la palette) — icône seule sur mobile */}
+          <div className="relative z-10 flex items-center gap-2">
             <button
               type="button"
               onClick={() => {
                 closeMega();
                 setSearchOpen(true);
               }}
-              className="group flex h-11 items-center gap-3 rounded-[var(--radius-sm)] px-3 text-silver transition-[color,border-color,background-color] duration-300 hover:text-platinum lg:h-10 lg:w-48 lg:border lg:border-line lg:bg-[rgb(237_255_254/0.04)] lg:pr-3 lg:hover:border-line-strong lg:hover:bg-[rgb(237_255_254/0.07)] xl:w-64"
-              aria-label="Rechercher sur le site"
+              className="grid size-11 place-items-center rounded-full text-linen transition-colors duration-300 hover:bg-wash-strong"
+              aria-label="Rechercher une galerie, une équipe, un match"
               aria-haspopup="dialog"
             >
-              <Search size={17} className="shrink-0" />
-              <span className="hidden flex-1 truncate text-left text-[0.8125rem] text-silver/80 transition-colors group-hover:text-silver lg:inline">
-                Rechercher<span className="hidden xl:inline"> une équipe, un match…</span>
-              </span>
+              <Search size={19} />
             </button>
 
-            <span className="hidden xl:block">
-              <ButtonLink href="/contact" variant="outline" onClick={closeMega}>
-                Travaillons ensemble
+            <span className="hidden sm:block">
+              <ButtonLink href={photoAccess.href} variant="signal" size="sm" icon={false} onClick={closeMega}>
+                {photoAccess.label}
               </ButtonLink>
             </span>
 
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
-              className="group -mr-2 flex h-11 items-center gap-3 rounded-[var(--radius-sm)] px-2 text-platinum lg:hidden"
+              className="group -mr-2 flex h-11 items-center gap-3 rounded-full px-3 text-linen lg:hidden"
               aria-label="Ouvrir le menu"
               aria-haspopup="dialog"
               aria-expanded={menuOpen}
             >
-              <span className="t-nav hidden sm:inline">Menu</span>
-              <span aria-hidden className="flex w-6 flex-col items-end gap-[5px]">
-                <span className="h-px w-6 bg-current" />
-                <span className="h-px w-4 bg-current transition-[width] duration-300 group-hover:w-6" />
+              <span className="t-label hidden sm:inline">Menu</span>
+              <span aria-hidden className="flex w-6 flex-col items-end gap-[6px]">
+                <span className="h-[1.5px] w-6 bg-current" />
+                <span className="h-[1.5px] w-4 bg-current transition-[width] duration-300 group-hover:w-6" />
               </span>
             </button>
           </div>
         </div>
 
-        <MegaMenu
-          open={megaOpen}
-          categories={portfolioNav}
-          onNavigate={closeMega}
-          onPointerEnter={() => window.clearTimeout(hoverTimer.current)}
-        />
+        <MegaMenu open={megaOpen} categories={portfolioNav} onNavigate={closeMega} onPointerEnter={() => window.clearTimeout(hoverTimer.current)} />
       </header>
 
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} categories={portfolioNav} pathname={pathname} />

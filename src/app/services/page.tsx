@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import type { CSSProperties } from "react";
 import { PageIntro } from "@/components/layout/PageIntro";
 import { ClosingCta } from "@/components/sections/ClosingCta";
+import { RouteSteps } from "@/components/sections/RouteSteps";
 import { ButtonLink } from "@/components/ui/Button";
 import { Check } from "@/components/ui/Icons";
 import { PhotoImage } from "@/components/ui/PhotoImage";
-import { SectionLabel } from "@/components/ui/SectionLabel";
+import { SectionStamp } from "@/components/ui/SectionLabel";
 import { services } from "@/data/services";
 import { getPhotoById } from "@/lib/portfolio";
 import { inArea, pageMetadata } from "@/lib/seo";
@@ -31,7 +32,7 @@ export default function ServicesPage() {
       <PageIntro
         crumbs={[{ name: "Services", path: "/services" }]}
         kicker="Prestations"
-        title="Ser*vices*"
+        title="Services"
         intro={<p>Des prestations pensées pour les clubs, les fédérations, les partenaires et les joueurs. Chaque projet fait l&apos;objet d&apos;un devis personnalisé.</p>}
       />
 
@@ -44,32 +45,32 @@ export default function ServicesPage() {
               key={service.slug}
               id={service.slug}
               aria-labelledby={`${service.slug}-title`}
-              className="grid scroll-mt-28 gap-10 border-t border-line pt-10 pb-[clamp(4rem,8vw,8rem)] md:grid-cols-12 md:gap-8"
+              className="grid scroll-mt-28 gap-10 border-t border-line pt-6 pb-[clamp(3.5rem,7vw,7rem)] md:grid-cols-12 md:gap-8"
             >
               <div className={`md:col-span-6 ${reversed ? "md:order-2 md:col-start-7" : ""}`} data-reveal="image">
-                <PhotoImage photo={photo} fill sizes="(min-width: 768px) 50vw, 100vw" className={i % 3 === 0 ? "aspect-[4/5]" : "aspect-[4/3]"} />
+                <PhotoImage photo={photo} fill sizes="(min-width: 768px) 50vw, 100vw" className={`${i % 3 === 0 ? "aspect-[4/5]" : "aspect-[4/3]"} rounded-[var(--radius-card)]`} />
               </div>
               <div className={`flex flex-col md:col-span-5 ${reversed ? "md:order-1 md:col-start-1" : "md:col-start-8"}`}>
-                <div className="flex items-center gap-4">
-                  <span className="t-caption t-tabular text-phosphor">{pad(i + 1)}</span>
-                  <span className="rounded-[var(--radius-sm)] bg-kelp px-2.5 py-1 t-caption text-mist">{service.format}</span>
+                <div className="flex items-center justify-between gap-4 t-mono">
+                  <span className="text-flamingo">({pad(i + 1)})</span>
+                  <span className="text-ash">{service.format}</span>
                 </div>
-                <h2 id={`${service.slug}-title`} className="t-h2 mt-6 text-platinum" data-reveal>
+                <h2 id={`${service.slug}-title`} className="t-h2 mt-8 text-linen" data-reveal>
                   {service.title}
                 </h2>
-                <p className="mt-6 t-lead text-silver" data-reveal style={{ "--reveal-delay": "100ms" } as CSSProperties}>
+                <p className="mt-6 t-lead text-taupe" data-reveal style={{ "--reveal-delay": "100ms" } as CSSProperties}>
                   {service.description}
                 </p>
                 <ul className="mt-8 space-y-3 border-t border-line pt-6" data-reveal style={{ "--reveal-delay": "180ms" } as CSSProperties}>
                   {service.deliverables.map((d) => (
-                    <li key={d} className="flex items-start gap-3 t-small text-mist">
-                      <Check size={16} className="mt-0.5 shrink-0 text-phosphor" />
+                    <li key={d} className="flex items-start gap-3 t-small text-linen/90">
+                      <Check size={16} className="mt-0.5 shrink-0 text-flamingo" />
                       {d}
                     </li>
                   ))}
                 </ul>
-                <div className="mt-10 flex flex-wrap gap-3">
-                  <ButtonLink href={`/contact?projet=${service.slug}`} variant={i === 0 ? "aurora" : "solid"}>
+                <div className="mt-10">
+                  <ButtonLink href={`/contact?projet=${service.slug}`} variant="outline">
                     Demander un devis
                   </ButtonLink>
                 </div>
@@ -79,26 +80,14 @@ export default function ServicesPage() {
         })}
       </section>
 
-      <section aria-labelledby="process-title" className="section-sm bg-deep">
-        <div className="container-wide">
-          <SectionLabel>Déroulé</SectionLabel>
-          <h2 id="process-title" className="t-h2 mt-6 max-w-[16ch] text-platinum" data-reveal>
-            Comment se passe <span className="t-serif text-phosphor">une collaboration</span>
-          </h2>
-          <ol className="mt-14 grid gap-px overflow-hidden rounded-[var(--radius-lg)] bg-line sm:grid-cols-2 lg:grid-cols-4">
-            {STEPS.map((step, i) => (
-              <li key={step.title} className="bg-deep p-8 lg:p-10" data-reveal style={{ "--reveal-delay": `${i * 80}ms` } as CSSProperties}>
-                <span className="text-[clamp(2.5rem,1.5rem+2.5vw,4.5rem)] leading-none font-medium tracking-[-0.046em] text-phosphor t-tabular">{pad(i + 1)}</span>
-                <h3 className="mt-8 text-xl font-medium tracking-[-0.02em] text-platinum">{step.title}</h3>
-                <p className="mt-3 t-small text-silver">{step.body}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
+      <section aria-labelledby="process-title" className="container-wide pb-[var(--section-space)]">
+        <SectionStamp id="process-title" index="01" meta="Une collaboration" className="mb-12 md:mb-16">
+          Déroulé
+        </SectionStamp>
+        <RouteSteps steps={STEPS} />
       </section>
 
-      <div className="h-[var(--section-space-sm)]" />
-      <ClosingCta label="Devis" title="Un projet *en tête* ?" body="Les tarifs dépendent du format et de la durée : chaque demande reçoit une réponse personnalisée." />
+      <ClosingCta stamp="Devis" title="Un projet *en tête ?*" body="Les tarifs dépendent du format et de la durée : chaque demande reçoit une réponse personnalisée." cta={{ label: "Demander un devis", href: "/contact" }} />
     </>
   );
 }

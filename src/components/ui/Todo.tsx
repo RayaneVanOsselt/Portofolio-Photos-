@@ -8,7 +8,7 @@ import { isDev } from "@/config/site";
 export function Todo({ children }: { children: string }) {
   if (!isDev) return null;
   return (
-    <span className="inline-flex items-center gap-2 rounded-[var(--radius-sm)] border border-dashed border-phosphor/50 px-2 py-1 t-caption text-phosphor">
+    <span className="inline-flex items-center gap-2 rounded-[var(--radius-sm)] border border-dashed border-flamingo/60 px-2 py-1 t-mono text-flamingo normal-case tracking-[0.06em]">
       À configurer · {children}
     </span>
   );

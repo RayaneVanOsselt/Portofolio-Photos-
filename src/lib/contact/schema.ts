@@ -70,7 +70,7 @@ export function validateField(field: ContactField, v: ContactValues): string | u
       if (value && !PHONE_RE.test(value)) return "Ce numéro ne semble pas valide.";
       return;
     case "projectType":
-      if (!value) return "Choisissez un type de projet.";
+      if (!value) return "Choisissez un sujet.";
       if (!PROJECT_TYPES.some((t) => t.value === value)) return "Type de projet inconnu.";
       return;
     case "projectDate": {

@@ -1,7 +1,7 @@
 /**
- * Icônes maison : traits fins géométriques (1.25px), cohérents avec le
- * monogramme. Toutes décoratives (aria-hidden) — le libellé est porté
- * par le bouton ou le lien parent.
+ * Icônes maison : glyphes linéaires fins (1.5px), angles nets.
+ * Toutes décoratives (aria-hidden) — le libellé est porté par le bouton
+ * ou le lien parent.
  */
 import type { SVGProps } from "react";
 
@@ -15,7 +15,7 @@ function Base({ size = 16, children, ...props }: IconProps) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={1.25}
+      strokeWidth={1.5}
       strokeLinecap="square"
       aria-hidden
       focusable="false"
@@ -39,6 +39,11 @@ export const ArrowRight = (p: IconProps) => (
 export const ArrowLeft = (p: IconProps) => (
   <Base {...p}>
     <path d="M20 12H4M10 6l-6 6 6 6" />
+  </Base>
+);
+export const ArrowUp = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M12 20V4M6 10l6-6 6 6" />
   </Base>
 );
 export const Close = (p: IconProps) => (
@@ -84,7 +89,6 @@ export const ChevronDown = (p: IconProps) => (
     <path d="m6 9 6 6 6-6" />
   </Base>
 );
-
 export const Camera = (p: IconProps) => (
   <Base {...p}>
     <path d="M3.5 7.5h4l1.5-2.5h6l1.5 2.5h4v11h-17z" />
@@ -103,15 +107,14 @@ export const PageIcon = (p: IconProps) => (
     <path d="M14 3.5v4h4M9 12h6M9 15.5h6" />
   </Base>
 );
-export const CornerDownLeft = (p: IconProps) => (
-  <Base {...p}>
-    <path d="M19 5v7H6M10 8l-4 4 4 4" />
-  </Base>
-);
-
 export const Share = (p: IconProps) => (
   <Base {...p}>
     <path d="M12 15V3.5M7.5 8 12 3.5 16.5 8M5 12.5v8h14v-8" />
+  </Base>
+);
+export const Download = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M12 3.5V15M7.5 10.5 12 15l4.5-4.5M5 19.5h14" />
   </Base>
 );
 export const Expand = (p: IconProps) => (
@@ -122,6 +125,41 @@ export const Expand = (p: IconProps) => (
 export const Shrink = (p: IconProps) => (
   <Base {...p}>
     <path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5" />
+  </Base>
+);
+/** Vue planche (mosaïque) */
+export const GridIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M3.5 4.5h7v6h-7zM13.5 4.5h7v6h-7zM3.5 13.5h7v6h-7zM13.5 13.5h7v6h-7z" />
+  </Base>
+);
+/** Vue éditoriale */
+export const RowsIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M3.5 4h17v9h-17zM3.5 16h7.5v4H3.5zM14 16h6.5v4H14z" />
+  </Base>
+);
+export const Key = (p: IconProps) => (
+  <Base {...p}>
+    <circle cx="8" cy="15" r="4" />
+    <path d="m11 12 8.5-8.5M16 7l2.5 2.5M14 9l1.5 1.5" />
+  </Base>
+);
+export const Calendar = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M4 6h16v14H4zM4 10.5h16M8.5 3.5V8M15.5 3.5V8" />
+  </Base>
+);
+export const Pin = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M12 20.5s6.5-5.6 6.5-10.5a6.5 6.5 0 0 0-13 0c0 4.9 6.5 10.5 6.5 10.5z" />
+    <circle cx="12" cy="10" r="2.25" />
+  </Base>
+);
+export const Images = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M3.5 7.5h13v12h-13zM7.5 4.5h13v12" />
+    <path d="m3.5 16 4-4 3.5 3.5 2-2 3.5 3.5" />
   </Base>
 );
 

@@ -3,11 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { ArrowRight, ArrowUpRight, Close, Search } from "@/components/ui/Icons";
 import { useAnimatedDialog } from "@/hooks/useAnimatedDialog";
-import { SEARCH_TYPES, searchItems, type SearchItem } from "@/lib/search";
-import { Highlight, Thumb } from "./SearchParts";
+import { SEARCH_TYPE_PLURAL, SEARCH_TYPES, searchItems, type SearchItem, type SearchType } from "@/lib/search";
+import { Highlight, ResultMeta, Thumb } from "./SearchParts";
 
 type Props = {
   open: boolean;
@@ -15,16 +15,7 @@ type Props = {
   index: SearchItem[];
 };
 
-type Filter = "Tout" | SearchItem["type"];
-
-const FILTER_LABELS: Record<Filter, string> = {
-  Tout: "Tout",
-  Rubrique: "Rubriques",
-  Équipe: "Équipes",
-  Série: "Séries",
-  Service: "Services",
-  Page: "Pages",
-};
+type Filter = "Tout" | SearchType;
 
 const RECENT_KEY = "rayvo:recherches-recentes";
 const RECENT_MAX = 5;
@@ -33,6 +24,11 @@ const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 /** Une ligne navigable au clavier, quelle que soit la section qui l'affiche. */
 type Entry = { key: string; item: SearchItem; section: string };
 
+/**
+ * Palette de recherche : résultats pendant la saisie (galeries, catégories,
+ * équipes, services, pages), surlignage, filtres, navigation au clavier,
+ * recherches récentes et suggestions quand le champ est vide.
+ */
 export function SearchDialog({ open, onClose, index }: Props) {
   const router = useRouter();
   const dialogRef = useAnimatedDialog(open, onClose, 350);
@@ -59,19 +55,21 @@ export function SearchDialog({ open, onClose, index }: Props) {
   }, [allResults]);
   const results = filter === "Tout" ? allResults : allResults.filter((r) => r.type === filter);
 
-  const categories = useMemo(() => index.filter((i) => i.type === "Rubrique"), [index]);
+  const latest = useMemo(() => index.filter((i) => i.type === "Galerie").slice(0, 4), [index]);
+  const categories = useMemo(() => index.filter((i) => i.type === "Catégorie"), [index]);
   const quickLinks = useMemo(() => index.filter((i) => i.type === "Page"), [index]);
 
   // Sections affichées + liste à plat pour la navigation clavier.
   const sections: { title: string; entries: Entry[]; layout: "rows" | "tiles" }[] = trimmed
     ? SEARCH_TYPES.map((type) => ({
-        title: FILTER_LABELS[type],
+        title: SEARCH_TYPE_PLURAL[type],
         layout: "rows" as const,
         entries: results.filter((r) => r.type === type).map((item) => ({ key: `${type}-${item.href}`, item, section: type })),
       })).filter((s) => s.entries.length)
     : [
         ...(recent.length ? [{ title: "Récentes", layout: "rows" as const, entries: recent.map((item) => ({ key: `recent-${item.href}`, item, section: "recent" })) }] : []),
-        { title: "Rubriques", layout: "tiles" as const, entries: categories.map((item) => ({ key: `cat-${item.href}`, item, section: "cat" })) },
+        { title: "Dernières galeries", layout: "tiles" as const, entries: latest.map((item) => ({ key: `latest-${item.href}`, item, section: "latest" })) },
+        { title: "Catégories", layout: "rows" as const, entries: categories.map((item) => ({ key: `cat-${item.href}`, item, section: "cat" })) },
         { title: "Accès rapide", layout: "rows" as const, entries: quickLinks.map((item) => ({ key: `page-${item.href}`, item, section: "page" })) },
       ];
   const flat = sections.flatMap((s) => s.entries);
@@ -149,12 +147,12 @@ export function SearchDialog({ open, onClose, index }: Props) {
     <dialog
       ref={dialogRef}
       aria-label="Recherche"
-      className="search-dialog m-0 h-dvh max-h-none w-full max-w-none bg-transparent p-0 text-mist"
+      className="search-dialog m-0 h-dvh max-h-none w-full max-w-none bg-transparent p-0 text-linen"
       onClick={(event) => {
         if (event.target === event.currentTarget) close();
       }}
     >
-      <div className="search-panel flex h-dvh w-full flex-col overflow-hidden bg-deep sm:mx-auto sm:mt-[max(4.5rem,11vh)] sm:h-auto sm:max-h-[min(78vh,46rem)] sm:w-[calc(100%-2*var(--gutter))] sm:max-w-3xl sm:rounded-[var(--radius-lg)] sm:border sm:border-line">
+      <div className="search-panel flex h-dvh w-full flex-col overflow-hidden bg-ink sm:mx-auto sm:mt-[max(4.5rem,10vh)] sm:h-auto sm:max-h-[min(80vh,48rem)] sm:w-[calc(100%-2*var(--gutter))] sm:max-w-3xl sm:rounded-[var(--radius-card)] sm:border sm:border-line-strong">
         {/* Champ */}
         <form
           role="search"
@@ -165,9 +163,9 @@ export function SearchDialog({ open, onClose, index }: Props) {
             showAll();
           }}
         >
-          <Search size={22} className="shrink-0 text-phosphor" />
+          <Search size={22} className="shrink-0 text-flamingo" />
           <label htmlFor="site-search" className="sr-only">
-            Rechercher une rubrique, une équipe, une série ou un service
+            Rechercher une galerie, une équipe, un match, une date
           </label>
           <input
             id="site-search"
@@ -176,7 +174,7 @@ export function SearchDialog({ open, onClose, index }: Props) {
             autoComplete="off"
             spellCheck={false}
             enterKeyHint="search"
-            placeholder="Rechercher une équipe, une compétition, un service…"
+            placeholder="Équipe, match, date, catégorie…"
             value={query}
             onChange={(event) => {
               setQuery(event.target.value);
@@ -189,7 +187,7 @@ export function SearchDialog({ open, onClose, index }: Props) {
             aria-controls={listId}
             aria-autocomplete="list"
             aria-activedescendant={activeEntry ? `${listId}-${activeIndex}` : undefined}
-            className="h-16 w-full min-w-0 bg-transparent text-lg tracking-[-0.01em] text-platinum outline-none placeholder:text-silver/60 sm:h-[4.5rem] sm:text-xl [&::-webkit-search-cancel-button]:hidden"
+            className="h-16 w-full min-w-0 bg-transparent text-lg font-light tracking-[-0.015em] text-linen outline-none placeholder:text-ash sm:h-[4.5rem] sm:text-xl [&::-webkit-search-cancel-button]:hidden"
           />
           {query ? (
             <button
@@ -200,7 +198,7 @@ export function SearchDialog({ open, onClose, index }: Props) {
                 setActive(0);
                 document.getElementById("site-search")?.focus();
               }}
-              className="shrink-0 rounded-[var(--radius-sm)] px-2 py-1 t-caption text-silver transition-colors hover:text-platinum"
+              className="shrink-0 rounded-full px-3 py-1.5 text-[0.8125rem] text-taupe transition-colors hover:bg-wash-strong hover:text-linen"
             >
               Effacer
             </button>
@@ -208,7 +206,7 @@ export function SearchDialog({ open, onClose, index }: Props) {
           <button
             type="button"
             onClick={close}
-            className="-mr-1 grid size-10 shrink-0 place-items-center rounded-[var(--radius-sm)] text-silver transition-colors hover:bg-kelp hover:text-platinum"
+            className="-mr-1 grid size-10 shrink-0 place-items-center rounded-full text-taupe transition-colors hover:bg-wash-strong hover:text-linen"
             aria-label="Fermer la recherche"
           >
             <Close size={20} />
@@ -232,12 +230,12 @@ export function SearchDialog({ open, onClose, index }: Props) {
                     setActive(0);
                     document.getElementById("site-search")?.focus();
                   }}
-                  className={`flex shrink-0 items-center gap-2 rounded-[var(--radius-sm)] border px-3 py-1.5 text-xs font-medium tracking-[0.04em] transition-colors ${
-                    selected ? "border-phosphor/60 bg-phosphor/10 text-platinum" : "border-line text-silver hover:border-line-strong hover:text-platinum"
+                  className={`flex h-8 shrink-0 items-center gap-2 rounded-full border px-3.5 text-[0.8125rem] transition-colors ${
+                    selected ? "border-linen bg-linen text-ink" : "border-line text-taupe hover:border-line-strong hover:text-linen"
                   }`}
                 >
-                  {FILTER_LABELS[f]}
-                  <span className={`t-tabular ${selected ? "text-phosphor" : "text-silver/70"}`}>{count}</span>
+                  {f === "Tout" ? "Tout" : SEARCH_TYPE_PLURAL[f]}
+                  <span className={`font-mono text-[0.6875rem] ${selected ? "text-ink/70" : "text-ash"}`}>{count}</span>
                 </button>
               );
             })}
@@ -258,38 +256,32 @@ export function SearchDialog({ open, onClose, index }: Props) {
               return (
                 <section key={section.title} className="mb-3 last:mb-0" role="group" aria-label={section.title}>
                   <div className="flex items-center justify-between px-3 pt-2 pb-2">
-                    <h3 className="t-caption text-silver">
+                    <h3 className="t-mono text-ash">
                       {section.title}
-                      {trimmed ? <span className="ml-2 t-tabular text-silver/60">{section.entries.length}</span> : null}
+                      {trimmed ? <span className="ml-2 text-ash/70">{section.entries.length}</span> : null}
                     </h3>
                     {section.title === "Récentes" ? (
-                      <button type="button" onClick={clearRecent} className="t-caption text-silver/70 transition-colors hover:text-platinum">
-                        Effacer l&apos;historique
+                      <button type="button" onClick={clearRecent} className="t-mono text-ash transition-colors hover:text-linen">
+                        Effacer
                       </button>
                     ) : null}
                   </div>
 
                   {section.layout === "tiles" ? (
-                    <div className="grid grid-cols-2 gap-2 px-1 sm:grid-cols-3">
+                    <div className="grid grid-cols-2 gap-2 px-1 sm:grid-cols-4">
                       {section.entries.map((entry, i) => (
-                        <Tile
-                          key={entry.key}
-                          entry={entry}
-                          id={`${listId}-${offset + i}`}
-                          active={offset + i === activeIndex}
-                          onHover={() => setActive(offset + i)}
-                          onSelect={() => go(entry.item)}
-                        />
+                        <Tile key={entry.key} entry={entry} id={`${listId}-${offset + i}`} active={offset + i === activeIndex} onHover={() => setActive(offset + i)} onSelect={() => go(entry.item)} />
                       ))}
                     </div>
                   ) : (
                     section.entries.map((entry, i) => (
                       <Row
-                        key={entry.key}
+                        key={`${entry.key}-${trimmed}`}
                         entry={entry}
                         id={`${listId}-${offset + i}`}
                         query={trimmed}
                         recent={entry.section === "recent"}
+                        order={offset + i}
                         active={offset + i === activeIndex}
                         onHover={() => setActive(offset + i)}
                         onSelect={() => go(entry.item)}
@@ -303,15 +295,18 @@ export function SearchDialog({ open, onClose, index }: Props) {
         </div>
 
         {/* Pied */}
-        <div className="hidden shrink-0 items-center justify-between gap-4 border-t border-line bg-abyss/60 px-6 py-3 text-[0.6875rem] text-silver sm:flex">
+        <div className="hidden shrink-0 items-center justify-between gap-4 border-t border-line px-6 py-3 t-mono text-ash sm:flex">
           <span>{trimmed && allResults.length ? `${allResults.length} résultat${allResults.length > 1 ? "s" : ""}` : "Hockey · Rugby · Football"}</span>
           {trimmed && allResults.length ? (
-            <button type="button" onClick={showAll} className="group flex items-center gap-2 font-medium tracking-[0.04em] text-platinum">
-              Voir les {allResults.length} résultats
+            <button type="button" onClick={showAll} className="group flex items-center gap-2 text-linen">
+              Voir tous les résultats
               <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
             </button>
           ) : (
-            <span>Tout le portfolio, en un seul endroit</span>
+            <Link href="/galeries" onClick={close} className="group flex items-center gap-2 text-linen">
+              Trouver mes photos
+              <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+            </Link>
           )}
         </div>
       </div>
@@ -331,7 +326,7 @@ function readRecent(): SearchItem[] {
 
 type ItemProps = { entry: Entry; id: string; active: boolean; onHover: () => void; onSelect: () => void };
 
-function Row({ entry, id, query, recent, active, onHover, onSelect }: ItemProps & { query: string; recent?: boolean }) {
+function Row({ entry, id, query, recent, order, active, onHover, onSelect }: ItemProps & { query: string; recent?: boolean; order: number }) {
   const { item } = entry;
   return (
     <Link
@@ -346,21 +341,20 @@ function Row({ entry, id, query, recent, active, onHover, onSelect }: ItemProps 
         event.preventDefault();
         onSelect();
       }}
-      className={`group flex items-center gap-4 rounded-[var(--radius-sm)] px-3 py-2.5 transition-colors duration-150 ${active ? "bg-kelp" : ""}`}
+      className={`result-in group flex items-center gap-4 rounded-[var(--radius-btn)] px-3 py-2.5 transition-colors duration-150 ${active ? "bg-wash-strong" : ""}`}
+      style={{ "--i": order } as CSSProperties}
     >
-      <Thumb item={item} recent={recent} />
+      <Thumb item={item} recent={recent} size="size-12" />
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[0.9375rem] font-medium text-platinum">
+        <span className="block truncate text-[0.9375rem] font-medium text-linen">
           <Highlight text={item.title} query={query} />
         </span>
-        <span className="mt-0.5 block truncate text-xs text-silver">
-          <Highlight text={item.context} query={query} />
+        <span className="mt-0.5 block truncate text-xs text-taupe">
+          <ResultMeta item={item} query={query} />
         </span>
       </span>
-      <span className="hidden shrink-0 rounded-[4px] border border-line px-2 py-0.5 text-[0.625rem] font-medium tracking-[0.1em] text-silver uppercase sm:inline">
-        {item.type}
-      </span>
-      <span className={`grid size-7 shrink-0 place-items-center rounded-[4px] transition-opacity ${active ? "bg-phosphor text-ink opacity-100" : "opacity-0"}`} aria-hidden>
+      <span className="hidden shrink-0 t-mono text-ash sm:inline">{item.type}</span>
+      <span className={`grid size-8 shrink-0 place-items-center rounded-full transition-[opacity,background-color] ${active ? "bg-flamingo text-ink opacity-100" : "opacity-0"}`} aria-hidden>
         <ArrowUpRight size={14} />
       </span>
     </Link>
@@ -382,20 +376,17 @@ function Tile({ entry, id, active, onHover, onSelect }: ItemProps) {
         event.preventDefault();
         onSelect();
       }}
-      className={`group relative block overflow-hidden rounded-[var(--radius-sm)] outline-offset-2 transition-[outline-color] ${active ? "outline outline-1 outline-phosphor" : "outline-transparent"}`}
+      className={`group relative block overflow-hidden rounded-[var(--radius-btn)] outline-offset-2 transition-[outline-color] ${active ? "outline-2 outline-flamingo outline-solid" : "outline-transparent"}`}
     >
-      <span className="relative block aspect-[16/10]" style={{ backgroundColor: item.thumb?.color }}>
+      <span className="relative block aspect-[4/5]" style={{ backgroundColor: item.thumb?.color }}>
         {item.thumb ? (
-          <Image src={item.thumb.src} alt="" fill sizes="(min-width: 640px) 240px, 45vw" className={`object-cover transition-transform duration-700 ease-[var(--ease-out-expo)] ${active ? "scale-105" : ""}`} />
+          <Image src={item.thumb.src} alt="" fill sizes="(min-width: 640px) 180px, 45vw" className={`object-cover transition-transform duration-700 ease-[var(--ease-out-expo)] ${active ? "scale-105" : ""}`} />
         ) : null}
-        <span aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,transparent_35%,rgb(1_29_28/0.9))]" />
+        <span aria-hidden className="scrim-bottom absolute inset-0" />
       </span>
-      <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-3">
-        <span className="min-w-0">
-          <span className="block truncate text-sm font-medium text-platinum">{item.title}</span>
-          <span className="block truncate text-[0.6875rem] text-silver">{item.context}</span>
-        </span>
-        <ArrowUpRight size={14} className={`shrink-0 text-platinum transition-transform ${active ? "rotate-45" : ""}`} />
+      <span className="absolute inset-x-0 bottom-0 p-3">
+        <span className="block truncate text-sm font-medium text-linen">{item.title}</span>
+        <span className="block truncate t-mono text-linen/70">{item.date ?? `${item.count ?? 0} photos`}</span>
       </span>
     </Link>
   );
@@ -404,26 +395,26 @@ function Tile({ entry, id, active, onHover, onSelect }: ItemProps) {
 function EmptyState({ query, categories, onPick, onClose }: { query: string; categories: SearchItem[]; onPick: (item: SearchItem) => void; onClose: () => void }) {
   return (
     <div className="px-4 py-10 text-center sm:py-14">
-      <span className="mx-auto grid size-12 place-items-center rounded-[var(--radius-sm)] bg-kelp text-silver">
+      <span className="mx-auto grid size-12 place-items-center rounded-full bg-wash-strong text-taupe">
         <Search size={20} />
       </span>
-      <p className="mt-5 text-lg font-medium text-platinum">Aucun résultat pour « {query} »</p>
-      <p className="mx-auto mt-2 max-w-sm t-small text-silver">Vérifiez l&apos;orthographe ou essayez une rubrique :</p>
+      <p className="mt-5 text-xl font-light tracking-[-0.02em] text-linen">Aucun résultat pour « {query} »</p>
+      <p className="mx-auto mt-2 max-w-sm t-small text-taupe">Vérifiez l&apos;orthographe ou essayez une catégorie :</p>
       <div className="mt-6 flex flex-wrap justify-center gap-2">
         {categories.map((c) => (
           <button
             key={c.href}
             type="button"
             onClick={() => onPick(c)}
-            className="rounded-[var(--radius-sm)] border border-line px-3 py-1.5 text-xs font-medium text-silver transition-colors hover:border-line-strong hover:text-platinum"
+            className="h-9 rounded-full border border-line px-4 text-[0.8125rem] text-taupe transition-colors hover:border-line-strong hover:text-linen"
           >
             {c.title}
           </button>
         ))}
       </div>
-      <p className="mt-8 t-small text-silver">
-        Un projet particulier ?{" "}
-        <Link href="/contact" onClick={onClose} className="text-platinum underline underline-offset-4">
+      <p className="mt-8 t-small text-taupe">
+        Votre match n&apos;est pas en ligne ?{" "}
+        <Link href="/contact/?projet=demande-photo" onClick={onClose} className="text-linen underline underline-offset-4">
           Écrivez-moi
         </Link>
       </p>

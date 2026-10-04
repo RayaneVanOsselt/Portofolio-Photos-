@@ -84,16 +84,16 @@ export function ContactForm({ initialProjectType = "", initialMessage = "" }: { 
   if (status.kind === "success") {
     return (
       <div role="status" className="success-in flex min-h-[32rem] flex-col justify-center">
-        <span className="grid size-14 place-items-center rounded-[var(--radius-sm)] bg-phosphor text-ink">
+        <span className="grid size-14 place-items-center rounded-full bg-flamingo text-ink">
           <Check size={26} />
         </span>
-        <p className="mt-10 t-label text-phosphor">Message envoyé</p>
-        <h2 className="t-h2 mt-4 text-platinum">
-          Merci pour <span className="t-serif text-phosphor">votre message.</span>
+        <p className="mt-10 t-mono text-flamingo">+ Message envoyé</p>
+        <h2 className="t-h2 mt-4 text-linen">
+          Merci pour <span className="text-taupe">votre message.</span>
         </h2>
-        <p className="mt-6 max-w-md t-lead text-silver">Je reviens vers vous dès que possible.</p>
+        <p className="mt-6 max-w-md t-lead text-taupe">Je reviens vers vous dès que possible.</p>
         {status.simulated ? (
-          <p className="mt-6 rounded-[var(--radius-sm)] border border-dashed border-phosphor/50 p-4 t-small text-phosphor">
+          <p className="mt-6 rounded-[var(--radius-sm)] border border-dashed border-flamingo/60 p-4 t-small text-flamingo">
             Mode développement : le message a été affiché dans la console du navigateur au lieu d&apos;être envoyé. Renseignez NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY pour l&apos;envoi réel.
           </p>
         ) : null}
@@ -109,7 +109,7 @@ export function ContactForm({ initialProjectType = "", initialMessage = "" }: { 
           >
             Envoyer un autre message
           </Button>
-          <Link href="/portfolio" className="inline-flex h-11 items-center px-5 t-label text-silver hover:text-platinum">
+          <Link href="/portfolio" className="inline-flex h-12 items-center px-5 text-[0.9375rem] text-taupe hover:text-linen">
             Retour au portfolio
           </Link>
         </div>
@@ -129,14 +129,14 @@ export function ContactForm({ initialProjectType = "", initialMessage = "" }: { 
 
       <div id="form-status" aria-live="polite" className="sm:col-span-2 empty:hidden">
         {status.kind === "error" ? (
-          <div role="alert" className="rounded-[var(--radius-sm)] border border-danger/40 bg-danger/10 p-4 t-small text-mist">
-            <p className="font-medium text-platinum">Une erreur est survenue.</p>
-            <p className="mt-1 text-silver">
+          <div role="alert" className="rounded-[var(--radius-sm)] border border-danger/40 bg-danger/10 p-4 t-small text-linen">
+            <p className="font-medium text-linen">Une erreur est survenue.</p>
+            <p className="mt-1 text-taupe">
               {status.message}
               {siteConfig.contact.email ? (
                 <>
                   {" "}
-                  <a href={`mailto:${siteConfig.contact.email}`} className="text-platinum underline underline-offset-4">
+                  <a href={`mailto:${siteConfig.contact.email}`} className="text-linen underline underline-offset-4">
                     {siteConfig.contact.email}
                   </a>
                 </>
@@ -162,19 +162,19 @@ export function ContactForm({ initialProjectType = "", initialMessage = "" }: { 
       <Field id="phone" label="Téléphone" optional error={errors.phone}>
         <input {...inputProps("phone", values, errors, update, onBlur)} type="tel" autoComplete="tel" inputMode="tel" maxLength={LIMITS.phone} />
       </Field>
-      <Field id="projectType" label="Type de projet" error={errors.projectType}>
+      <Field id="projectType" label="Sujet" error={errors.projectType}>
         <div className="relative">
-          <select {...inputProps("projectType", values, errors, update, onBlur)} required className={`${fieldClass} appearance-none pr-8 ${values.projectType ? "" : "text-silver"}`}>
+          <select {...inputProps("projectType", values, errors, update, onBlur)} required className={`${fieldClass} appearance-none pr-8 ${values.projectType ? "" : "text-ash"}`}>
             <option value="" disabled>
               Sélectionner…
             </option>
             {PROJECT_TYPES.map((t) => (
-              <option key={t.value} value={t.value} className="bg-deep text-platinum">
+              <option key={t.value} value={t.value} className="bg-ink text-linen">
                 {t.label}
               </option>
             ))}
           </select>
-          <ChevronDown size={16} className="pointer-events-none absolute top-1/2 right-0 -translate-y-1/2 text-silver" />
+          <ChevronDown size={16} className="pointer-events-none absolute top-1/2 right-0 -translate-y-1/2 text-taupe" />
         </div>
       </Field>
       <Field id="projectDate" label="Date du projet" optional error={errors.projectDate}>
@@ -198,13 +198,13 @@ export function ContactForm({ initialProjectType = "", initialMessage = "" }: { 
               onChange={(e) => update("consent", e.target.checked ? "on" : "")}
               aria-invalid={Boolean(errors.consent)}
               aria-describedby={errors.consent ? "consent-error" : undefined}
-              className="peer absolute inset-0 cursor-pointer appearance-none rounded-[4px] border border-line-strong transition-colors checked:border-phosphor checked:bg-phosphor"
+              className="peer absolute inset-0 cursor-pointer appearance-none rounded-[4px] border border-line-strong transition-colors checked:border-flamingo checked:bg-flamingo"
             />
             <Check size={14} className="pointer-events-none relative text-ink opacity-0 peer-checked:opacity-100" />
           </span>
-          <span className="t-small text-silver">
+          <span className="t-small text-taupe">
             J&apos;accepte que mes données soient utilisées afin d&apos;être recontacté(e) concernant ma demande.{" "}
-            <Link href="/privacy" className="text-mist underline underline-offset-4 hover:text-platinum">
+            <Link href="/privacy" className="text-linen underline underline-offset-4">
               Politique de confidentialité
             </Link>
           </span>
@@ -217,17 +217,17 @@ export function ContactForm({ initialProjectType = "", initialMessage = "" }: { 
       </div>
 
       <div className="flex flex-col gap-4 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
-        <Button type="submit" variant="aurora" size="lg" icon disabled={pending} aria-disabled={pending}>
+        <Button type="submit" variant="signal" size="lg" icon disabled={pending} aria-disabled={pending}>
           {pending ? "Envoi en cours…" : "Envoyer le message"}
         </Button>
-        <p className="t-caption text-silver">Tous les champs sont requis sauf mention « facultatif ».</p>
+        <p className="t-mono text-ash">Champs requis sauf « facultatif »</p>
       </div>
     </form>
   );
 }
 
 const fieldClass =
-  "w-full border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[1.0625rem] text-platinum outline-none transition-colors placeholder:text-silver/60 hover:border-silver focus:border-phosphor aria-[invalid=true]:border-danger";
+  "w-full border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[1.0625rem] text-linen outline-none transition-colors placeholder:text-ash hover:border-taupe focus:border-flamingo aria-[invalid=true]:border-danger";
 
 function inputProps(
   field: ContactField,
@@ -268,11 +268,11 @@ function Field({
   return (
     <div className={className}>
       <div className="flex items-baseline justify-between gap-4">
-        <label htmlFor={id} className="t-caption text-silver">
+        <label htmlFor={id} className="t-mono text-taupe">
           {label}
-          {optional ? <span className="ml-2 normal-case tracking-normal text-silver/70">(facultatif)</span> : null}
+          {optional ? <span className="ml-2 tracking-[0.06em] text-ash normal-case">(facultatif)</span> : null}
         </label>
-        {hint ? <span className="t-caption t-tabular text-silver/70">{hint}</span> : null}
+        {hint ? <span className="t-mono text-ash">{hint}</span> : null}
       </div>
       {children}
       {error ? (

@@ -1,10 +1,14 @@
 import { Fragment } from "react";
 
-/** Met en serif italique les mots entourés d'astérisques : « l'instant où tout *bascule* ». */
+/**
+ * Les mots entourés d'astérisques passent en ton secondaire (Taupe) :
+ * « Parlons de votre *projet*. » — l'accent reste achromatique,
+ * l'orange est réservé aux actions.
+ */
 export function Emphasis({ text }: { text: string }) {
   return text.split(/(\*[^*]+\*)/g).map((part, i) =>
     part.startsWith("*") && part.endsWith("*") ? (
-      <span key={i} className="t-serif text-phosphor">
+      <span key={i} className="text-taupe">
         {part.slice(1, -1)}
       </span>
     ) : (

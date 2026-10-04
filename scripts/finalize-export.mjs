@@ -12,7 +12,7 @@ import { readdir, readFile, rename, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const OUT = join(process.cwd(), "out");
-const IMAGE_ROUTES = ["opengraph-image", "twitter-image"];
+const IMAGE_ROUTES = ["opengraph-image", "twitter-image", "apple-icon"];
 
 if (!existsSync(OUT)) {
   console.error("Dossier out/ introuvable : lancez d'abord `next build`.");

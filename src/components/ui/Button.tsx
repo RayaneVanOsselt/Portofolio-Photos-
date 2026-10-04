@@ -2,25 +2,31 @@ import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 import { ArrowUpRight } from "./Icons";
 
-type Variant = "aurora" | "solid" | "outline" | "ghost";
-type Size = "md" | "lg";
+/**
+ * Boutons du système — deux formes seulement :
+ * - pilule (999px) : actions principales — `signal` (orange, une par écran),
+ *   `ghost` (voile translucide) et `ink` (sur le bloc orange) ;
+ * - rectangle 8px : `outline`, l'action discrète bordée de lin.
+ */
+type Variant = "signal" | "ghost" | "ink" | "outline";
+type Size = "sm" | "md" | "lg";
 
 const base =
-  "group/btn relative inline-flex items-center justify-center gap-3 rounded-[var(--radius-sm)] t-label whitespace-nowrap select-none " +
+  "group/btn relative inline-flex items-center justify-center gap-2.5 whitespace-nowrap select-none font-medium tracking-[-0.005em] " +
   "transition-[background-color,color,border-color,transform] duration-300 ease-[var(--ease-out-expo)] active:scale-[0.98] " +
   "disabled:pointer-events-none disabled:opacity-60";
 
 const variants: Record<Variant, string> = {
-  // CTA principal : le dégradé aurora, réservé à une action par écran.
-  aurora: "text-ink bg-[image:var(--gradient-aurora)] bg-[length:200%_100%] bg-left hover:bg-right [transition-property:background-position,transform] duration-700",
-  solid: "bg-kelp text-platinum hover:bg-[#0a4743]",
-  outline: "border border-line-strong text-platinum hover:border-mist hover:bg-[rgb(237_255_254/0.06)]",
-  ghost: "text-platinum hover:text-phosphor",
+  signal: "rounded-full bg-flamingo text-ink hover:bg-tango",
+  ghost: "rounded-full bg-wash-strong text-linen hover:bg-[rgb(231_231_216/0.16)]",
+  ink: "rounded-full bg-ink text-linen hover:bg-iron",
+  outline: "rounded-[var(--radius-btn)] border border-linen/80 text-linen hover:border-linen hover:bg-wash-strong",
 };
 
 const sizes: Record<Size, string> = {
-  md: "h-11 px-5",
-  lg: "h-14 px-7",
+  sm: "h-9 px-4 text-[0.8125rem]",
+  md: "h-12 px-6 text-[0.9375rem]",
+  lg: "h-14 px-8 text-base",
 };
 
 type CommonProps = {
@@ -45,6 +51,10 @@ function Inner({ children, icon }: { children: ReactNode; icon?: boolean }) {
   );
 }
 
+export function buttonClass(variant: Variant = "outline", size: Size = "md", className = "") {
+  return `${base} ${variants[variant]} ${sizes[size]} ${className}`;
+}
+
 export function ButtonLink({
   variant = "outline",
   size = "md",
@@ -54,7 +64,7 @@ export function ButtonLink({
   ...props
 }: CommonProps & Omit<ComponentProps<typeof Link>, "children" | "className">) {
   return (
-    <Link className={`${base} ${variants[variant]} ${sizes[size]} ${className}`} data-cursor="follow" {...props}>
+    <Link className={buttonClass(variant, size, className)} {...props}>
       <Inner icon={icon}>{children}</Inner>
     </Link>
   );
@@ -69,22 +79,22 @@ export function Button({
   ...props
 }: CommonProps & Omit<ComponentProps<"button">, "children" | "className">) {
   return (
-    <button className={`${base} ${variants[variant]} ${sizes[size]} ${className}`} {...props}>
+    <button className={buttonClass(variant, size, className)} {...props}>
       <Inner icon={icon}>{children}</Inner>
     </button>
   );
 }
 
-/** Lien texte avec flèche qui glisse — pour les invitations secondaires. */
+/** Lien texte avec flèche — pour les invitations secondaires (« Voir la galerie → »). */
 export function ArrowLink({
   children,
   className = "",
   ...props
 }: { children: ReactNode; className?: string } & Omit<ComponentProps<typeof Link>, "children" | "className">) {
   return (
-    <Link className={`group/al inline-flex items-center gap-3 t-label text-platinum ${className}`} data-cursor="follow" {...props}>
+    <Link className={`group/al inline-flex items-center gap-3 text-[0.9375rem] font-medium text-linen ${className}`} {...props}>
       <span className="link-underline">{children}</span>
-      <span className="inline-grid size-8 place-items-center rounded-[var(--radius-sm)] bg-kelp-soft transition-colors duration-300 group-hover/al:bg-kelp">
+      <span className="inline-grid size-8 place-items-center rounded-full border border-line-strong transition-[background-color,border-color,color] duration-300 group-hover/al:border-flamingo group-hover/al:bg-flamingo group-hover/al:text-ink">
         <ArrowUpRight className="transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover/al:rotate-45" />
       </span>
     </Link>
