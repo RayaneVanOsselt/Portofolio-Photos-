@@ -117,6 +117,47 @@ Elle n'apparaît ni dans les listes, ni dans la recherche, ni dans le plan du si
 
 Chaque photo possède un lien permanent (`…/galeries/<slug>/#photo-<slug>-<numéro>`) : il peut être partagé (bouton « Partager ») et rouvre directement la photo. Le bouton « Demander cette photo » ouvre le formulaire de contact pré-rempli (type « Demande d'une photo », numéro et lien de l'image) : pratique pour les joueurs, parents et clubs. Le bloc orange « Vous êtes sur les photos ? » rappelle cette possibilité sur l'accueil, les catégories et les galeries. Les anciennes adresses `/project/<slug>` redirigent automatiquement vers `/galeries/<slug>` (ancre comprise : un lien de photo déjà partagé reste valable).
 
+## 4 bis. Football — reportages « Matchday »
+
+Une galerie qui possède une fiche `match` (dans `src/data/projects.ts`) s'affiche comme un **reportage de match** : en-tête « MATCHDAY · 2026 / 10 / 04 », affiche des équipes, stade, photo principale, fiche de match, puis le récit en chapitres. Elle apparaît aussi dans **l'archive `/football`** (par année et par mois) et sur l'accueil.
+
+```ts
+{
+  slug: "2026-10-04-union-sg-u23-rwdm",
+  title: "Union SG U23 vs RWDM",
+  category: "rwdm",
+  folder: "portfolio/rwdm/2026-10-04-union-sg-u23-rwdm",
+  date: "2026-10-04",
+  location: "Stade Joseph Marien",          // le stade
+  match: {
+    home: "Union Saint-Gilloise U23", homeShort: "Union SG U23",
+    away: "RWDM",
+    score: [2, 1],                           // facultatif
+    competition: "Championnat U23",          // facultatif
+    round: "J8",                             // facultatif
+  },
+  chapters: { "avant-match": { text: "Arrivée au stade, échauffement." } }, // facultatif
+}
+```
+
+**Raconter le match en chapitres** : rangez les photos dans des sous-dossiers numérotés du dossier de la galerie, puis lancez `npm run photos` :
+
+```
+public/images/portfolio/rwdm/2026-10-04-union-sg-u23-rwdm/
+├── 01-avant-match/
+├── 02-action/
+├── 03-ambiance/
+├── 04-supporters/
+├── 05-coulisses/
+└── 06-apres-match/
+```
+
+Les noms connus reçoivent un titre propre (« Avant-match », « Après-match », « Échauffement », « Célébrations »…) ; tout autre nom est repris tel quel. Les photos posées directement dans le dossier de la galerie ouvrent le récit (« Introduction »). La visionneuse reste continue d'un chapitre à l'autre.
+
+**Sélection de photos** : dans une galerie, le visiteur ajoute des photos à sa sélection (cœur dans la visionneuse), puis clique sur « Demander ma sélection » : le formulaire de contact arrive pré-rempli avec les numéros des photos et le lien de la galerie. La sélection reste dans son navigateur, rien n'est envoyé avant sa demande.
+
+Les informations sportives restent discrètes et n'apparaissent que si elles sont renseignées (jamais de score inventé).
+
 ## 5. Ajouter ou modifier des rubriques
 
 Tout est dans **`src/data/categories.ts`** : une rubrique = un objet, ses équipes = `children`. L'ordre du fichier est celui des menus, des filtres et du plan du site. Les URL (`/portfolio/<rubrique>/<équipe>`), le méga-menu, le menu mobile, la recherche, le sitemap et les images de partage sont générés automatiquement.

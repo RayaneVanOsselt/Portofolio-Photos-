@@ -1,7 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
-import { GridIcon, RowsIcon } from "@/components/ui/Icons";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
+import Link from "next/link";
+import { GridIcon, Heart, RowsIcon } from "@/components/ui/Icons";
+import { useFavorites } from "@/hooks/useFavorites";
 import { PhotoImage } from "@/components/ui/PhotoImage";
 import { composeGallery, flexFor, sizesFor, type GalleryRow } from "@/lib/gallery-layout";
 import type { Photo } from "@/lib/types";
@@ -18,6 +20,9 @@ export type GalleryItem = {
 
 export type GalleryView = "editorial" | "mosaic";
 
+/** Découpage en chapitres : un en-tête avant chaque tranche de photos [start, end[. */
+export type GallerySection = { id: string; start: number; end: number; header: ReactNode };
+
 type Props = {
   /** Identifiant unique sur la page : sert aux liens permanents (#photo-<id>-<n>). */
   id: string;
@@ -32,6 +37,8 @@ type Props = {
   toolbar?: boolean;
   /** Bouton « Télécharger » dans la visionneuse. */
   allowDownload?: boolean;
+  /** Chapitres (reportage de match) : la visionneuse reste continue d'un chapitre à l'autre. */
+  sections?: GallerySection[];
 };
 
 /** Photos affichées d'emblée, puis par lots au défilement : une galerie de 400 photos reste légère. */
@@ -65,15 +72,27 @@ function saveView(view: GalleryView) {
   window.dispatchEvent(new Event(VIEW_EVENT));
 }
 
-export function Gallery({ id, items, label, priorityCount = 0, defaultView = "editorial", toolbar = false, allowDownload = false }: Props) {
+export function Gallery({ id, items, label, priorityCount = 0, defaultView = "editorial", toolbar = false, allowDownload = false, sections }: Props) {
   const stored = useSyncExternalStore(subscribeView, readView, () => null);
   const [localView, setLocalView] = useState<GalleryView | null>(null);
   const view = toolbar ? (localView ?? stored ?? defaultView) : defaultView;
 
-  const rows = useMemo(() => composeGallery(items.map((item) => item.photo)), [items]);
+  // Une composition par chapitre (ou une seule pour toute la galerie), indices globaux.
+  const groups = useMemo(() => {
+    const parts = sections?.length ? sections : [{ id: "all", start: 0, end: items.length, header: null }];
+    return parts.map((part) => ({
+      ...part,
+      rows: composeGallery(items.slice(part.start, part.end).map((item) => item.photo)).map((row) => ({
+        ...row,
+        items: row.items.map((i) => i + part.start),
+      })),
+    }));
+  }, [items, sections]);
   const [shown, setShown] = useState(BATCH);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const fav = useFavorites(id);
+  const selection = fav.favorites.filter((i) => i < items.length);
   const hashPrefix = `#photo-${id}-`;
   // Tant que le lien d'arrivée n'a pas été lu, on ne touche pas à l'adresse.
   const hashRead = useRef(false);
@@ -172,29 +191,39 @@ export function Gallery({ id, items, label, priorityCount = 0, defaultView = "ed
         </div>
       ) : null}
 
-      {view === "mosaic" ? (
-        <div className="mosaic" role="list" aria-label={label}>
-          {items.slice(0, visible).map((item, index) => (
-            <div key={item.photo.id} role="listitem" className="mosaic-item" style={{ "--r": (item.photo.width / item.photo.height).toFixed(4) } as CSSProperties}>
-              <TileButton item={item} index={index} total={items.length} onOpen={setOpenIndex}>
-                <PhotoImage
-                  photo={item.photo}
-                  sizes="(min-width: 1280px) 30vw, (min-width: 640px) 40vw, 60vw"
-                  priority={index < priorityCount}
-                  className="rounded-[var(--radius-xs)]"
-                />
-              </TileButton>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="gallery" role="list" aria-label={label}>
-          {rows
-            .filter((row) => row.items[0] < visible)
-            .map((row, r) => (
-              <Row key={`${r}-${row.items[0]}`} row={row} items={items} total={items.length} priorityCount={priorityCount} onOpen={setOpenIndex} />
-            ))}
-        </div>
+      {groups.map((group) =>
+        group.start < visible ? (
+          <Fragment key={group.id}>
+            {group.header}
+            {view === "mosaic" ? (
+              <div className="mosaic" role="list" aria-label={label}>
+                {items.slice(group.start, Math.min(group.end, visible)).map((item, k) => {
+                  const index = group.start + k;
+                  return (
+                    <div key={item.photo.id} role="listitem" className="mosaic-item" style={{ "--r": (item.photo.width / item.photo.height).toFixed(4) } as CSSProperties}>
+                      <TileButton item={item} index={index} total={items.length} onOpen={setOpenIndex} selected={fav.has(index)}>
+                        <PhotoImage
+                          photo={item.photo}
+                          sizes="(min-width: 1280px) 30vw, (min-width: 640px) 40vw, 60vw"
+                          priority={index < priorityCount}
+                          className="rounded-[var(--radius-xs)]"
+                        />
+                      </TileButton>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="gallery" role="list" aria-label={label}>
+                {group.rows
+                  .filter((row) => row.items[0] < visible)
+                  .map((row) => (
+                    <Row key={`${group.id}-${row.items[0]}`} row={row} items={items} total={items.length} priorityCount={priorityCount} onOpen={setOpenIndex} isSelected={fav.has} />
+                  ))}
+              </div>
+            )}
+          </Fragment>
+        ) : null,
       )}
 
       {remaining > 0 ? (
@@ -210,12 +239,32 @@ export function Gallery({ id, items, label, priorityCount = 0, defaultView = "ed
         </div>
       ) : null}
 
-      <Lightbox items={items} permalink={permalink} index={openIndex} onClose={() => setOpenIndex(null)} onChange={changeIndex} allowDownload={allowDownload} />
+      {selection.length ? (
+        <div role="region" aria-label="Ma sélection" className="selection-bar sticky bottom-4 z-30 mx-auto mt-10 flex w-fit max-w-full flex-wrap items-center gap-2 rounded-full border border-line-strong bg-night/90 py-2 pr-2 pl-5 backdrop-blur-xl">
+          <span className="flex items-center gap-2 text-[0.875rem] text-linen">
+            <Heart size={16} filled className="text-flamingo" />
+            <span>
+              <span className="font-mono">{pad(selection.length)}</span> photo{selection.length > 1 ? "s" : ""} sélectionnée{selection.length > 1 ? "s" : ""}
+            </span>
+          </span>
+          <button type="button" onClick={fav.clear} className="h-10 rounded-full px-4 text-[0.8125rem] text-taupe transition-colors hover:text-linen">
+            Vider
+          </button>
+          <Link
+            href={`/contact/?photo=${encodeURIComponent(`n° ${selection.map((i) => i + 1).join(", ")} — ${items[0]?.title ?? label}`)}&lien=${encodeURIComponent(typeof window === "undefined" ? "" : `${location.origin}${location.pathname}`)}`}
+            className="flex h-10 items-center rounded-full bg-flamingo px-5 text-[0.875rem] font-medium text-ink transition-colors hover:bg-tango"
+          >
+            Demander ma sélection
+          </Link>
+        </div>
+      ) : null}
+
+      <Lightbox items={items} favorite={{ has: fav.has, toggle: fav.toggle }} permalink={permalink} index={openIndex} onClose={() => setOpenIndex(null)} onChange={changeIndex} allowDownload={allowDownload} />
     </>
   );
 }
 
-function Row({ row, items, total, priorityCount, onOpen }: { row: GalleryRow; items: GalleryItem[]; total: number; priorityCount: number; onOpen: (index: number) => void }) {
+function Row({ row, items, total, priorityCount, onOpen, isSelected }: { row: GalleryRow; items: GalleryItem[]; total: number; priorityCount: number; onOpen: (index: number) => void; isSelected: (index: number) => boolean }) {
   const rowPhotos = row.items.map((i) => items[i].photo);
   const portraits = rowPhotos.filter((p) => p.width < p.height).length;
 
@@ -229,7 +278,7 @@ function Row({ row, items, total, priorityCount, onOpen }: { row: GalleryRow; it
         className="gallery-tile"
         style={{ "--flex": flexFor(item.photo), "--ratio": `${item.photo.width / item.photo.height}` } as CSSProperties}
       >
-        <TileButton item={item} index={index} total={total} onOpen={onOpen}>
+        <TileButton item={item} index={index} total={total} onOpen={onOpen} selected={isSelected(index)}>
           <div data-reveal={priority ? undefined : "image"} style={{ "--reveal-delay": `${k * 90}ms` } as CSSProperties}>
             <PhotoImage photo={item.photo} sizes={sizesFor(row.kind, item.photo, rowPhotos)} priority={priority} className="rounded-[var(--radius-xs)]" />
           </div>
@@ -262,16 +311,35 @@ function Row({ row, items, total, priorityCount, onOpen }: { row: GalleryRow; it
   );
 }
 
-function TileButton({ item, index, total, onOpen, children }: { item: GalleryItem; index: number; total: number; onOpen: (index: number) => void; children: React.ReactNode }) {
+function TileButton({
+  item,
+  index,
+  total,
+  onOpen,
+  selected,
+  children,
+}: {
+  item: GalleryItem;
+  index: number;
+  total: number;
+  onOpen: (index: number) => void;
+  selected: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <button
       type="button"
       onClick={() => onOpen(index)}
       className="photo-hover group relative block w-full rounded-[var(--radius-xs)] text-left"
-      aria-label={`Agrandir la photo ${index + 1} sur ${total} : ${item.photo.alt}`}
+      aria-label={`Agrandir la photo ${index + 1} sur ${total}${selected ? " (dans ma sélection)" : ""} : ${item.photo.alt}`}
       aria-haspopup="dialog"
     >
       {children}
+      {selected ? (
+        <span aria-hidden className="pointer-events-none absolute top-2 left-2 grid size-8 place-items-center rounded-full bg-flamingo text-ink">
+          <Heart size={15} filled />
+        </span>
+      ) : null}
       <span
         aria-hidden
         className="pointer-events-none absolute right-2 bottom-2 rounded-full bg-ink/70 px-2 py-1 font-mono text-[0.625rem] tracking-[0.12em] text-linen opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"

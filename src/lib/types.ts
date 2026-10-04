@@ -44,6 +44,40 @@ export type Category = {
   photoCount: number;
 };
 
+/**
+ * Fiche de match (football et autres sports d'équipe). Tout est facultatif sauf
+ * les deux équipes ; un champ vide n'est jamais affiché. Le stade = `location`.
+ */
+export type MatchInfo = {
+  /** Équipe à domicile, en entier : « Union Saint-Gilloise U23 ». */
+  home: string;
+  /** Équipe visiteuse : « RWDM ». */
+  away: string;
+  /** Versions courtes pour les grands titres : « Union SG U23 ». */
+  homeShort?: string;
+  awayShort?: string;
+  /** Score final [domicile, visiteur] — laisser vide s'il n'est pas connu. */
+  score?: [number, number];
+  /** Compétition : « Championnat U23 », « Coupe de Belgique »… */
+  competition?: string;
+  /** Journée / tour : « J8 », « Quart de finale »… */
+  round?: string;
+};
+
+/** Textes facultatifs d'un chapitre (clé = nom du sous-dossier sans numéro, ex. « avant-match »). */
+export type ChapterNote = { title?: string; text?: string };
+
+export type Chapter = {
+  /** « avant-match » */
+  slug: string;
+  /** « Avant-match » */
+  title: string;
+  text?: string;
+  /** Position de la première photo du chapitre dans la galerie. */
+  start: number;
+  photos: Photo[];
+};
+
 export type ProjectInput = {
   slug: string;
   title: string;
@@ -71,12 +105,21 @@ export type ProjectInput = {
   accessCode?: string;
   /** Affiche un bouton « Télécharger » dans la visionneuse (photo d'origine). */
   allowDownload?: boolean;
+  /** Fiche de match : active la mise en page « Matchday ». */
+  match?: MatchInfo;
+  /** Textes des chapitres (sous-dossiers 01-avant-match/, 02-action/…). */
+  chapters?: Record<string, ChapterNote>;
+  /** Photographe crédité (par défaut : le nom du site). */
+  photographer?: string;
 };
 
-export type Project = Omit<ProjectInput, "category"> & {
+export type Project = Omit<ProjectInput, "category" | "chapters"> & {
   href: string;
   category: Category;
+  /** Toutes les photos, dans l'ordre des chapitres. */
   photos: Photo[];
+  /** Chapitres du reportage (vide si les photos ne sont pas réparties en sous-dossiers). */
+  chapters: Chapter[];
   cover: Photo;
 };
 

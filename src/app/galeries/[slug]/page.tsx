@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
+import { MatchdayView } from "@/components/football/MatchdayView";
 import { ShareGalleryButton } from "@/components/galleries/ShareGalleryButton";
 import { Gallery } from "@/components/gallery/Gallery";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
@@ -52,67 +53,95 @@ export default async function GalleryPage({ params }: PageProps<"/galeries/[slug
     project.teams?.length ? { label: "Équipes", value: project.teams.join(", ") } : null,
   ].filter(Boolean) as { label: string; value: string }[];
 
+  const crumbs = project.private
+    ? [
+        { name: "Galeries", path: "/galeries" },
+        { name: project.title, path: project.href },
+      ]
+    : [
+        ...(project.match && project.category.sport === "football" ? [{ name: "Football", path: "/football" }] : [{ name: "Portfolio", path: "/portfolio" }]),
+        ...trail.map((c) => ({ name: c.title, path: c.href })),
+        { name: project.title, path: project.href },
+      ];
+
   return (
     <>
-      <header className="container-wide page-top pb-[clamp(2.5rem,5vw,4rem)]">
-        <Breadcrumbs
-          items={
-            project.private
-              ? [{ name: "Galeries", path: "/galeries" }, { name: project.title, path: project.href }]
-              : [{ name: "Portfolio", path: "/portfolio" }, ...trail.map((c) => ({ name: c.title, path: c.href })), { name: project.title, path: project.href }]
-          }
-        />
-        <div className="mt-10 grid gap-10 md:mt-14 lg:grid-cols-12 lg:items-end">
-          <div className="lg:col-span-7">
-            <div className="anim-rise" style={delay(120)}>
-              <SectionLabel>{project.private ? "Galerie privée" : context}</SectionLabel>
+      {project.match ? (
+        <MatchdayView project={project} crumbs={crumbs} />
+      ) : (
+        <>
+          <header className="container-wide page-top pb-[clamp(2.5rem,5vw,4rem)]">
+            <Breadcrumbs items={crumbs} />
+            <div className="mt-10 grid gap-10 md:mt-14 lg:grid-cols-12 lg:items-end">
+              <div className="lg:col-span-7">
+                <div className="anim-rise" style={delay(120)}>
+                  <SectionLabel>{project.private ? "Galerie privée" : context}</SectionLabel>
+                </div>
+                <h1 className="t-h1 mt-6 text-linen">
+                  <span className="line-mask">
+                    <span style={delay(180)}>{project.title}</span>
+                  </span>
+                </h1>
+                <div className="anim-rise mt-8 max-w-xl" style={delay(380)}>
+                  <p className="t-lead text-taupe">{project.description}</p>
+                  {details.length ? (
+                    <dl className="mt-6 space-y-1.5">
+                      {details.map((d) => (
+                        <div key={d.label} className="flex gap-4 t-small">
+                          <dt className="w-20 shrink-0 t-mono leading-6 text-ash">{d.label}</dt>
+                          <dd className="text-linen">{d.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  ) : null}
+                </div>
+              </div>
+              <div className="anim-rise lg:col-span-5" style={delay(460)}>
+                <MatchTicket
+                  project={project}
+                  actions={
+                    <>
+                      <a
+                        href="#photos"
+                        className="flex h-9 items-center rounded-full bg-flamingo px-4 text-[0.8125rem] font-medium text-ink transition-colors hover:bg-tango"
+                      >
+                        Voir les photos
+                      </a>
+                      <ShareGalleryButton title={project.title} />
+                    </>
+                  }
+                />
+              </div>
             </div>
-            <h1 className="t-h1 mt-6 text-linen">
-              <span className="line-mask">
-                <span style={delay(180)}>{project.title}</span>
-              </span>
-            </h1>
-            <div className="anim-rise mt-8 max-w-xl" style={delay(380)}>
-              <p className="t-lead text-taupe">{project.description}</p>
-              {details.length ? (
-                <dl className="mt-6 space-y-1.5">
-                  {details.map((d) => (
-                    <div key={d.label} className="flex gap-4 t-small">
-                      <dt className="w-20 shrink-0 t-mono leading-6 text-ash">{d.label}</dt>
-                      <dd className="text-linen">{d.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              ) : null}
-            </div>
-          </div>
-          <div className="anim-rise lg:col-span-5" style={delay(460)}>
-            <MatchTicket
-              project={project}
-              actions={
-                <>
-                  <a href="#photos" className="flex h-9 items-center rounded-full bg-flamingo px-4 text-[0.8125rem] font-medium text-ink transition-colors hover:bg-tango">
-                    Voir les photos
-                  </a>
-                  <ShareGalleryButton title={project.title} />
-                </>
+          </header>
+
+          <section id="photos" aria-label={`Photos — ${project.title}`} className="container-wide scroll-mt-4 pb-[var(--section-space)]">
+            <Gallery
+              id={project.slug}
+              items={project.photos.map((photo) => ({ photo, title: project.title, context }))}
+              label={`Photos — ${project.title}`}
+              priorityCount={2}
+              toolbar
+              defaultView={project.photos.length > 24 ? "mosaic" : "editorial"}
+              allowDownload={project.allowDownload}
+              sections={
+                project.chapters.length > 1
+                  ? project.chapters.map((chapter, i) => ({
+                      id: chapter.slug,
+                      start: chapter.start,
+                      end: chapter.start + chapter.photos.length,
+                      header: (
+                        <p className={`t-mono text-ash ${i ? "mt-16 mb-6 md:mt-24" : "mb-6"}`} id={`chapitre-${chapter.slug}`}>
+                          <span className="text-flamingo">{String(i + 1).padStart(2, "0")}</span> — {chapter.title}
+                        </p>
+                      ),
+                    }))
+                  : undefined
               }
             />
-          </div>
-        </div>
-      </header>
-
-      <section id="photos" aria-label={`Photos — ${project.title}`} className="container-wide scroll-mt-4 pb-[var(--section-space)]">
-        <Gallery
-          id={project.slug}
-          items={project.photos.map((photo) => ({ photo, title: project.title, context }))}
-          label={`Photos — ${project.title}`}
-          priorityCount={2}
-          toolbar
-          defaultView={project.photos.length > 24 ? "mosaic" : "editorial"}
-          allowDownload={project.allowDownload}
-        />
-      </section>
+          </section>
+        </>
+      )}
 
       <PhotoAccessBand context={project.title} withSearch={false} />
 

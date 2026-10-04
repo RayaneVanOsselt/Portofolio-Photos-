@@ -12,6 +12,14 @@
  * - `teams`    équipes, adversaires, personnes (« Union Saint-Gilloise U23 »…)
  * - `location` lieu
  *
+ * Reportage de match (mise en page « Matchday ») : ajoutez `match` —
+ *   match: { home: "Union Saint-Gilloise U23", away: "RWDM", homeShort: "Union SG U23",
+ *            score: [2, 1], competition: "Championnat U23", round: "J8" }
+ * et le stade dans `location`. Pour raconter le match en chapitres, rangez les
+ * photos en sous-dossiers numérotés du dossier de la galerie :
+ *   01-avant-match/  02-action/  03-ambiance/  04-supporters/  05-coulisses/  06-apres-match/
+ * (textes facultatifs par chapitre : `chapters: { "avant-match": { text: "…" } }`).
+ *
  * Galerie client privée : `private: true` + `accessCode: "CODE"` (+ `allowDownload: true`
  * pour autoriser le téléchargement). Voir le README, § « Galeries privées ».
  *
@@ -23,6 +31,24 @@ import type { ProjectInput } from "@/lib/types";
 const TODO_DESCRIPTION = "[DESCRIPTION DE LA SÉRIE — match, adversaire, contexte]";
 
 export const projectInputs: ProjectInput[] = [
+  {
+    // Exemple de reportage « Matchday » (photos temporaires) — à ajuster : score, compétition…
+    slug: "2026-10-04-union-sg-u23-rwdm",
+    title: "Union SG U23 vs RWDM",
+    category: "rwdm",
+    folder: "portfolio/rwdm/2026-10-04-union-sg-u23-rwdm",
+    description: "[DESCRIPTION DU MATCH — contexte, enjeu, moment fort]",
+    date: "2026-10-04",
+    location: "Stade Joseph Marien",
+    event: "Match",
+    teams: ["Union Saint-Gilloise U23", "Union SG", "USG", "RWDM", "U23"],
+    match: {
+      home: "Union Saint-Gilloise U23",
+      away: "RWDM",
+      homeShort: "Union SG U23",
+    },
+    featured: true,
+  },
   {
     slug: "red-lions-serie-01",
     title: "Red Lions — Série 01",

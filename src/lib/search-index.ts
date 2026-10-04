@@ -16,6 +16,9 @@ export function projectKeywords(project: Project) {
     category.kicker,
     project.event,
     ...(project.teams ?? []),
+    ...(project.match
+      ? [project.match.home, project.match.away, project.match.homeShort, project.match.awayShort, project.match.competition, project.match.round, "matchday match", project.match.score?.join("-")]
+      : []),
     project.location,
     dateKeywords(project.date),
   ]
@@ -75,6 +78,7 @@ export function buildSearchIndex(): SearchItem[] {
 
   items.push(
     { type: "Page", title: "Galeries — accès aux photos", href: "/galeries", context: "Retrouver ses photos", keywords: "mes photos match récupérer télécharger code accès client" },
+    { type: "Page", title: "Football — archive des matchs", href: "/football", context: "Matchs, clubs, jeunes, supporters", keywords: "football foot soccer matchday archive matchs derby u23 jeunes supporters" },
     { type: "Page", title: "Portfolio", href: "/portfolio", context: "Le travail, par catégorie", keywords: "galerie photos travail sélection" },
     { type: "Page", title: "À propos", href: "/about", context: "Le photographe", keywords: "about biographie approche valeurs matériel" },
     { type: "Page", title: "Services", href: "/services", context: "Prestations", keywords: "offres prestations devis" },

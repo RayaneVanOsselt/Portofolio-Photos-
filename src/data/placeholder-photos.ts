@@ -17,7 +17,7 @@ const toPhoto = ([id, width, height, color, alt, author, username]: Row): Photo 
   // Taille d'origine limitée à 2400px : le serveur d'images de Next.js recadre ensuite.
   const scale = Math.min(1, 2400 / Math.max(width, height));
   return {
-    id: `ph-${id.replace("photo-", "")}`,
+    id: `ph-${id.replace(/^(flagged\/)?photo-/, "")}`,
     src: `https://images.unsplash.com/${id}?w=${width >= height ? 2400 : Math.round(2400 * (width / height))}&q=80&fm=jpg`,
     width: Math.round(width * scale),
     height: Math.round(height * scale),
@@ -129,4 +129,47 @@ export const placeholderByFolder: Record<string, Photo[]> = {
   "portfolio/rugby": placeholderPools.rugby,
   "portfolio/rwdm": placeholderPools.football,
   "site/about": placeholderPools.photographer,
+};
+
+/**
+ * Match de démonstration « Union SG U23 vs RWDM » : photos temporaires
+ * réparties en chapitres (comme les sous-dossiers 01-avant-match/, 02-action/…).
+ */
+export const placeholderChapters: Record<string, Record<string, Photo[]>> = {
+  "portfolio/rwdm/2026-10-04-union-sg-u23-rwdm": {
+    "01-avant-match": [
+      ["photo-1739550635585-484633b21450", 6369, 4246, "#d9d9d9", "échauffement avant le match", "Omar Ramadan", "omarvellous14"],
+      ["photo-1505250469679-203ad9ced0cb", 5472, 3648, "#404026", "joueur jonglant avec le ballon à l'échauffement", "Ruben Leija", "rleija_"],
+      ["photo-1676498110083-89a7f89e8f88", 4128, 2322, "#262626", "vestiaire, maillots accrochés au mur", "Cristian Tarzi", "ctarzi"],
+    ].map((r) => toPhoto(r as Row)),
+    "02-action": [
+      ["flagged/photo-1568105631375-d992b82a905b", 6660, 4436, "#f3f3f3", "joueur de football en pleine course", "Manuel Navarro", "momentista"],
+      ["photo-1748111821989-d7c4c677c729", 2807, 4248, "#737340", "un arbitre et un joueur face à face", "Salah Regouane", "salaheregouane"],
+      ["flagged/photo-1559559403-a902f2a17eea", 5329, 3553, "#262626", "joueur seul sur la pelouse", "Elio Santos", "eliomendes"],
+      ["photo-1600551778275-0f76a4f1fa39", 6000, 4000, "#597340", "joueur en maillot bleu en action", "Nigel Msipa", "nigelm23"],
+      ["photo-1630552227424-81c9e52d7c83", 4079, 2719, "#404040", "joueur en maillot noir et blanc conduisant le ballon", "My Profit Tutor", "myprofittutor"],
+    ].map((r) => toPhoto(r as Row)),
+    "03-ambiance": [
+      ["photo-1767916732786-a83902ffc25c", 6000, 4000, "#8ca640", "match en nocturne dans un stade comble", "Zaki", "zaki_0711"],
+      ["photo-1705593973313-75de7bf95b56", 2400, 3000, "#0c4059", "tribunes pleines pendant le match", "Igor Batista", "igorvw"],
+      ["photo-1544366981-43d8d59eeba9", 4000, 2667, "#8cc073", "vue sur le stade", "Fikri Rasyid", "fikrirasyid"],
+      ["photo-1700831212888-c1e23eeaf129", 3264, 1840, "#737373", "fumée au-dessus du terrain", "Cristian Tarzi", "ctarzi"],
+    ].map((r) => toPhoto(r as Row)),
+    "04-supporters": [
+      ["photo-1683838946268-e0db005a09b4", 7008, 4672, "#8c8c8c", "supporters autour d'un fumigène rouge", "BEN ELLIOTT", "benjaminelliott"],
+      ["photo-1565099012060-78659e4c209c", 6000, 4000, "#262626", "fumigènes rouges dans la nuit", "Alexandre Brondino", "brondia"],
+      ["photo-1716463312211-cc87066c129f", 4240, 2832, "#262626", "supporters agitant un drapeau", "Omar Ramadan", "omarvellous14"],
+      ["photo-1723551032860-acc2df5fc494", 4032, 2268, "#262626", "supporters devant un écran géant", "Jametlene Reskp", "reskp"],
+    ].map((r) => toPhoto(r as Row)),
+    "05-coulisses": [
+      ["photo-1528036788076-c031f7707270", 6000, 4000, "#c0d9c0", "staff au bord du terrain", "Jeffrey F Lin", "jeffreyflin"],
+      ["photo-1748112442319-6780a8dd7528", 4088, 6130, "#8cc0d9", "deux joueurs discutent sur le terrain", "Salah Regouane", "salaheregouane"],
+      ["photo-1748112442584-b298253216fe", 3829, 5744, "#8cc0d9", "échange entre coéquipiers", "Salah Regouane", "salaheregouane"],
+    ].map((r) => toPhoto(r as Row)),
+    "06-apres-match": [
+      ["photo-1579156412375-310af82390a8", 3984, 5976, "#8c8c8c", "poignée de main après le match", "Austrian National Library", "austriannationallibrary"],
+      ["photo-1748112443153-d62a14463a35", 4019, 6030, "#737340", "deux joueurs main dans la main sur la pelouse", "Salah Regouane", "salaheregouane"],
+      ["photo-1757518416247-e4246950489a", 6000, 4000, "#737340", "joueurs agenouillés sur la pelouse au coup de sifflet final", "Bryce Scarbrough", "24hrtz"],
+    ].map((r) => toPhoto(r as Row)),
+  },
 };
