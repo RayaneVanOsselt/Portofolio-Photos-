@@ -55,7 +55,22 @@ export type ProjectInput = {
   /** Date ISO (AAAA-MM-JJ) ou null si non renseignée. */
   date: string | null;
   location: string | null;
+  /** Type d'événement affiché et recherchable (« Match », « Tournoi », « Portraits »…). */
+  event?: string;
+  /** Équipes, clubs ou personnes concernés — recherchables (« Union Saint-Gilloise », « U23 »…). */
+  teams?: string[];
+  /** Mise en avant sur l'accueil et le portfolio. */
   featured?: boolean;
+  /**
+   * Galerie privée : absente des listes, de la recherche et du plan du site.
+   * Elle s'ouvre avec son code d'accès (page Galeries) ou son lien direct.
+   * ⚠️ Discrétion, pas sécurité : les photos restent publiques pour qui connaît l'adresse.
+   */
+  private?: boolean;
+  /** Code à communiquer au client (insensible à la casse et aux espaces). */
+  accessCode?: string;
+  /** Affiche un bouton « Télécharger » dans la visionneuse (photo d'origine). */
+  allowDownload?: boolean;
 };
 
 export type Project = Omit<ProjectInput, "category"> & {
