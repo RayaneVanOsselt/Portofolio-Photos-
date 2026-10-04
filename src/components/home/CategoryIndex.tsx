@@ -17,9 +17,9 @@ export type IndexEntry = {
 };
 
 /**
- * Les rubriques comme navigation : une liste typographique surdimensionnée.
- * Desktop : la photo de couverture flotte et suit le curseur au survol.
- * Tactile : une vignette accompagne chaque ligne.
+ * Les catégories comme un tableau des départs : une liste typographique,
+ * numéros mono, grands titres légers. Desktop : la couverture flotte et suit
+ * le pointeur au survol. Tactile : une vignette accompagne chaque ligne.
  */
 export function CategoryIndex({ entries }: { entries: IndexEntry[] }) {
   const [active, setActive] = useState<number | null>(null);
@@ -59,7 +59,6 @@ export function CategoryIndex({ entries }: { entries: IndexEntry[] }) {
           <li key={entry.href} className="border-b border-line" data-reveal style={{ "--reveal-delay": `${i * 60}ms` } as React.CSSProperties}>
             <Link
               href={entry.href}
-              data-cursor="explore"
               onPointerMove={(e) => {
                 if (e.pointerType !== "mouse" || active === i) return;
                 if (active === null) {
@@ -70,27 +69,25 @@ export function CategoryIndex({ entries }: { entries: IndexEntry[] }) {
               }}
               onFocus={() => setActive(i)}
               onBlur={() => setActive(null)}
-              className={`group grid grid-cols-[auto_1fr_auto] text-platinum items-center gap-x-4 py-5 transition-colors duration-500 md:grid-cols-[4rem_1fr_14rem_auto] md:gap-x-8 md:py-7 ${
-                active !== null && active !== i ? "md:text-slate" : ""
+              className={`group grid grid-cols-[auto_1fr_auto] items-center gap-x-4 py-5 transition-colors duration-500 md:grid-cols-[5rem_1fr_16rem_auto] md:gap-x-8 md:py-7 ${
+                active !== null && active !== i ? "md:text-linen/30" : "text-linen"
               }`}
             >
               <span className="relative size-14 overflow-hidden rounded-[var(--radius-sm)] md:hidden">
                 <PhotoImage photo={entry.cover} fill sizes="56px" className="absolute inset-0" />
               </span>
-              <span className="hidden t-caption t-tabular text-phosphor md:block">{pad(i + 1)}</span>
+              <span className="hidden t-mono text-ash md:block">({pad(i + 1)})</span>
               <span className="min-w-0">
-                <span className="block truncate text-[clamp(1.6rem,0.9rem+3.6vw,4.5rem)] leading-[1] font-medium tracking-[-0.045em] text-current transition-transform duration-700 ease-[var(--ease-out-expo)] group-hover:md:translate-x-3">
+                <span className="block truncate pb-[0.08em] text-[clamp(1.6rem,0.9rem+3.4vw,4.25rem)] leading-[1.12] font-light tracking-[-0.045em] text-current transition-transform duration-700 ease-[var(--ease-out-expo)] group-hover:md:translate-x-3">
                   {entry.title}
                 </span>
-                <span className="mt-1.5 block t-caption text-silver md:hidden">{entry.kicker}</span>
+                <span className="mt-1 block t-mono text-ash md:hidden">{entry.kicker}</span>
               </span>
               <span className="hidden text-right md:block">
-                <span className="block t-caption text-silver">{entry.kicker}</span>
-                <span className="mt-1 block t-small text-silver/80">
-                  {entry.subtitles.length ? entry.subtitles.join(" · ") : `${entry.count} photos`}
-                </span>
+                <span className="block t-mono text-taupe">{entry.kicker}</span>
+                <span className="mt-1 block t-small text-ash">{entry.subtitles.length ? entry.subtitles.join(" · ") : `${entry.count} photos`}</span>
               </span>
-              <span className="grid size-10 place-items-center rounded-[var(--radius-sm)] bg-kelp-soft text-platinum transition-colors duration-300 group-hover:bg-kelp">
+              <span className="grid size-11 place-items-center rounded-full border border-line-strong text-linen transition-[background-color,border-color,color] duration-300 group-hover:border-flamingo group-hover:bg-flamingo group-hover:text-ink">
                 <ArrowUpRight className="transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-45" />
               </span>
             </Link>
@@ -100,18 +97,11 @@ export function CategoryIndex({ entries }: { entries: IndexEntry[] }) {
 
       {/* Aperçu flottant (desktop, pointeur précis) */}
       <div ref={previewRef} aria-hidden className="pointer-events-none fixed top-0 left-0 z-30 hidden [@media(pointer:fine)]:md:block">
-        <div
-          className={`-translate-x-1/2 -translate-y-1/2 transition-[opacity,scale] duration-500 ease-[var(--ease-out-expo)] ${
-            active === null ? "scale-90 opacity-0" : "scale-100 opacity-100"
-          }`}
-        >
-          <div className="relative aspect-[4/5] w-[clamp(14rem,18vw,20rem)] overflow-hidden rounded-[var(--radius-sm)]">
+        <div className={`-translate-x-1/2 -translate-y-1/2 transition-[opacity,scale] duration-500 ease-[var(--ease-out-expo)] ${active === null ? "scale-90 opacity-0" : "scale-100 opacity-100"}`}>
+          <div className="relative aspect-[4/5] w-[clamp(14rem,18vw,20rem)] overflow-hidden rounded-[var(--radius-card)]">
             {entries.map((entry, i) => (
-              <div
-                key={entry.href}
-                className={`absolute inset-0 transition-[opacity,scale] duration-700 ease-[var(--ease-out-expo)] ${active === i ? "scale-100 opacity-100" : "scale-110 opacity-0"}`}
-              >
-                <PhotoImage photo={entry.cover} fill sizes="320px" className="h-full rounded-none" />
+              <div key={entry.href} className={`absolute inset-0 transition-[opacity,scale] duration-700 ease-[var(--ease-out-expo)] ${active === i ? "scale-100 opacity-100" : "scale-110 opacity-0"}`}>
+                <PhotoImage photo={entry.cover} fill sizes="320px" className="h-full" />
               </div>
             ))}
           </div>

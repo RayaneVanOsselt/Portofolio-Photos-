@@ -1,7 +1,7 @@
 # rayvo.captures0808 — Portfolio photographique
 
 Portfolio de photographie sportive (hockey, rugby, football), publié comme **site statique sur GitHub Pages**. Le code est écrit avec Next.js 16, React 19, TypeScript et Tailwind CSS v4 ; une GitHub Action le compile et ne met en ligne que le site final (HTML, CSS, images).
-Direction artistique inspirée de la référence *Auros* : canevas sarcelle abyssal, typographie grotesque en graisse 500, labels en capitales espacées, aucune ombre, profondeur par surfaces.
+Direction artistique « billet de match à minuit » : la charte de la marque (Heavy Metal, Satin Linen, Taupe Gray, orange Flamingo · Tango · Jaffa) appliquée au style de la référence *dope.security* — canevas presque noir, **une seule couleur signal** (l'orange) rationnée, titres de section « tamponnés » en monospace très espacé, carte « billet » en verre sur le hero, filets fins au lieu des ombres, boutons pilule.
 
 > ⚠️ **Photos temporaires.** En attendant vos images, le site affiche des photos libres de droits issues d'Unsplash (signalées « Photo temporaire » dans la visionneuse). Elles disparaissent automatiquement dès que vos photos sont ajoutées (voir §4). **Ne mettez pas le site en ligne avec ces photos.**
 
@@ -80,15 +80,42 @@ Le script crée aussi, pour chaque photo, des versions WebP légères (640 à 24
 
 **Réglages de prise de vue** : le boîtier, l'objectif, la focale, l'ouverture, la vitesse et l'ISO sont lus automatiquement dans vos fichiers (EXIF) et affichés dans la visionneuse. La position GPS n'est jamais lue, et les versions mises en ligne ne contiennent aucune métadonnée. Exportez vos photos depuis Lightroom en conservant les métadonnées « Tout sauf les informations de localisation » pour en profiter.
 
-**Nouvelle série (nouveau match)** : créez un sous-dossier, par ex. `public/images/portfolio/fih-pro-league/red-lions/2026-03-belgique-pays-bas/`, lancez `npm run photos`, puis ajoutez une entrée dans `src/data/projects.ts` avec `folder: "portfolio/fih-pro-league/red-lions/2026-03-belgique-pays-bas"`.
+**Nouvelle galerie (nouveau match)** : créez un sous-dossier, par ex. `public/images/portfolio/fih-pro-league/red-lions/2026-03-belgique-pays-bas/`, lancez `npm run photos`, puis ajoutez une entrée dans `src/data/projects.ts` avec `folder: "portfolio/fih-pro-league/red-lions/2026-03-belgique-pays-bas"`. La galerie est publiée à l'adresse `/galeries/<slug>`.
+
+Pour que vos clients la retrouvent en quelques secondes (page **Galeries** et recherche), renseignez :
+
+| Champ      | Exemple                                  | Effet                                                                 |
+| ---------- | ---------------------------------------- | --------------------------------------------------------------------- |
+| `date`     | `"2026-10-03"`                           | Affichée, triée (plus récentes d'abord), recherchable : « 3 octobre », « octobre 2026 », « 03/10/2026 »… |
+| `event`    | `"Match"`, `"Tournoi"`, `"Portraits"`    | Affiché sur le billet et dans les listes                              |
+| `teams`    | `["Union Saint-Gilloise", "U23"]`        | Recherchable (adversaire, catégorie d'âge, club…)                     |
+| `location` | `"Stade Joseph Marien"`                  | Affiché et recherchable                                               |
+
+Les galeries de plus de 24 photos s'ouvrent en vue **Planche** (mosaïque compacte, idéale pour retrouver ses photos) ; les autres en vue **Éditoriale**. Le visiteur peut changer de vue, son choix est mémorisé. Les photos se chargent par lots de 24 au défilement.
 
 **Photo du hero, de la page À propos, des services** : indiquez l'identifiant de la photo dans `src/data/content.ts` et `src/data/services.ts`. L'identifiant d'une photo locale est `dossier/fichier`, par ex. `portfolio/rugby/01-melee.jpg`. Si un identifiant n'existe pas, une photo du portfolio est utilisée.
 
 Une fois toutes les photos temporaires remplacées, vous pouvez supprimer `src/data/placeholder-photos.ts` (et son import dans `src/data/photos.ts`) ainsi que le cas Unsplash dans `src/lib/image-loader.ts`.
 
+### Galeries privées (clients)
+
+Une galerie peut être réservée à un client (séance, événement privé, club) :
+
+```ts
+{
+  slug: "seance-club-xyz-k7p2",      // ajoutez un suffixe difficile à deviner
+  // …
+  private: true,
+  accessCode: "XYZ-2026",            // à communiquer au client
+  allowDownload: true,               // bouton « Télécharger » dans la visionneuse
+}
+```
+
+Elle n'apparaît ni dans les listes, ni dans la recherche, ni dans le plan du site, et n'est pas indexée par Google. Le client la retrouve sur la page **Galeries** → « Vous avez reçu un code d'accès ? » (le code est insensible à la casse, aux espaces et aux tirets ; seule son empreinte est publiée, jamais le code). ⚠️ C'est de la **discrétion, pas une sécurité** : le site étant statique, les photos restent accessibles à qui connaît l'adresse exacte.
+
 ### Visionneuse et demandes de photos
 
-Chaque photo possède un lien permanent (`…/#photo-<série>-<numéro>`) : il peut être partagé (bouton « Partager ») et rouvre directement la photo. Le bouton « Demander cette photo » ouvre le formulaire de contact pré-rempli (type « Demande d'une photo », numéro et lien de l'image) : pratique pour les joueurs, parents et clubs. Un encart « Vous êtes sur une photo ? » rappelle cette possibilité en bas des pages de rubriques et de séries.
+Chaque photo possède un lien permanent (`…/galeries/<slug>/#photo-<slug>-<numéro>`) : il peut être partagé (bouton « Partager ») et rouvre directement la photo. Le bouton « Demander cette photo » ouvre le formulaire de contact pré-rempli (type « Demande d'une photo », numéro et lien de l'image) : pratique pour les joueurs, parents et clubs. Le bloc orange « Vous êtes sur les photos ? » rappelle cette possibilité sur l'accueil, les catégories et les galeries. Les anciennes adresses `/project/<slug>` redirigent automatiquement vers `/galeries/<slug>` (ancre comprise : un lien de photo déjà partagé reste valable).
 
 ## 5. Ajouter ou modifier des rubriques
 
@@ -100,7 +127,8 @@ Chaque rubrique ou équipe doit avoir au moins un projet dans `src/data/projects
 
 Dans **`src/config/site.ts`** : `name`, `logo.primary`, `logo.secondary`, `tagline`, `description`.
 Le logo, les titres, les metadata, le footer, les e-mails et les images de partage se mettent à jour.
-Le monogramme dessiné (initiales « RV ») se trouve dans `src/components/brand/Monogram.tsx` ; les fichiers de marque statiques (logo horizontal, compact, monogramme, filigrane — versions claires et sombres) sont dans `public/brand/`.
+Le monogramme (bloc orange au coin coupé, initiales « RV » en réserve) se trouve dans `src/components/brand/Monogram.tsx` ; les fichiers de marque statiques (logo horizontal, compact, monogramme, filigrane — versions pour fond clair `-dark` et fond sombre `-light`) sont dans `public/brand/`.
+Le pied de page affiche l'heure locale en direct (`timeZone`) et votre zone (`seo.area` ou `contact.location`).
 
 ## 7. Réseaux sociaux et coordonnées
 
@@ -168,8 +196,9 @@ Après la mise en ligne :
 src/
 ├── app/                    Routes (App Router)
 │   ├── page.tsx            Accueil
-│   ├── portfolio/          Portfolio, rubriques, équipes (+ images OG)
-│   ├── project/[slug]/     Séries
+│   ├── portfolio/          Portfolio, catégories, équipes (+ images OG)
+│   ├── galeries/           Accès aux photos (recherche) + galeries /galeries/[slug]
+│   ├── project/[slug]/     Redirection des anciennes adresses
 │   ├── about/ services/ contact/ search/ privacy/ legal/
 │   ├── sitemap.ts robots.ts manifest.ts opengraph-image.tsx icon.svg …
 │   └── globals.css         Design system (tokens, typographie, animations)
@@ -177,11 +206,13 @@ src/
 │   ├── brand/              Logo, monogramme
 │   ├── layout/             Header, méga-menu, menu mobile, footer, en-têtes
 │   ├── home/               Sections de l'accueil
-│   ├── portfolio/          Tuiles, vue rubrique, galerie filtrable
-│   ├── gallery/            Galerie éditoriale + visionneuse (lightbox)
+│   ├── portfolio/          Tuiles, vue catégorie, carte de galerie, billet de match
+│   ├── galleries/          Recherche instantanée des galeries, code d'accès, partage
+│   ├── gallery/            Galerie (vues éditoriale / planche) + visionneuse
 │   ├── search/             Palette de recherche (⌘K ou /)
+│   ├── sections/           Bloc orange d'accès aux photos, étapes, appel final
 │   ├── contact/            Formulaire
-│   ├── effects/            Révélations au scroll, parallaxe, curseur
+│   ├── effects/            Révélations au scroll, parallaxe, retour en haut
 │   └── ui/                 Boutons, icônes, image, libellés
 ├── config/site.ts          ← nom, coordonnées, réseaux, navigation
 ├── data/                   ← rubriques, projets, services, textes, photos
@@ -193,12 +224,12 @@ scripts/finalize-export.mjs Finalisation de l'export statique
 
 ### Design system (extrait)
 
-| Élément     | Valeurs                                                                                                                    |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Couleurs    | `abyss #012624` (fond) · `deep #011d1c` · `kelp #003734` · `silver #bbc7c6` · `mist #edfffe` · `phosphor #fde9ff` (accent) |
-| Typographie | Inter Tight 400/500 (interface et titres) · Instrument Serif italique (accents éditoriaux)                                 |
-| Échelle     | `t-display`, `t-h1`, `t-h2`, `t-h3`, `t-lead`, `t-small`, `t-label`, `t-caption`, `t-nav` — tailles fluides (`clamp`)      |
-| Rayons      | 6 px (boutons, images) · 16 px (surfaces)                                                                                  |
-| Mouvement   | `--ease-out-expo`, durées 200 / 400 / 800 / 1100 ms — désactivé avec la préférence « réduire les animations »              |
+| Élément     | Valeurs                                                                                                                                                  |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Couleurs    | `ink #1D1E1C` (Heavy Metal, fond) · `night #131412` (puits) · `linen #E7E7D8` (texte) · `taupe #AFAC96` (secondaire) · `flamingo #EB642B` (signal) · `tango #ED762F` (survol) · `jaffa #F09235` (lueur) |
+| Typographie | **Archivo** étendu 800 en capitales (`t-display`, `t-h1` : 2–3 grands moments par page) · **Poppins** (texte, `t-h2` léger, `t-h3`, `t-lead`, `t-label`) · **JetBrains Mono** très espacé (`t-stamp` : tampons de section, `t-mono` : métadonnées) |
+| Rayons      | 4 px (vignettes) · 6 px (petites commandes) · 8 px (bouton bordé) · 20 px (cartes, grandes images) · pilule (actions principales)                         |
+| Surfaces    | Plates : filets de lin à 14–30 % d'opacité et voiles translucides (`wash`, `glass`), aucune ombre                                                       |
+| Mouvement   | `--ease-out-expo`, apparitions au scroll, masques de titres, tampons qui se resserrent — tout est désactivé avec « réduire les animations »               |
 
-Le dégradé « aurora » est réservé au bouton d'action principal de chaque écran. Dans un texte, les mots entre `*astérisques*` passent en serif italique (titres de `src/data/content.ts`).
+L'orange est **rationné** : une action principale par écran (bouton pilule `signal`) et un seul bloc orange par page (`PhotoAccessBand`, classe `theme-orange bloom`). Dans un titre, les mots entre `*astérisques*` passent en ton secondaire (Taupe).

@@ -3,15 +3,20 @@
  * Insensible à la casse et aux accents : « leopold » trouve « Léopold ».
  */
 
+export type SearchType = "Galerie" | "Catégorie" | "Équipe" | "Service" | "Page";
+
 export type SearchItem = {
-  type: "Rubrique" | "Équipe" | "Série" | "Service" | "Page";
+  type: SearchType;
   title: string;
   href: string;
-  /** Contexte affiché sous le titre (rubrique parente, format…). */
+  /** Contexte affiché sous le titre (catégorie parente, format…). */
   context: string;
-  /** Texte supplémentaire indexé mais non affiché. */
+  /** Texte supplémentaire indexé mais non affiché (dates, équipes, lieu…). */
   keywords: string;
   thumb?: { src: string; color?: string };
+  /** Galeries : date affichée (déjà formatée) et nombre de photos. */
+  date?: string;
+  count?: number;
 };
 
 export function normalize(value: string) {
@@ -23,26 +28,49 @@ export function normalize(value: string) {
     .trim();
 }
 
-const TYPE_WEIGHT: Record<SearchItem["type"], number> = { Rubrique: 6, Équipe: 5, Série: 3, Service: 2, Page: 1 };
+const TYPE_WEIGHT: Record<SearchType, number> = { Galerie: 6, Équipe: 5, Catégorie: 5, Service: 2, Page: 1 };
+
+/** Ordre d'affichage des groupes de résultats. */
+export const SEARCH_TYPES: SearchType[] = ["Galerie", "Catégorie", "Équipe", "Service", "Page"];
+
+export const SEARCH_TYPE_PLURAL: Record<SearchType, string> = {
+  Galerie: "Galeries",
+  Catégorie: "Catégories",
+  Équipe: "Équipes",
+  Service: "Services",
+  Page: "Pages",
+};
+
+/**
+ * Score d'un élément pour une requête (0 = pas de correspondance).
+ * Tous les mots doivent être trouvés ; le titre compte plus que le reste.
+ */
+export function scoreText(title: string, rest: string, tokens: string[]) {
+  const t = normalize(title);
+  const haystack = `${t} ${normalize(rest)}`;
+  if (!tokens.length || !tokens.every((token) => haystack.includes(token))) return 0;
+  let score = 1;
+  for (const token of tokens) {
+    if (t === token) score += 30;
+    else if (t.startsWith(token)) score += 20;
+    else if (t.split(" ").some((word) => word.startsWith(token))) score += 14;
+    else if (t.includes(token)) score += 8;
+  }
+  return score;
+}
+
+export function tokenize(query: string) {
+  return normalize(query).split(" ").filter(Boolean);
+}
 
 export function searchItems(items: SearchItem[], query: string, limit = 12): SearchItem[] {
-  const tokens = normalize(query).split(" ").filter(Boolean);
+  const tokens = tokenize(query);
   if (!tokens.length) return [];
 
   const scored: { item: SearchItem; score: number }[] = [];
   for (const item of items) {
-    const title = normalize(item.title);
-    const haystack = `${title} ${normalize(item.context)} ${normalize(item.keywords)}`;
-    if (!tokens.every((t) => haystack.includes(t))) continue;
-
-    let score = TYPE_WEIGHT[item.type];
-    for (const t of tokens) {
-      if (title === t) score += 30;
-      else if (title.startsWith(t)) score += 20;
-      else if (title.split(" ").some((word) => word.startsWith(t))) score += 14;
-      else if (title.includes(t)) score += 8;
-    }
-    scored.push({ item, score });
+    const score = scoreText(item.title, `${item.context} ${item.keywords}`, tokens);
+    if (score) scored.push({ item, score: score + TYPE_WEIGHT[item.type] });
   }
 
   return scored
@@ -56,11 +84,11 @@ export function searchItems(items: SearchItem[], query: string, limit = 12): Sea
  * (insensible aux accents et à la casse) — pour surligner les résultats.
  */
 export function matchRanges(text: string, query: string): [number, number][] {
-  const tokens = normalize(query).split(" ").filter(Boolean);
+  const tokens = tokenize(query);
   if (!tokens.length) return [];
   // Normalisation caractère par caractère : les positions restent alignées sur le texte d'origine.
   const folded = Array.from(text, (c) =>
-    c.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, " ").charAt(0) || " ",
+    c.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, " ").charAt(0) || " ",
   ).join("");
   const ranges: [number, number][] = [];
   for (const token of tokens) {
@@ -79,5 +107,3 @@ export function matchRanges(text: string, query: string): [number, number][] {
     return merged;
   }, []);
 }
-
-export const SEARCH_TYPES: SearchItem["type"][] = ["Rubrique", "Équipe", "Série", "Service", "Page"];

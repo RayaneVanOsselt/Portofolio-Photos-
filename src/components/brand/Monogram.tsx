@@ -1,30 +1,30 @@
 /**
- * Monogramme : les initiales tracées en lignes fines dans les coins d'un viseur.
- * Le dessin est en traits (stroke) pour rester net de 16px (favicon) à l'affiche.
- * Le tracé est volontairement indépendant de toute police.
+ * Monogramme : un bloc plein au coin coupé (le langage de la charte),
+ * initiales « RV » en réserve. Un seul tracé, rempli en `currentColor` :
+ * les lettres sont des trous (fill-rule evenodd), donc le fond transparaît
+ * — lisible de 16px (favicon) à l'affiche, sur n'importe quel fond.
  */
-type Props = { className?: string; title?: string; strokeWidth?: number };
+type Props = { className?: string; title?: string };
 
-export const MONOGRAM_PATHS = {
-  frame: "M4 17V4h13M47 4h13v13M60 47v13H47M17 60H4V47",
-  letters: "M19.5 44V20h7a6 6 0 0 1 0 12h-7M25.5 32 31 44M34 20l5.5 24L45 20",
-};
+export const MONOGRAM_PATH =
+  // Bloc 52×52, coin inférieur droit coupé
+  "M6 6h52v40L46 58H6z" +
+  // R
+  "M14.7 16h12.5a7.6 7.6 0 0 1 2.6 14.74L34.2 44h-6l-3.9-12.4h-3.7V44h-5.9zM20.6 21.2v5.6h6.3a2.8 2.8 0 0 0 0-5.6z" +
+  // V
+  "M33.7 16h5.8l3.7 18 3.8-18h5.8l-6.9 28h-5.3z";
 
-export function Monogram({ className, title, strokeWidth = 2.5 }: Props) {
+export function Monogram({ className, title }: Props) {
   return (
     <svg
       viewBox="0 0 64 64"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={strokeWidth}
-      strokeLinecap="square"
+      fill="currentColor"
       className={className}
       role={title ? "img" : undefined}
       aria-hidden={title ? undefined : true}
     >
       {title ? <title>{title}</title> : null}
-      <path d={MONOGRAM_PATHS.frame} />
-      <path d={MONOGRAM_PATHS.letters} strokeLinecap="butt" strokeLinejoin="miter" />
+      <path d={MONOGRAM_PATH} fillRule="evenodd" />
     </svg>
   );
 }

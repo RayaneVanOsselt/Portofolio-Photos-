@@ -8,7 +8,7 @@ export const size = OG_SIZE;
 export const contentType = "image/png";
 
 export default function Image() {
-  return renderOgImage({ kicker: "Photographe sportif", title: "Hockey · Rugby · Football", photo: getPhotoById(homeContent.hero.photoId) });
+  return renderOgImage({ kicker: "Photographe sportif", title: homeContent.hero.title.join(" "), photo: getPhotoById(homeContent.hero.photoId) });
 }
 
 export const dynamic = "force-static";

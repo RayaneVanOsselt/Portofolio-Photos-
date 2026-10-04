@@ -10,25 +10,21 @@
 export const homeContent = {
   hero: {
     photoId: "ph-1680010090687-6a5e4fe855b8",
-    eyebrow: "Photographe sportif — Hockey / Rugby / Football",
-    primaryCta: { label: "Découvrir le travail", href: "/portfolio" },
-    secondaryCta: { label: "Me contacter", href: "/contact" },
-  },
-  intro: {
-    label: "Approche",
-    statement: "Des images qui capturent l'instant où le match *bascule* — l'effort, le geste, l'émotion.",
-    body: "[VOTRE PHRASE D'INTRODUCTION — qui vous êtes, ce que vous photographiez, pour qui.]",
-  },
-  selectedProjectSlug: "red-lions-serie-01",
-  closing: {
-    label: "Travaillons ensemble",
-    title: "Créons quelque *chose*.",
-    body: "Un match, une saison, un événement ou un projet de club : parlons-en.",
+    eyebrow: "Photographe sportif — Hockey · Rugby · Football",
+    /** Deux lignes, affichées en très grand (capitales étendues). */
+    title: ["Au cœur", "du jeu."] as [string, string],
+    lead: "Matchs, équipes et clubs photographiés au bord du terrain — l'effort, le geste, l'émotion, au moment exact où tout bascule.",
+    primaryCta: { label: "Voir le portfolio", href: "/portfolio" },
+    secondaryCta: { label: "Trouver mes photos", href: "/galeries" },
   },
 };
 
 export const aboutContent = {
   portraitId: "ph-1777304012262-594db955dce9",
+  /** Spécialités (puces de la page À propos et de l'accueil). */
+  specialties: ["Hockey sur gazon", "Rugby", "Football", "Portraits d'équipe", "Contenus pour clubs"],
+  /** Matériel : laisser vide pour masquer la section (rien n'est inventé). Ex. "Sony A1", "70-200 mm f/2.8". */
+  equipment: [] as string[],
   wideId: "ph-1780509459807-d47e3571cc99",
   intro: "[VOTRE PRÉSENTATION — deux ou trois phrases authentiques : qui vous êtes, d'où vous venez, ce qui vous a amené à la photo de sport.]",
   approach: [
@@ -60,5 +56,5 @@ export const aboutContent = {
 
 export const contactContent = {
   title: "Parlons de votre *projet*.",
-  intro: "Match, saison, événement, portraits ou contenus pour votre club : décrivez votre besoin, je vous réponds rapidement.",
+  intro: "Match, saison, événement, portraits ou contenus pour votre club : décrivez votre besoin, je vous réponds rapidement.",
 };

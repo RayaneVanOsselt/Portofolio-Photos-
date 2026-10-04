@@ -12,14 +12,14 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
 
   return (
     <section className="container-wide flex min-h-[80svh] flex-col justify-center pt-[var(--header-height)]">
-      <p className="t-label text-phosphor">Erreur</p>
-      <h1 className="t-h1 mt-5 max-w-[16ch] text-platinum">Quelque chose s&apos;est mal passé.</h1>
-      <p className="mt-6 max-w-md t-lead text-silver">Réessayez dans un instant ou revenez à l&apos;accueil.</p>
+      <p className="t-mono text-flamingo">+ Erreur</p>
+      <h1 className="t-h1 mt-6 max-w-[16ch] text-linen">Quelque chose s&apos;est mal passé.</h1>
+      <p className="mt-6 max-w-md t-lead text-taupe">Réessayez dans un instant ou revenez à l&apos;accueil.</p>
       <div className="mt-10 flex flex-wrap gap-3">
-        <Button variant="aurora" size="lg" onClick={reset}>
+        <Button variant="signal" size="lg" onClick={reset}>
           Réessayer
         </Button>
-        <Link href="/" className="inline-flex h-14 items-center px-6 t-label text-silver hover:text-platinum">
+        <Link href="/" className="inline-flex h-14 items-center rounded-full px-6 text-base text-taupe hover:text-linen">
           Accueil
         </Link>
       </div>
