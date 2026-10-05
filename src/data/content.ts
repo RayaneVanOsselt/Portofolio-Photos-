@@ -2,9 +2,10 @@
  * Textes des pages. Tout ce qui est entre crochets [ … ] est un emplacement
  * réservé à remplacer par le vrai contenu — rien n'a été inventé.
  *
- * Les références aux photos utilisent leur identifiant (voir src/data/photos.ts).
- * Si un identifiant n'existe plus (ex. photos temporaires remplacées),
- * une photo du portfolio est utilisée automatiquement à la place.
+ * Les références aux photos utilisent leur identifiant (voir src/data/photos.ts),
+ * ex. « site/home/hero.jpg » ou « albums/daring-h1/20-09-2026-daring-h1-leo-h1/12-but.jpg ».
+ * Si un identifiant n'existe plus (ex. photos temporaires remplacées), la première
+ * photo du dossier de la page est utilisée (public/images/site/home/, site/about/…).
  */
 
 export const homeContent = {
@@ -14,7 +15,7 @@ export const homeContent = {
     /** Deux lignes, affichées en très grand (capitales étendues). */
     title: ["Au cœur", "du jeu."] as [string, string],
     lead: "Matchs, équipes et clubs photographiés au bord du terrain — l'effort, le geste, l'émotion, au moment exact où tout bascule.",
-    primaryCta: { label: "Voir le portfolio", href: "/portfolio" },
+    primaryCta: { label: "Voir les albums", href: "/albums" },
     secondaryCta: { label: "Trouver mes photos", href: "/galeries" },
   },
 };

@@ -2,14 +2,14 @@
 /**
  * npm run photos
  *
- * Indexe toutes les photos de public/images/** et génère
+ * Indexe toutes les photos de public/images/** (albums/ et site/) et génère
  * src/data/photo-manifest.json : dimensions réelles (orientation EXIF prise
  * en compte), couleur dominante et mini-aperçu flou pour chaque image.
  *
  * - Les photos sont triées par nom de fichier (préfixez 01-, 02-… pour l'ordre).
  * - Le texte alternatif (alt) est déduit du nom de fichier la première fois,
  *   puis conservé : vous pouvez le modifier dans le manifest, il ne sera pas écrasé.
- * - Chaque photo est déclinée en WebP (640, 1080, 1600, 2400 px) dans
+ * - Chaque photo est déclinée en WebP (320, 640, 1080, 1600, 2400 px) dans
  *   public/_photos/ : le site charge la taille adaptée à l'écran.
  *   Les déclinaisons existantes et à jour ne sont pas recalculées.
  * - Les réglages de prise de vue (boîtier, objectif, focale, ouverture,
@@ -18,6 +18,9 @@
  *   versions WebP mises en ligne ne contiennent aucune métadonnée.
  * - Les fichiers trop lourds sont signalés (le site les redimensionne, mais
  *   des originaux de plus de 3000 px ralentissent le premier affichage).
+ * - Les noms de fichiers d'appareil (DSC_1234.jpg, IMG_0042.jpg…) sont signalés :
+ *   un nom descriptif aide Google Images (le site génère malgré tout un texte
+ *   alternatif à partir du match : « Daring H1 vs Leo H1 — photo 12 … »).
  */
 import { existsSync } from "node:fs";
 import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
@@ -30,8 +33,10 @@ const IMAGES_DIR = join(ROOT, "public", "images");
 const MANIFEST = join(ROOT, "src", "data", "photo-manifest.json");
 const EXTENSIONS = /\.(jpe?g|png|webp|avif)$/i;
 const MAX_RECOMMENDED = 3000;
+/** Noms de fichiers génériques d'appareils photo et de téléphones. */
+const CAMERA_NAME = /^(?:\d+[-_ ]*)?(?:_?dsc[fn]?|img|_mg|pxl|p\d|photo|image)[-_ ]?\d+/i;
 // Déclinaisons WebP servies au navigateur (voir src/lib/image-loader.ts — mêmes valeurs).
-const VARIANT_WIDTHS = [640, 1080, 1600, 2400];
+const VARIANT_WIDTHS = [320, 640, 1080, 1600, 2400];
 const VARIANTS_DIR = join(ROOT, "public", "_photos");
 
 /** Génère les déclinaisons WebP d'une photo si elles manquent ou sont plus anciennes que l'original. */
@@ -93,6 +98,7 @@ const previousAlt = new Map(Object.values(previous).flat().map((p) => [p.src, p.
 const files = (await walk(IMAGES_DIR)).sort((a, b) => a.localeCompare(b, "fr", { numeric: true }));
 const manifest = {};
 const warnings = [];
+const cameraNames = new Set();
 
 for (const fullPath of files) {
   const rel = relative(IMAGES_DIR, fullPath).split(sep).join("/");
@@ -118,6 +124,8 @@ for (const fullPath of files) {
     warnings.push(`${rel} — ${width}×${height}, ${(size / 1e6).toFixed(1)} Mo (conseillé : ≤ ${MAX_RECOMMENDED}px, ≤ 3 Mo)`);
   }
 
+  if (CAMERA_NAME.test(file)) cameraNames.add(folder);
+
   (manifest[folder] ??= []).push({
     file,
     src,
@@ -138,4 +146,8 @@ for (const [folder, list] of Object.entries(manifest)) console.log(`  · ${folde
 if (warnings.length) {
   console.warn(`\n⚠ ${warnings.length} fichier(s) volumineux — pensez à les exporter plus léger :`);
   for (const w of warnings) console.warn(`  · ${w}`);
+}
+if (cameraNames.size) {
+  console.warn(`\nℹ Noms de fichiers d'appareil (DSC_1234…) dans ${cameraNames.size} dossier(s) — un nom descriptif est meilleur pour Google Images :`);
+  for (const folder of cameraNames) console.warn(`  · ${folder}  (ex. 01-daring-h1-but-capitaine.jpg)`);
 }

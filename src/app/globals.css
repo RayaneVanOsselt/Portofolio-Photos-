@@ -154,6 +154,10 @@
     font-stretch: 125%;
     font-weight: 800;
     text-transform: uppercase;
+    /* Un mot trop large pour un petit écran (« AUTHENTICITÉ » sur 320 px) se coupe
+       avec un trait d'union plutôt que de déborder de la page. */
+    hyphens: auto;
+    overflow-wrap: anywhere;
   }
   .t-display {
     font-size: var(--text-display);

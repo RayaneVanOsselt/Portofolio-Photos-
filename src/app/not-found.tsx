@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { QuickSearchForm } from "@/components/sections/QuickSearchForm";
 import { ButtonLink } from "@/components/ui/Button";
 import { PhotoImage } from "@/components/ui/PhotoImage";
-import { getCategories } from "@/lib/portfolio";
+import { getAlbums } from "@/lib/albums";
 
 export const metadata: Metadata = { title: "Page introuvable", robots: { index: false } };
 
 export default function NotFound() {
-  const cover = getCategories()[0]?.cover;
+  const cover = getAlbums().find((a) => a.cover)?.cover;
   return (
     <section className="relative isolate flex min-h-[100svh] items-end overflow-hidden bg-night">
       {cover ? (
@@ -40,8 +40,8 @@ export default function NotFound() {
           <ButtonLink href="/" variant="ghost" size="lg" icon={false}>
             Retour à l&apos;accueil
           </ButtonLink>
-          <ButtonLink href="/portfolio" variant="outline" size="lg">
-            Voir le portfolio
+          <ButtonLink href="/albums" variant="outline" size="lg">
+            Voir les albums
           </ButtonLink>
         </div>
       </div>

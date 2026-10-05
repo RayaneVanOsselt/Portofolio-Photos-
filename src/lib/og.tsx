@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { MONOGRAM_PATH } from "@/components/brand/Monogram";
 import { siteConfig } from "@/config/site";
-import type { Photo } from "@/lib/types";
+import type { Crest, Photo } from "@/lib/types";
 
 export const OG_SIZE = { width: 1200, height: 630 };
 
@@ -48,14 +48,26 @@ async function photoSource(photo?: Photo): Promise<string | null> {
   return null;
 }
 
+/** Logo (PNG généré par `npm run logos`) en data URI, ou null s'il est introuvable. */
+async function crestSource(crest: Crest): Promise<string | null> {
+  try {
+    const data = await readFile(join(process.cwd(), "public", crest.png));
+    return `data:image/png;base64,${data.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
+
 /** Image de partage : la charte (Heavy Metal, Satin Linen, Flamingo) et le style « billet ». */
-export async function renderOgImage({ kicker, title, photo }: { kicker: string; title: string; photo?: Photo }) {
-  const [display, mono, sans, image] = await Promise.all([
+export async function renderOgImage({ kicker, title, photo, crests = [] }: { kicker: string; title: string; photo?: Photo | null; crests?: Crest[] }) {
+  const [display, mono, sans, image, logos] = await Promise.all([
     loadFont("Archivo:wdth,wght@125,800"),
     loadFont("JetBrains+Mono:wght@400"),
     loadFont("Poppins:wght@400"),
-    photoSource(photo),
+    photoSource(photo ?? undefined),
+    Promise.all(crests.slice(0, 2).map(crestSource)),
   ]);
+  const crestImages = logos.filter((src): src is string => Boolean(src));
   const fonts = [
     ...(display ? [{ name: "Archivo", data: display, weight: 800 as const, style: "normal" as const }] : []),
     ...(mono ? [{ name: "JetBrains Mono", data: mono, weight: 400 as const, style: "normal" as const }] : []),
@@ -83,6 +95,7 @@ export async function renderOgImage({ kicker, title, photo }: { kicker: string; 
           }}
         />
         <div style={{ position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 64, width: "100%" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
             <svg width="56" height="56" viewBox="0 0 64 64">
               <path d={MONOGRAM_PATH} fill="#eb642b" fillRule="evenodd" />
@@ -94,6 +107,20 @@ export async function renderOgImage({ kicker, title, photo }: { kicker: string; 
               </span>
               <span style={{ fontFamily: "JetBrains Mono", fontSize: 13, letterSpacing: 4, textTransform: "uppercase", color: "#afac96", marginTop: 4 }}>{siteConfig.logo.secondary}</span>
             </div>
+          </div>
+          {crestImages.length ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              {crestImages.map((src, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                  {i ? <span style={{ fontFamily: "JetBrains Mono", fontSize: 18, letterSpacing: 4, color: "#eb642b" }}>VS</span> : null}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 132, height: 132, borderRadius: 999, background: "#ffffff" }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={src} alt="" style={{ width: 90, height: 90, objectFit: "contain" }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
           </div>
           <div style={{ display: "flex", flexDirection: "column", maxWidth: 820 }}>
             <span style={{ fontFamily: "JetBrains Mono", fontSize: 18, letterSpacing: 4, textTransform: "uppercase", color: "#e7e7d8" }}>

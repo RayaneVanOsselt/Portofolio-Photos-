@@ -22,10 +22,10 @@ export function ClosingCta({
     <section aria-labelledby="closing-title" className="container-site pt-[var(--section-space-sm)] pb-[var(--section-space)]">
       <SectionStamp meta="Réponse rapide">{stamp}</SectionStamp>
       <div className="mt-12 grid gap-10 md:mt-16 md:grid-cols-12 md:items-end">
-        <h2 id="closing-title" className="t-h1 text-linen md:col-span-8" data-reveal>
+        <h2 id="closing-title" className="t-h1 text-linen md:col-span-7 lg:col-span-8" data-reveal>
           <Emphasis text={title} />
         </h2>
-        <div className="flex flex-col items-start gap-6 md:col-span-4" data-reveal style={{ "--reveal-delay": "120ms" } as React.CSSProperties}>
+        <div className="flex flex-col items-start gap-6 md:col-span-5 lg:col-span-4" data-reveal style={{ "--reveal-delay": "120ms" } as React.CSSProperties}>
           <p className="t-lead text-taupe">{body}</p>
           <ButtonLink href={cta.href} variant="signal" size="lg">
             {cta.label}

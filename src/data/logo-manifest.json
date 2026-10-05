@@ -1,0 +1,50 @@
+{
+  "daring": {
+    "src": "/logos/daring.webp",
+    "png": "/logos/daring.png",
+    "width": 163,
+    "height": 256
+  },
+  "fih-pro-league": {
+    "src": "/logos/fih-pro-league.webp",
+    "png": "/logos/fih-pro-league.png",
+    "width": 152,
+    "height": 180
+  },
+  "leopold": {
+    "src": "/logos/leopold.webp",
+    "png": "/logos/leopold.png",
+    "width": 162,
+    "height": 256
+  },
+  "louvain-la-neuve": {
+    "src": "/logos/louvain-la-neuve.webp",
+    "png": "/logos/louvain-la-neuve.png",
+    "width": 256,
+    "height": 256
+  },
+  "rwdm": {
+    "src": "/logos/rwdm.webp",
+    "png": "/logos/rwdm.png",
+    "width": 173,
+    "height": 256
+  },
+  "white-star": {
+    "src": "/logos/white-star.webp",
+    "png": "/logos/white-star.png",
+    "width": 224,
+    "height": 224
+  },
+  "woluwe": {
+    "src": "/logos/woluwe.webp",
+    "png": "/logos/woluwe.png",
+    "width": 256,
+    "height": 256
+  },
+  "wolvendael": {
+    "src": "/logos/wolvendael.webp",
+    "png": "/logos/wolvendael.png",
+    "width": 256,
+    "height": 223
+  }
+}

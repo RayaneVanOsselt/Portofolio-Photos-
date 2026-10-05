@@ -1,18 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { MatchTicket } from "@/components/portfolio/MatchTicket";
+import { MatchTicket } from "@/components/albums/MatchTicket";
 import { ButtonLink } from "@/components/ui/Button";
 import { ArrowUpRight } from "@/components/ui/Icons";
 import { siteConfig } from "@/config/site";
-import { categoryContext } from "@/lib/portfolio";
+import { categoryContext } from "@/lib/albums";
 import { inArea } from "@/lib/seo";
-import type { Photo, Project } from "@/lib/types";
+import type { Album, Photo } from "@/lib/types";
 
 type Props = {
-  photo: Photo;
-  /** Galerie mise en avant dans le billet (la plus récente). */
-  latest?: Project;
+  /** Photo du hero (null : fond uni, en attendant une photo). */
+  photo: Photo | null;
+  /** Album mis en avant dans le billet (le plus récent). */
+  latest?: Album;
   eyebrow: string;
   title: [string, string];
   lead: string;
@@ -37,15 +38,15 @@ export function Hero({ photo, latest, eyebrow, title, lead, primaryCta, secondar
 
   return (
     <section aria-labelledby="hero-title" className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-night">
-      <div className="absolute inset-0 -z-10" style={{ backgroundColor: photo.color }}>
+      <div className="absolute inset-0 -z-10" style={{ backgroundColor: photo?.color }}>
         <div className="anim-hero-image absolute inset-0">
           {video ? (
-            <video className="h-full w-full object-cover" autoPlay muted loop playsInline poster={withBase(photo.src)} aria-hidden>
+            <video className="h-full w-full object-cover" autoPlay muted loop playsInline poster={photo ? withBase(photo.src) : undefined} aria-hidden>
               <source src={withBase(video.src)} type={video.type} />
             </video>
-          ) : (
+          ) : photo ? (
             <Image src={photo.src} alt={photo.alt} fill preload fetchPriority="high" sizes="100vw" className="object-cover" />
-          )}
+          ) : null}
         </div>
       </div>
       {/* Voiles de lisibilité : le texte se pose sur la photo sans l'éteindre */}
@@ -86,12 +87,12 @@ export function Hero({ photo, latest, eyebrow, title, lead, primaryCta, secondar
           {latest ? (
             <div className="anim-rise hidden lg:col-span-5 lg:block xl:col-span-4" style={delay(1000)}>
               <MatchTicket
-                project={latest}
-                label="Dernière galerie"
+                album={latest}
+                label="Dernier album"
                 glass
                 actions={
                   <Link href={latest.href} className="group flex h-9 items-center gap-2 rounded-full bg-wash-strong px-4 text-[0.8125rem] font-medium text-linen transition-colors hover:bg-[rgb(231_231_216/0.18)]">
-                    Ouvrir la galerie
+                    Ouvrir l&apos;album
                     <ArrowUpRight size={14} className="transition-transform duration-500 group-hover:rotate-45" />
                   </Link>
                 }

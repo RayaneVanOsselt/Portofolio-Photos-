@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { getSocialLinks, siteConfig } from "@/config/site";
 import { services } from "@/data/services";
-import type { Category, Photo, Project } from "@/lib/types";
+import { categoryContext, SPORT_LABEL } from "@/lib/albums";
+import type { Album, Category, Photo } from "@/lib/types";
+import { formatDate } from "@/lib/utils";
 
 /* --------------------------------------------------------------- textes */
 
@@ -13,8 +15,6 @@ export const inArea = area ? ` à ${area}` : "";
 /** Titre principal du site (page d'accueil). */
 export const homeTitle = `Photographe sportif${inArea} — hockey, rugby & football`;
 
-const SPORT_LABEL = { hockey: "hockey sur gazon", rugby: "rugby", football: "football" } as const;
-
 export function sportLabel(category: Category) {
   return SPORT_LABEL[category.sport];
 }
@@ -25,9 +25,11 @@ type PageMeta = {
   /** Titre court de la page — devient « Titre | Nom du site ». */
   title: string;
   description?: string;
-  /** Chemin canonique, ex. "/portfolio/rugby". */
+  /** Chemin canonique, ex. "/albums/daring-h1". */
   path: string;
   noIndex?: boolean;
+  /** Image de partage propre à la page (sinon celle du fichier opengraph-image le plus proche). */
+  image?: { url: string; alt: string };
 };
 
 /** Description limitée à ~160 caractères (ce que Google affiche), coupée proprement. */
@@ -42,9 +44,12 @@ function clampDescription(text: string, max = 158) {
  * Le mot-clé de la page vient en premier dans le titre (meilleur pour Google),
  * le nom du site en dernier. Les images sociales viennent des fichiers opengraph-image.
  */
-export function pageMetadata({ title, description = siteConfig.description, path, noIndex }: PageMeta): Metadata {
+export function pageMetadata({ title, description = siteConfig.description, path, noIndex, image }: PageMeta): Metadata {
   const fullTitle = `${title} | ${siteConfig.name}`;
   const desc = clampDescription(description);
+  // Toujours une image de partage : sinon une page qui définit son `openGraph` perd celle du site.
+  const shared = image ?? { url: "/opengraph-image.png", alt: `${siteConfig.name} — ${siteConfig.tagline}` };
+  const images = [{ url: absoluteUrl(shared.url), width: 1200, height: 630, alt: shared.alt, type: "image/png" }];
   return {
     title: { absolute: fullTitle },
     description: desc,
@@ -56,15 +61,16 @@ export function pageMetadata({ title, description = siteConfig.description, path
       url: path,
       title: fullTitle,
       description: desc,
+      images,
     },
-    twitter: { card: "summary_large_image", title: fullTitle, description: desc },
+    twitter: { card: "summary_large_image", title: fullTitle, description: desc, images },
     robots: noIndex ? { index: false, follow: true } : { index: true, follow: true, "max-image-preview": "large" },
   };
 }
 
 /**
  * URL absolue d'une page ou d'un fichier. Les pages prennent un « / » final
- * (le site est exporté en dossiers : /portfolio/rugby/index.html).
+ * (le site est exporté en dossiers : /albums/rugby/index.html).
  */
 export function absoluteUrl(path: string) {
   const raw = path.startsWith("/") ? path : `/${path}`;
@@ -72,6 +78,11 @@ export function absoluteUrl(path: string) {
   const isFile = /\.[a-z0-9]+$/i.test(pathname);
   const clean = !isFile && !pathname.endsWith("/") ? `${pathname}/` : pathname;
   return `${siteConfig.url}${clean}${suffix}`;
+}
+
+/** Image de partage d'une page d'albums : « /albums/daring-h1 » → « /og/albums/daring-h1.png » (src/app/og/). */
+export function ogImageHref(href: string) {
+  return `/og${href.replace(/\/$/, "")}.png`;
 }
 
 /* ---------------------------------------------- données structurées */
@@ -167,84 +178,122 @@ export function imageObjectJsonLd(photo: Photo, caption?: string) {
   };
 }
 
-/** Page de rubrique / équipe : une collection de photos. */
-export function collectionJsonLd(category: Category, projects: Project[]) {
-  const photos = projects.flatMap((p) => p.photos);
+/** Page d'une catégorie : la liste de ses albums (et leurs photos, s'il y en a). */
+export function collectionJsonLd(category: Category, albums: Album[]) {
+  const photos = albums.flatMap((a) => a.photos).filter((p) => !p.credit);
   return {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: `${category.title} — photos de ${sportLabel(category)}`,
-    description: category.intro,
+    name: `${category.fullTitle} — albums photo ${sportLabel(category)}`,
+    description: categorySummary(category),
     url: absoluteUrl(category.href),
     inLanguage: siteConfig.language,
     isPartOf: { "@id": WEBSITE_ID() },
-    about: { "@type": "Thing", name: category.parent ? `${category.title} (${category.parent.title})` : category.title },
-    primaryImageOfPage: imageObjectJsonLd(category.cover),
+    about: { "@type": "Thing", name: category.fullTitle },
+    ...(category.cover && !category.cover.credit ? { primaryImageOfPage: imageObjectJsonLd(category.cover) } : {}),
     mainEntity: {
-      "@type": "ImageGallery",
-      name: category.title,
-      numberOfItems: photos.length,
-      image: photos.slice(0, 30).map((photo) => imageObjectJsonLd(photo)),
+      "@type": "ItemList",
+      name: `Albums ${category.fullTitle}`,
+      numberOfItems: albums.length,
+      itemListElement: albums.map((album, i) => ({ "@type": "ListItem", position: i + 1, name: `${album.title} — ${formatDate(album.date)}`, url: absoluteUrl(album.href) })),
     },
+    ...(photos.length ? { image: photos.slice(0, 30).map((photo) => imageObjectJsonLd(photo)) } : {}),
   };
 }
 
-/** Page d'une série. */
-export function projectJsonLd(project: Project) {
+/** Page d'un album : la galerie de photos et, pour un match, l'événement sportif. */
+export function albumJsonLd(album: Album) {
+  const photos = album.photos.filter((p) => !p.credit);
   return {
     "@context": "https://schema.org",
     "@type": "ImageGallery",
-    name: project.title,
-    description: project.description,
-    url: absoluteUrl(project.href),
+    name: `${album.title} — photos du match`,
+    description: albumDescription(album),
+    url: absoluteUrl(album.href),
     inLanguage: siteConfig.language,
     isPartOf: { "@id": WEBSITE_ID() },
     author: { "@id": BUSINESS_ID() },
-    ...(project.date ? { dateCreated: project.date } : {}),
-    ...(project.location ? { contentLocation: { "@type": "Place", name: project.location } } : {}),
-    image: project.photos.map((photo) => imageObjectJsonLd(photo, `${project.title} — ${photo.alt}`)),
-    ...(project.match ? { about: sportsEventJsonLd(project) } : {}),
+    datePublished: album.date,
+    ...(album.location ? { contentLocation: { "@type": "Place", name: album.location } } : {}),
+    ...(photos.length ? { image: photos.map((photo) => imageObjectJsonLd(photo, photo.alt)) } : {}),
+    about: sportsEventJsonLd(album),
   };
 }
 
-/** Le match photographié (schema.org SportsEvent) : équipes, date, stade, compétition. */
-function sportsEventJsonLd(project: Project) {
-  const match = project.match!;
-  const sport = { football: "Football", hockey: "Hockey sur gazon", rugby: "Rugby" }[project.category.sport];
+/**
+ * Le match photographié (schema.org SportsEvent). Seules les données connues
+ * sont déclarées : équipes (sans présumer qui reçoit), date, lieu, compétition.
+ */
+function sportsEventJsonLd(album: Album) {
+  const sport = { football: "Football", hockey: "Hockey sur gazon", rugby: "Rugby" }[album.category.sport];
+  const match = album.match;
+  const competition = match?.competition ?? (album.category.parent ? categoryContext(album.category) : null);
   return {
     "@type": "SportsEvent",
-    name: `${match.home} – ${match.away}`,
+    name: match ? `${match.home} – ${match.away}` : album.title,
     sport,
-    ...(project.date ? { startDate: project.date } : {}),
-    ...(project.location ? { location: { "@type": "Place", name: project.location } } : {}),
-    ...(match.competition ? { superEvent: { "@type": "SportsEvent", name: match.competition } } : {}),
-    homeTeam: { "@type": "SportsTeam", name: match.home, sport },
-    awayTeam: { "@type": "SportsTeam", name: match.away, sport },
-    competitor: [
-      { "@type": "SportsTeam", name: match.home },
-      { "@type": "SportsTeam", name: match.away },
-    ],
+    startDate: album.date,
+    eventStatus: "https://schema.org/EventScheduled",
+    ...(album.location ? { location: { "@type": "Place", name: album.location } } : {}),
+    ...(competition ? { superEvent: { "@type": "SportsEvent", name: competition } } : {}),
+    ...(match
+      ? {
+          competitor: [
+            { "@type": "SportsTeam", name: match.home, sport },
+            { "@type": "SportsTeam", name: match.away, sport },
+          ],
+        }
+      : {}),
   };
 }
 
-/* ------------------------------------------------ rubriques & séries */
+/* ------------------------------------------------ catégories & albums */
 
-/** « Red Lions (FIH Pro League) — photos de hockey sur gazon » */
+/** « Daring H1 — albums photo hockey » · « FIH Pro League Femmes — albums photo hockey » */
 export function categoryTitle(category: Category) {
-  const name = category.parent ? `${category.title} (${category.parent.title})` : category.title;
-  // Titre court (≈ 60 caractères max. avec le nom du site) : sport en version brève.
   const short = { hockey: "hockey", rugby: "rugby", football: "football" }[category.sport];
-  return `${name} — photos ${short}`;
+  return `${category.fullTitle} — albums photo ${short}`;
 }
 
-/** Phrase factuelle décrivant une rubrique (metadata + texte de page). */
-export function categorySummary(category: Category, seriesCount: number) {
-  const where = category.parent ? ` en ${category.parent.title}` : "";
-  const teams = category.children.length ? `, ${category.children.length} équipes (${category.children.map((c) => c.title).join(", ")})` : "";
-  const series = `${seriesCount} série${seriesCount > 1 ? "s" : ""}`;
-  return `${category.title}${where} : ${category.photoCount} photos de ${sportLabel(category)}${teams}, ${series}.`;
+/** Phrase factuelle décrivant une catégorie (metadata + texte de page) — uniquement des données réelles. */
+export function categorySummary(category: Category) {
+  const n = category.albumCount;
+  const matches = `${n} match${n > 1 ? "s" : ""} photographié${n > 1 ? "s" : ""}`;
+  const sport = plainText(category.fullTitle).includes(plainText(sportLabel(category))) ? "" : ` en ${sportLabel(category)}`;
+  const teams = category.children.length ? ` (${category.children.map((c) => c.title).join(" et ")})` : "";
+  const photos = category.photoCount ? ` ${category.photoCount} photos en ligne.` : "";
+  return `${category.fullTitle} : ${matches}${sport}${teams}.${photos}`;
 }
 
-export function categoryDescription(category: Category, seriesCount: number) {
-  return `${categorySummary(category, seriesCount)} ${category.intro} Photographe sportif${inArea}.`;
+export function categoryDescription(category: Category) {
+  return `Albums photo ${category.fullTitle} : chaque match en images, du plus récent au plus ancien. ${categorySummary(category)} Photographe sportif${inArea}.`;
 }
+
+/**
+ * Titre SEO d'un album : « Daring H1 vs Leo H1 — Photos du match ».
+ * La compétition est ajoutée quand le titre ne la contient pas
+ * (« Belgique vs Pays-Bas · FIH Pro League Femmes — Photos du match »).
+ */
+export function albumTitle(album: Album) {
+  const title = plainText(album.title);
+  const crest = album.category.crest;
+  const root = album.category.parent ? album.category.parent : album.category;
+  const named = title.includes(plainText(root.title)) || (crest !== null && title.includes(plainText(crest.name.split(" ")[0])));
+  return `${album.title}${named ? "" : ` · ${album.category.fullTitle}`} — Photos du match`;
+}
+
+/** Description factuelle d'un album : équipes, date, catégorie, lieu, nombre de photos. */
+export function albumDescription(album: Album) {
+  const count = album.photos.length;
+  const photos = count ? `${count} photos` : "Photos à venir";
+  const where = album.location ? ` à ${album.location}` : "";
+  const context = categoryContext(album.category);
+  const sport = plainText(`${album.title} ${context}`).includes(plainText(sportLabel(album.category))) ? "" : `, ${sportLabel(album.category)}`;
+  return `${album.title}, ${formatDate(album.date)}${where} — ${context}${sport}. ${photos}. Photographe sportif${inArea}.`;
+}
+
+const plainText = (value: string) =>
+  value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();

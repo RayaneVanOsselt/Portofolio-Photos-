@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Fragment, type ReactNode } from "react";
 import { Camera, Clock, Images, PageIcon } from "@/components/ui/Icons";
 import { matchRanges, type SearchItem } from "@/lib/search";
+import { publicPath } from "@/lib/utils";
 
 /** Éléments partagés par la palette de recherche et la page /search. */
 
@@ -26,6 +27,15 @@ export function Highlight({ text, query }: { text: string; query: string }) {
 }
 
 export function Thumb({ item, recent, size = "size-14", sizes = "64px" }: { item: SearchItem; recent?: boolean; size?: string; sizes?: string }) {
+  if (item.thumb?.logo) {
+    return (
+      <span className={`grid ${size} shrink-0 place-items-center rounded-[var(--radius-sm)] bg-wash-strong`}>
+        <span className="grid size-[78%] place-items-center rounded-full bg-white">
+          <Image src={publicPath(item.thumb.src)} alt="" width={48} height={48} unoptimized className="h-[68%] w-[68%] object-contain" />
+        </span>
+      </span>
+    );
+  }
   if (item.thumb) {
     return (
       <span className={`relative ${size} shrink-0 overflow-hidden rounded-[var(--radius-sm)]`} style={{ backgroundColor: item.thumb.color }}>
@@ -33,7 +43,7 @@ export function Thumb({ item, recent, size = "size-14", sizes = "64px" }: { item
       </span>
     );
   }
-  const Icon = recent ? Clock : item.type === "Service" ? Camera : item.type === "Galerie" ? Images : PageIcon;
+  const Icon = recent ? Clock : item.type === "Service" ? Camera : item.type === "Album" ? Images : PageIcon;
   return (
     <span className={`grid ${size} shrink-0 place-items-center rounded-[var(--radius-sm)] bg-wash-strong text-linen`}>
       <Icon size={20} />
@@ -52,7 +62,7 @@ export function ResultMeta({ item, query }: { item: SearchItem; query: string })
           <Highlight text={item.date} query={query} />
         </>
       ) : null}
-      {item.count !== undefined && item.type !== "Service" && item.type !== "Page" ? ` · ${item.count} photos` : null}
+      {item.count ? ` · ${item.count} photos` : item.type === "Album" ? " · photos à venir" : null}
     </>
   );
 }
