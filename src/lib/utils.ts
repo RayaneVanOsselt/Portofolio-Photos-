@@ -4,6 +4,14 @@ export function isActivePath(pathname: string, href: string) {
   return href === "/" ? clean === "/" : clean === href || clean.startsWith(`${href}/`);
 }
 
+/**
+ * Fichier de /public servi tel quel (logos…) : ajoute le sous-dossier de
+ * publication (GitHub Pages), que Next.js n'ajoute pas aux images `unoptimized`.
+ */
+export function publicPath(src: string) {
+  return `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${src}`;
+}
+
 /** Numérotation éditoriale : 1 → « 01 ». */
 export function pad(n: number) {
   return String(n).padStart(2, "0");
@@ -16,6 +24,11 @@ const fmt = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("fr
 /** « 3 octobre 2026 » */
 export function formatDate(iso: string) {
   return fmt({ day: "numeric", month: "long", year: "numeric" }).format(toDate(iso));
+}
+
+/** « 3 oct. 2026 » — listes chronologiques. */
+export function formatDateMedium(iso: string) {
+  return fmt({ day: "numeric", month: "short", year: "numeric" }).format(toDate(iso));
 }
 
 /** « 03.10.26 » — format compact des listes. */

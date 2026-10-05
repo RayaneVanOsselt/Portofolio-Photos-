@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "predev": "node scripts/photos.mjs",
+    "predev": "node scripts/photos.mjs && node scripts/logos.mjs",
     "build": "next build && node scripts/finalize-export.mjs",
-    "prebuild": "node scripts/photos.mjs",
+    "prebuild": "node scripts/photos.mjs && node scripts/logos.mjs",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "photos": "node scripts/photos.mjs"
+    "photos": "node scripts/photos.mjs",
+    "logos": "node scripts/logos.mjs"
   },
   "dependencies": {
     "next": "16.3.8",

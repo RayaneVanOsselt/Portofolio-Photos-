@@ -109,8 +109,8 @@ export function ContactForm({ initialProjectType = "", initialMessage = "" }: { 
           >
             Envoyer un autre message
           </Button>
-          <Link href="/portfolio" className="inline-flex h-12 items-center px-5 text-[0.9375rem] text-taupe hover:text-linen">
-            Retour au portfolio
+          <Link href="/albums" className="inline-flex h-12 items-center px-5 text-[0.9375rem] text-taupe hover:text-linen">
+            Retour aux albums
           </Link>
         </div>
       </div>

@@ -6,8 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { siteConfig } from "@/config/site";
-import { getPortfolioNav } from "@/lib/navigation";
-import { buildSearchIndex } from "@/lib/search-index";
+import { getAlbumsNav } from "@/lib/navigation";
 import { businessJsonLd, homeTitle, websiteJsonLd } from "@/lib/seo";
 import "./globals.css";
 
@@ -15,7 +14,8 @@ import "./globals.css";
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  // 600 n'est utilisé nulle part : une police de moins à télécharger.
+  weight: ["300", "400", "500"],
   display: "swap",
 });
 
@@ -87,7 +87,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Aller au contenu
         </a>
 
-        <Header portfolioNav={getPortfolioNav()} searchIndex={buildSearchIndex()} />
+        <Header albumsNav={getAlbumsNav()} />
         <main id="main" tabIndex={-1} className="outline-none">
           {children}
         </main>

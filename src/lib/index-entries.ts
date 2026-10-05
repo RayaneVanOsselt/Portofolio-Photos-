@@ -8,7 +8,8 @@ export function toIndexEntries(categories: Category[]): IndexEntry[] {
     href: c.href,
     kicker: c.kicker,
     cover: c.cover,
+    crest: c.crest,
     subtitles: c.children.map((child) => child.title),
-    count: c.photoCount,
+    count: c.albumCount,
   }));
 }

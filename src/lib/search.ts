@@ -3,7 +3,7 @@
  * Insensible à la casse et aux accents : « leopold » trouve « Léopold ».
  */
 
-export type SearchType = "Galerie" | "Catégorie" | "Équipe" | "Service" | "Page";
+export type SearchType = "Album" | "Catégorie" | "Service" | "Page";
 
 export type SearchItem = {
   type: SearchType;
@@ -13,8 +13,9 @@ export type SearchItem = {
   context: string;
   /** Texte supplémentaire indexé mais non affiché (dates, équipes, lieu…). */
   keywords: string;
-  thumb?: { src: string; color?: string };
-  /** Galeries : date affichée (déjà formatée) et nombre de photos. */
+  /** Vignette : photo de couverture, ou logo du club (`logo: true`) tant qu'il n'y a pas de photo. */
+  thumb?: { src: string; color?: string; logo?: boolean };
+  /** Albums : date affichée (déjà formatée) et nombre de photos. */
   date?: string;
   count?: number;
 };
@@ -28,15 +29,14 @@ export function normalize(value: string) {
     .trim();
 }
 
-const TYPE_WEIGHT: Record<SearchType, number> = { Galerie: 6, Équipe: 5, Catégorie: 5, Service: 2, Page: 1 };
+const TYPE_WEIGHT: Record<SearchType, number> = { Album: 6, Catégorie: 5, Service: 2, Page: 1 };
 
 /** Ordre d'affichage des groupes de résultats. */
-export const SEARCH_TYPES: SearchType[] = ["Galerie", "Catégorie", "Équipe", "Service", "Page"];
+export const SEARCH_TYPES: SearchType[] = ["Album", "Catégorie", "Service", "Page"];
 
 export const SEARCH_TYPE_PLURAL: Record<SearchType, string> = {
-  Galerie: "Galeries",
+  Album: "Albums",
   Catégorie: "Catégories",
-  Équipe: "Équipes",
   Service: "Services",
   Page: "Pages",
 };

@@ -49,9 +49,12 @@ export function PageIntro({ crumbs, kicker, title, intro, aside, size = "display
   );
 }
 
-/** Champs « billet » : libellé mono + valeur légère — uniquement des données réelles. */
-export function MetaList({ items, columns = 3 }: { items: { label: string; value: ReactNode }[]; columns?: 2 | 3 | 4 }) {
-  const cols = { 2: "grid-cols-2", 3: "grid-cols-3", 4: "grid-cols-2 sm:grid-cols-4" }[columns];
+/**
+ * Champs « billet » : libellé mono + valeur légère — uniquement des données réelles.
+ * `columns="2-3"` : deux colonnes sur petit écran, trois ensuite (valeurs longues, ex. une date).
+ */
+export function MetaList({ items, columns = 3 }: { items: { label: string; value: ReactNode }[]; columns?: 2 | 3 | 4 | "2-3" }) {
+  const cols = { 2: "grid-cols-2", 3: "grid-cols-3", 4: "grid-cols-2 sm:grid-cols-4", "2-3": "grid-cols-2 sm:grid-cols-3" }[columns];
   return (
     <dl className={`grid gap-x-6 gap-y-6 ${cols}`}>
       {items.map((item) => (

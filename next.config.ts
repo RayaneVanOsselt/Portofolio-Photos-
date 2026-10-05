@@ -22,6 +22,10 @@ const nextConfig: NextConfig = {
     // (npm run photos) et ce chargeur choisit la bonne taille.
     loader: "custom",
     loaderFile: "./src/lib/image-loader.ts",
+    // Largeurs du srcset = déclinaisons réellement générées (scripts/photos.mjs) :
+    // aucune entrée en double, le navigateur choisit le bon fichier du premier coup.
+    deviceSizes: [640, 1080, 1600, 2400],
+    imageSizes: [320],
   },
   poweredByHeader: false,
 };
