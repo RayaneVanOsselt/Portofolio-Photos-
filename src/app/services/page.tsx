@@ -8,7 +8,7 @@ import { Check } from "@/components/ui/Icons";
 import { PhotoImage } from "@/components/ui/PhotoImage";
 import { SectionStamp } from "@/components/ui/SectionLabel";
 import { services } from "@/data/services";
-import { getPhotoById } from "@/lib/portfolio";
+import { getPhotoById } from "@/lib/albums";
 import { inArea, pageMetadata } from "@/lib/seo";
 import { pad } from "@/lib/utils";
 
@@ -38,7 +38,7 @@ export default function ServicesPage() {
 
       <section aria-label="Liste des prestations" className="container-wide pb-[var(--section-space)]">
         {services.map((service, i) => {
-          const photo = getPhotoById(service.photoId);
+          const photo = getPhotoById(service.photoId, "site/services");
           const reversed = i % 2 === 1;
           return (
             <article
@@ -48,7 +48,9 @@ export default function ServicesPage() {
               className="grid scroll-mt-28 gap-10 border-t border-line pt-6 pb-[clamp(3.5rem,7vw,7rem)] md:grid-cols-12 md:gap-8"
             >
               <div className={`md:col-span-6 ${reversed ? "md:order-2 md:col-start-7" : ""}`} data-reveal="image">
-                <PhotoImage photo={photo} fill sizes="(min-width: 768px) 50vw, 100vw" className={`${i % 3 === 0 ? "aspect-[4/5]" : "aspect-[4/3]"} rounded-[var(--radius-card)]`} />
+                {photo ? (
+                  <PhotoImage photo={photo} fill sizes="(min-width: 768px) 50vw, 100vw" className={`${i % 3 === 0 ? "aspect-[4/5]" : "aspect-[4/3]"} rounded-[var(--radius-card)]`} />
+                ) : null}
               </div>
               <div className={`flex flex-col md:col-span-5 ${reversed ? "md:order-1 md:col-start-1" : "md:col-start-8"}`}>
                 <div className="flex items-center justify-between gap-4 t-mono">

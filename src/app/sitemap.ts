@@ -1,36 +1,35 @@
 import type { MetadataRoute } from "next";
-import { getCategories, getCategoryPhotos, getProjects } from "@/lib/portfolio";
+import { ALBUMS_HREF, getAlbums, getAllCategories, getCategoryAlbums } from "@/lib/albums";
 import { absoluteUrl, photoUrl } from "@/lib/seo";
 import type { Photo } from "@/lib/types";
 
 /**
  * Plan du site pour Google, avec les images de chaque page (Google Images).
- * Régénéré à chaque publication : la date de mise à jour est celle du build.
+ * Régénéré à chaque publication. Les albums sans photo (« Photos à venir ») et
+ * les albums privés n'y figurent pas : ils y entrent seuls dès que leurs photos
+ * sont en ligne, avec la date du match comme date de mise à jour.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date();
+  const now = new Date();
   type Freq = MetadataRoute.Sitemap[number]["changeFrequency"];
 
-  const page = (path: string, priority: number, changeFrequency: Freq = "monthly", photos: Photo[] = []) => ({
-    url: absoluteUrl(path),
-    lastModified,
-    changeFrequency,
-    priority,
+  const page = (path: string, priority: number, changeFrequency: Freq = "monthly", photos: (Photo | null)[] = [], lastModified: Date = now) => {
     // Seules vos propres photos sont déclarées (pas les photos temporaires d'Unsplash).
-    ...(photos.some((p) => !p.credit) ? { images: photos.filter((p) => !p.credit).slice(0, 50).map(photoUrl) } : {}),
-  });
+    const own = photos.filter((p): p is Photo => Boolean(p && !p.credit));
+    return { url: absoluteUrl(path), lastModified, changeFrequency, priority, ...(own.length ? { images: own.slice(0, 50).map(photoUrl) } : {}) };
+  };
 
-  const categories = getCategories();
-  const allCategories = categories.flatMap((c) => [c, ...c.children]);
+  const albums = getAlbums();
 
   return [
-    page("/", 1, "weekly", categories.map((c) => c.cover)),
-    page("/portfolio", 0.9, "weekly", categories.map((c) => c.cover)),
-    page("/football", 0.9, "weekly"),
-    page("/galeries", 0.9, "weekly", getProjects().map((p) => p.cover)),
-    ...allCategories.map((c) => page(c.href, c.parent ? 0.7 : 0.8, "weekly", getCategoryPhotos(c))),
-    // Galeries publiques uniquement (les galeries privées ne sont jamais listées).
-    ...getProjects().map((p) => page(p.href, 0.7, "monthly", p.photos)),
+    page("/", 1, "weekly", albums.map((a) => a.cover)),
+    page(ALBUMS_HREF, 0.9, "weekly", albums.map((a) => a.cover)),
+    ...getAllCategories()
+      .filter((c) => c.albumCount)
+      .map((c) => page(c.href, c.parent ? 0.7 : 0.8, "weekly", getCategoryAlbums(c).map((a) => a.cover))),
+    ...albums.filter((a) => a.photos.length).map((a) => page(a.href, 0.7, "monthly", a.photos, new Date(`${a.date}T12:00:00Z`))),
+    page("/galeries", 0.8, "weekly"),
+    page("/football", 0.7, "weekly"),
     page("/about", 0.7),
     page("/services", 0.7),
     page("/contact", 0.8),

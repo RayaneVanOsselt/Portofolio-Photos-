@@ -11,7 +11,7 @@
 import type { ImageLoaderProps } from "next/image";
 
 /** Mêmes valeurs que VARIANT_WIDTHS dans scripts/photos.mjs. */
-const VARIANT_WIDTHS = [640, 1080, 1600, 2400];
+const VARIANT_WIDTHS = [320, 640, 1080, 1600, 2400];
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export default function imageLoader({ src, width, quality }: ImageLoaderProps) {

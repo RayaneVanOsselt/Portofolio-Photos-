@@ -1,7 +1,8 @@
 /**
  * Prestations — liste provisoire, à adapter.
  * Aucun tarif n'est affiché : chaque service renvoie vers une demande de devis.
- * `photoId` : identifiant d'une photo du portfolio (voir src/data/photos.ts).
+ * `photoId` : identifiant d'une photo (voir src/data/photos.ts) ; à défaut,
+ * une photo de public/images/site/services/ est utilisée.
  */
 import type { Service } from "@/lib/types";
 

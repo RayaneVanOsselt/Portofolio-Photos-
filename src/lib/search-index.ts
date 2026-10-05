@@ -1,69 +1,63 @@
 import { services } from "@/data/services";
-import { getCategories, getProjects } from "@/lib/portfolio";
+import { albumCrests, categoryContext, getAlbums, getAllCategories, SPORT_LABEL } from "@/lib/albums";
 import type { SearchItem } from "@/lib/search";
-import type { Project } from "@/lib/types";
+import type { Album, Category } from "@/lib/types";
 import { dateKeywords, formatDate } from "@/lib/utils";
 
-const SPORT_LABEL = { hockey: "hockey sur gazon", rugby: "rugby", football: "football" } as const;
-
-/** Tout ce qu'un visiteur peut taper pour retrouver une galerie. */
-export function projectKeywords(project: Project) {
-  const { category } = project;
+/** Tout ce qu'un visiteur peut taper pour retrouver un album. */
+export function albumKeywords(album: Album) {
+  const { category } = album;
   return [
     SPORT_LABEL[category.sport],
-    category.parent?.title,
-    category.title,
+    categoryContext(category),
+    category.fullTitle,
     category.kicker,
-    project.event,
-    ...(project.teams ?? []),
-    ...(project.match
-      ? [project.match.home, project.match.away, project.match.homeShort, project.match.awayShort, project.match.competition, project.match.round, "matchday match", project.match.score?.join("-")]
+    category.crest?.name,
+    album.event,
+    ...(album.teams ?? []),
+    ...(album.match
+      ? [album.match.home, album.match.away, album.match.homeShort, album.match.awayShort, album.match.competition, album.match.round, "match", album.match.score?.join("-")]
       : []),
-    project.location,
-    dateKeywords(project.date),
+    album.location,
+    dateKeywords(album.date),
   ]
     .filter(Boolean)
     .join(" ");
 }
 
-/** Index construit au build à partir des données (quelques Ko). Les galeries privées en sont exclues. */
+/** Vignette : la couverture, sinon le logo du club ou de la compétition. */
+function thumbOf(cover: Album["cover"], crest: Category["crest"]): SearchItem["thumb"] {
+  if (cover) return { src: cover.src, color: cover.color };
+  return crest ? { src: crest.src, logo: true } : undefined;
+}
+
+/** Index construit au build à partir des données (quelques Ko). Les albums privés en sont exclus. */
 export function buildSearchIndex(): SearchItem[] {
   const items: SearchItem[] = [];
 
-  for (const project of getProjects()) {
+  for (const album of getAlbums()) {
     items.push({
-      type: "Galerie",
-      title: project.title,
-      href: project.href,
-      context: project.category.parent ? `${project.category.parent.title} · ${project.category.title}` : project.category.title,
-      keywords: projectKeywords(project),
-      thumb: { src: project.cover.src, color: project.cover.color },
-      date: project.date ? formatDate(project.date) : undefined,
-      count: project.photos.length,
+      type: "Album",
+      title: album.title,
+      href: album.href,
+      context: categoryContext(album.category),
+      keywords: albumKeywords(album),
+      thumb: thumbOf(album.cover, albumCrests(album)[0] ?? null),
+      date: formatDate(album.date),
+      count: album.photos.length,
     });
   }
 
-  for (const category of getCategories()) {
+  for (const category of getAllCategories()) {
     items.push({
       type: "Catégorie",
-      title: category.title,
+      title: category.fullTitle,
       href: category.href,
-      context: category.kicker,
-      keywords: `${SPORT_LABEL[category.sport]} ${category.intro} ${category.children.map((c) => c.title).join(" ")}`,
-      thumb: { src: category.cover.src, color: category.cover.color },
+      context: category.parent ? category.parent.title : category.kicker,
+      keywords: `${SPORT_LABEL[category.sport]} ${category.crest?.name ?? ""} ${category.children.map((c) => c.title).join(" ")} albums matchs`,
+      thumb: thumbOf(category.cover, category.crest),
       count: category.photoCount,
     });
-    for (const child of category.children) {
-      items.push({
-        type: "Équipe",
-        title: child.title,
-        href: child.href,
-        context: category.title,
-        keywords: `${SPORT_LABEL[category.sport]} ${child.intro}`,
-        thumb: { src: child.cover.src, color: child.cover.color },
-        count: child.photoCount,
-      });
-    }
   }
 
   for (const service of services) {
@@ -77,9 +71,9 @@ export function buildSearchIndex(): SearchItem[] {
   }
 
   items.push(
-    { type: "Page", title: "Galeries — accès aux photos", href: "/galeries", context: "Retrouver ses photos", keywords: "mes photos match récupérer télécharger code accès client" },
-    { type: "Page", title: "Football — archive des matchs", href: "/football", context: "Matchs, clubs, jeunes, supporters", keywords: "football foot soccer matchday archive matchs derby u23 jeunes supporters" },
-    { type: "Page", title: "Portfolio", href: "/portfolio", context: "Le travail, par catégorie", keywords: "galerie photos travail sélection" },
+    { type: "Page", title: "Albums", href: "/albums", context: "Tous les clubs, compétitions et matchs", keywords: "albums galeries photos matchs clubs compétitions portfolio" },
+    { type: "Page", title: "Retrouver mes photos", href: "/galeries", context: "Recherche par équipe, match ou date", keywords: "mes photos match récupérer télécharger code accès client galeries" },
+    { type: "Page", title: "Football — archive des matchs", href: "/football", context: "Matchs, clubs, saisons", keywords: "football foot soccer matchday archive matchs rwdm" },
     { type: "Page", title: "À propos", href: "/about", context: "Le photographe", keywords: "about biographie approche valeurs matériel" },
     { type: "Page", title: "Services", href: "/services", context: "Prestations", keywords: "offres prestations devis" },
     { type: "Page", title: "Contact", href: "/contact", context: "Demande de devis", keywords: "email message devis réserver disponibilité" },

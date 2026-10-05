@@ -2,24 +2,29 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { ClubCrest } from "@/components/clubs/ClubCrest";
 import { ArrowUpRight } from "@/components/ui/Icons";
 import { PhotoImage } from "@/components/ui/PhotoImage";
-import type { Photo } from "@/lib/types";
+import type { Crest, Photo } from "@/lib/types";
 import { pad } from "@/lib/utils";
 
 export type IndexEntry = {
   title: string;
   href: string;
   kicker: string;
-  cover: Photo;
+  /** Couverture (null tant que la catégorie n'a pas de photos : le logo la remplace). */
+  cover: Photo | null;
+  crest: Crest | null;
   subtitles: string[];
+  /** Nombre d'albums. */
   count: number;
 };
 
 /**
  * Les catégories comme un tableau des départs : une liste typographique,
- * numéros mono, grands titres légers. Desktop : la couverture flotte et suit
- * le pointeur au survol. Tactile : une vignette accompagne chaque ligne.
+ * numéros mono, grands titres légers, logo du club. Desktop : la couverture
+ * flotte et suit le pointeur au survol (dès qu'il y a des photos).
+ * Tactile : une vignette (ou le logo) accompagne chaque ligne.
  */
 export function CategoryIndex({ entries }: { entries: IndexEntry[] }) {
   const [active, setActive] = useState<number | null>(null);
@@ -69,14 +74,23 @@ export function CategoryIndex({ entries }: { entries: IndexEntry[] }) {
               }}
               onFocus={() => setActive(i)}
               onBlur={() => setActive(null)}
-              className={`group grid grid-cols-[auto_1fr_auto] items-center gap-x-4 py-5 transition-colors duration-500 md:grid-cols-[5rem_1fr_16rem_auto] md:gap-x-8 md:py-7 ${
+              className={`group grid grid-cols-[auto_1fr_auto] items-center gap-x-4 py-5 transition-colors duration-500 md:grid-cols-[7.5rem_1fr_16rem_auto] md:gap-x-8 md:py-7 ${
                 active !== null && active !== i ? "md:text-linen/30" : "text-linen"
               }`}
             >
-              <span className="relative size-14 overflow-hidden rounded-[var(--radius-sm)] md:hidden">
-                <PhotoImage photo={entry.cover} fill sizes="56px" className="absolute inset-0" />
+              {entry.cover ? (
+                <span className="relative size-14 overflow-hidden rounded-[var(--radius-sm)] md:hidden">
+                  <PhotoImage photo={entry.cover} fill sizes="56px" className="absolute inset-0" />
+                </span>
+              ) : entry.crest ? (
+                <ClubCrest crest={entry.crest} size={56} className="md:hidden" />
+              ) : (
+                <span aria-hidden className="size-14 rounded-full bg-wash-strong md:hidden" />
+              )}
+              <span className="hidden items-center gap-4 md:flex">
+                <span className="t-mono text-ash">({pad(i + 1)})</span>
+                {entry.crest ? <ClubCrest crest={entry.crest} size={36} /> : null}
               </span>
-              <span className="hidden t-mono text-ash md:block">({pad(i + 1)})</span>
               <span className="min-w-0">
                 <span className="block truncate pb-[0.08em] text-[clamp(1.6rem,0.9rem+3.4vw,4.25rem)] leading-[1.12] font-light tracking-[-0.045em] text-current transition-transform duration-700 ease-[var(--ease-out-expo)] group-hover:md:translate-x-3">
                   {entry.title}
@@ -85,7 +99,7 @@ export function CategoryIndex({ entries }: { entries: IndexEntry[] }) {
               </span>
               <span className="hidden text-right md:block">
                 <span className="block t-mono text-taupe">{entry.kicker}</span>
-                <span className="mt-1 block t-small text-ash">{entry.subtitles.length ? entry.subtitles.join(" · ") : `${entry.count} photos`}</span>
+                <span className="mt-1 block t-small text-ash">{entry.subtitles.length ? entry.subtitles.join(" · ") : `${entry.count} album${entry.count > 1 ? "s" : ""}`}</span>
               </span>
               <span className="grid size-11 place-items-center rounded-full border border-line-strong text-linen transition-[background-color,border-color,color] duration-300 group-hover:border-flamingo group-hover:bg-flamingo group-hover:text-ink">
                 <ArrowUpRight className="transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-45" />
@@ -97,13 +111,15 @@ export function CategoryIndex({ entries }: { entries: IndexEntry[] }) {
 
       {/* Aperçu flottant (desktop, pointeur précis) */}
       <div ref={previewRef} aria-hidden className="pointer-events-none fixed top-0 left-0 z-30 hidden [@media(pointer:fine)]:md:block">
-        <div className={`-translate-x-1/2 -translate-y-1/2 transition-[opacity,scale] duration-500 ease-[var(--ease-out-expo)] ${active === null ? "scale-90 opacity-0" : "scale-100 opacity-100"}`}>
+        <div className={`-translate-x-1/2 -translate-y-1/2 transition-[opacity,scale] duration-500 ease-[var(--ease-out-expo)] ${active === null || !entries[active]?.cover ? "scale-90 opacity-0" : "scale-100 opacity-100"}`}>
           <div className="relative aspect-[4/5] w-[clamp(14rem,18vw,20rem)] overflow-hidden rounded-[var(--radius-card)]">
-            {entries.map((entry, i) => (
-              <div key={entry.href} className={`absolute inset-0 transition-[opacity,scale] duration-700 ease-[var(--ease-out-expo)] ${active === i ? "scale-100 opacity-100" : "scale-110 opacity-0"}`}>
-                <PhotoImage photo={entry.cover} fill sizes="320px" className="h-full" />
-              </div>
-            ))}
+            {entries.map((entry, i) =>
+              entry.cover ? (
+                <div key={entry.href} className={`absolute inset-0 transition-[opacity,scale] duration-700 ease-[var(--ease-out-expo)] ${active === i ? "scale-100 opacity-100" : "scale-110 opacity-0"}`}>
+                  <PhotoImage photo={entry.cover} fill sizes="320px" className="h-full" />
+                </div>
+              ) : null,
+            )}
           </div>
         </div>
       </div>

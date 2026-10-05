@@ -8,7 +8,7 @@ import { Highlight } from "@/components/search/SearchParts";
 import { ArrowUpRight, Close, Search } from "@/components/ui/Icons";
 import type { GalleryEntry, GalleryFilter } from "@/lib/gallery-index";
 import { scoreText, tokenize } from "@/lib/search";
-import { pad } from "@/lib/utils";
+import { pad, publicPath } from "@/lib/utils";
 
 type Props = {
   entries: GalleryEntry[];
@@ -17,7 +17,7 @@ type Props = {
   suggestions: string[];
 };
 
-/** Recherche instantanée des galeries : nom, équipe, adversaire, date, catégorie, lieu. */
+/** Recherche instantanée des albums : nom, équipe, adversaire, date, catégorie, lieu. */
 export function GalleryFinder(props: Props) {
   return (
     <Suspense fallback={<FinderView {...props} initialQuery="" />}>
@@ -102,7 +102,7 @@ function FinderView({ entries, filters, suggestions, initialQuery }: Props & { i
       >
         <Search size={22} className="shrink-0 text-taupe transition-colors group-focus-within:text-flamingo" />
         <label htmlFor={inputId} className="sr-only">
-          Rechercher une galerie : équipe, adversaire, date, catégorie
+          Rechercher un album : équipe, adversaire, date, catégorie
         </label>
         <input
           ref={inputRef}
@@ -174,14 +174,14 @@ function FinderView({ entries, filters, suggestions, initialQuery }: Props & { i
       </div>
 
       <p id={`${listId}-count`} className="mt-8 t-mono text-ash" aria-live="polite">
-        <span className="text-linen">{pad(results.length)}</span> galerie{results.length > 1 ? "s" : ""}
+        <span className="text-linen">{pad(results.length)}</span> album{results.length > 1 ? "s" : ""}
         {trimmed ? <> pour « {trimmed} »</> : null}
         <span className="hidden sm:inline"> · les plus récentes d&apos;abord</span>
       </p>
 
       {/* Résultats */}
       {results.length ? (
-        <ul id={listId} className="mt-4 border-t border-line" aria-label="Galeries">
+        <ul id={listId} className="mt-4 border-t border-line" aria-label="Albums">
           {results.map((entry, i) => (
             <li key={`${entry.slug}-${trimmed}-${category}-${year}`} className="result-in border-b border-line" style={{ "--i": i } as CSSProperties}>
               <ResultRow entry={entry} query={trimmed} hasDates={hasDates} />
@@ -193,7 +193,7 @@ function FinderView({ entries, filters, suggestions, initialQuery }: Props & { i
           <span className="mx-auto grid size-12 place-items-center rounded-full bg-wash-strong text-taupe">
             <Search size={20} />
           </span>
-          <p className="mt-6 text-xl font-light tracking-[-0.02em] text-linen">Aucune galerie {trimmed ? <>pour « {trimmed} »</> : "avec ces filtres"}</p>
+          <p className="mt-6 text-xl font-light tracking-[-0.02em] text-linen">Aucun album {trimmed ? <>pour « {trimmed} »</> : "avec ces filtres"}</p>
           <p className="mx-auto mt-2 max-w-md t-small text-taupe">Vérifiez l&apos;orthographe, essayez le nom d&apos;une équipe ou retirez un filtre.</p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
             {trimmed || filtered ? (
@@ -235,8 +235,14 @@ function ResultRow({ entry, query, hasDates }: { entry: GalleryEntry; query: str
         hasDates ? "md:grid-cols-[8.5rem_7.5rem_1fr_9rem_auto]" : "md:grid-cols-[8.5rem_1fr_9rem_auto]"
       }`}
     >
-      <span className="photo-frame relative block aspect-[4/3] overflow-hidden rounded-[var(--radius-sm)]" style={{ "--photo-color": entry.cover.color } as CSSProperties}>
-        <Image src={entry.cover.src} alt="" fill sizes="(min-width: 640px) 136px, 88px" className="object-cover transition-transform duration-700 ease-[var(--ease-out-expo)] group-hover:scale-105" />
+      <span className="photo-frame relative grid aspect-[4/3] place-items-center overflow-hidden rounded-[var(--radius-sm)]" style={{ "--photo-color": entry.cover?.color } as CSSProperties}>
+        {entry.cover ? (
+          <Image src={entry.cover.src} alt="" fill sizes="(min-width: 640px) 136px, 88px" className="object-cover transition-transform duration-700 ease-[var(--ease-out-expo)] group-hover:scale-105" />
+        ) : entry.logo ? (
+          <span className="grid size-[62%] max-h-full place-items-center rounded-full bg-white">
+            <Image src={publicPath(entry.logo)} alt="" width={64} height={64} unoptimized className="h-[68%] w-[68%] object-contain" />
+          </span>
+        ) : null}
       </span>
       {hasDates ? <span className="hidden t-mono text-taupe md:block">{entry.dateShort ?? "—"}</span> : null}
       <span className="min-w-0">
@@ -251,10 +257,10 @@ function ResultRow({ entry, query, hasDates }: { entry: GalleryEntry; query: str
       </span>
       <span className="hidden t-mono text-taupe md:block">
         {entry.event ? <span className="block">{entry.event}</span> : null}
-        <span className="block text-ash">{entry.count} photos</span>
+        <span className="block text-ash">{entry.count ? `${entry.count} photos` : "Photos à venir"}</span>
       </span>
       <span className="flex items-center gap-3">
-        <span className="hidden text-[0.875rem] text-linen lg:inline">Voir la galerie</span>
+        <span className="hidden text-[0.875rem] text-linen lg:inline">Voir l&apos;album</span>
         <span className="grid size-10 place-items-center rounded-full border border-line-strong text-linen transition-[background-color,border-color,color] duration-300 group-hover:border-flamingo group-hover:bg-flamingo group-hover:text-ink">
           <ArrowUpRight className="transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-45" />
         </span>

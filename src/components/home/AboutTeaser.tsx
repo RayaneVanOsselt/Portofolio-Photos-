@@ -5,15 +5,15 @@ import { SectionStamp } from "@/components/ui/SectionLabel";
 import type { Photo } from "@/lib/types";
 
 /** Le photographe, en bref : portrait, présentation, spécialités. */
-export function AboutTeaser({ portrait, intro, specialties }: { portrait: Photo; intro: string; specialties: string[] }) {
+export function AboutTeaser({ portrait, intro, specialties }: { portrait: Photo | null; intro: string; specialties: string[] }) {
   return (
     <section aria-labelledby="about-teaser-title" className="container-site section">
-      <SectionStamp index="03" meta="À propos">
+      <SectionStamp index="04" meta="À propos">
         Le photographe
       </SectionStamp>
       <div className="mt-12 grid items-end gap-12 md:mt-16 md:grid-cols-12">
         <div className="md:col-span-5" data-reveal="image">
-          <PhotoImage photo={portrait} fill sizes="(min-width: 768px) 40vw, 100vw" className="aspect-[4/5] rounded-[var(--radius-card)]" />
+          {portrait ? <PhotoImage photo={portrait} fill sizes="(min-width: 768px) 40vw, 100vw" className="aspect-[4/5] rounded-[var(--radius-card)]" /> : null}
         </div>
         <div className="md:col-span-6 md:col-start-7 md:pb-4">
           <h2 id="about-teaser-title" className="t-h2 text-linen" data-reveal>

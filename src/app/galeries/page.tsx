@@ -7,11 +7,11 @@ import { RouteSteps } from "@/components/sections/RouteSteps";
 import { ButtonLink } from "@/components/ui/Button";
 import { SectionLabel, SectionStamp } from "@/components/ui/SectionLabel";
 import { getAccessCodeIndex, getGalleryEntries, getGalleryFilters } from "@/lib/gallery-index";
-import { getCategories, getFeaturedProjects } from "@/lib/portfolio";
+import { getAlbums, getCategories } from "@/lib/albums";
 import { inArea, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Galeries — retrouver ses photos de match",
+  title: "Retrouver ses photos de match",
   description: `Retrouvez vos photos en quelques secondes : recherchez une équipe, un match, une date ou une catégorie, puis demandez vos images en haute définition. Photographe sportif${inArea}.`,
   path: "/galeries",
 });
@@ -20,7 +20,7 @@ const delay = (ms: number) => ({ "--delay": `${ms}ms` }) as CSSProperties;
 
 const STEPS = [
   { title: "Cherchez", body: "Le nom de votre équipe, de l'adversaire, une date ou une compétition." },
-  { title: "Ouvrez la galerie", body: "Toutes les photos du match, en vue éditoriale ou en planche." },
+  { title: "Ouvrez l'album", body: "Toutes les photos du match, en vue éditoriale ou en planche." },
   { title: "Choisissez", body: "Agrandissez une photo, partagez son lien permanent." },
   { title: "Récupérez-la", body: "« Demander cette photo » : je vous envoie la haute définition." },
 ];
@@ -28,15 +28,13 @@ const STEPS = [
 /** Accès aux photos : le parcours de celles et ceux qui cherchent leurs images. */
 export default function GalleriesPage() {
   const entries = getGalleryEntries();
-  // Suggestions : quelques équipes des galeries à la une, puis des catégories.
-  const suggestions = [
-    ...new Set([...getFeaturedProjects().flatMap((p) => p.teams?.slice(0, 1) ?? []), ...getCategories().map((c) => c.title)]),
-  ].slice(0, 6);
+  // Suggestions : les équipes des derniers matchs, puis des catégories.
+  const suggestions = [...new Set([...getAlbums().slice(0, 3).flatMap((a) => (a.match ? [a.match.away] : [])), ...getCategories().map((c) => c.title)])].slice(0, 6);
 
   return (
     <>
       <header className="container-wide pt-[calc(var(--header-height)+clamp(2rem,1rem+3vw,4rem))] pb-[clamp(1.75rem,3vw,2.75rem)]">
-        <Breadcrumbs items={[{ name: "Galeries", path: "/galeries" }]} />
+        <Breadcrumbs items={[{ name: "Retrouver mes photos", path: "/galeries" }]} />
         <div className="anim-rise mt-8 md:mt-10" style={delay(120)}>
           <SectionLabel>Accès aux photos</SectionLabel>
         </div>
@@ -52,12 +50,12 @@ export default function GalleriesPage() {
             </span>
           </h1>
           <p className="anim-rise t-lead text-taupe lg:col-span-4" style={delay(420)}>
-            Un match, une équipe, une date : tapez ce que vous cherchez, les galeries s&apos;affichent pendant la saisie.
+            Un match, une équipe, une date : tapez ce que vous cherchez, les albums s&apos;affichent pendant la saisie.
           </p>
         </div>
       </header>
 
-      <section aria-label="Rechercher une galerie" className="container-wide anim-rise pb-[var(--section-space-sm)]" style={delay(480)}>
+      <section aria-label="Rechercher un album" className="container-wide anim-rise pb-[var(--section-space-sm)]" style={delay(480)}>
         <GalleryFinder entries={entries} filters={getGalleryFilters()} suggestions={suggestions} />
       </section>
 

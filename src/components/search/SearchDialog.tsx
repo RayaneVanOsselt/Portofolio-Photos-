@@ -7,12 +7,12 @@ import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type K
 import { ArrowRight, ArrowUpRight, Close, Search } from "@/components/ui/Icons";
 import { useAnimatedDialog } from "@/hooks/useAnimatedDialog";
 import { SEARCH_TYPE_PLURAL, SEARCH_TYPES, searchItems, type SearchItem, type SearchType } from "@/lib/search";
+import { publicPath } from "@/lib/utils";
 import { Highlight, ResultMeta, Thumb } from "./SearchParts";
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  index: SearchItem[];
 };
 
 type Filter = "Tout" | SearchType;
@@ -25,11 +25,11 @@ const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 type Entry = { key: string; item: SearchItem; section: string };
 
 /**
- * Palette de recherche : résultats pendant la saisie (galeries, catégories,
+ * Palette de recherche : résultats pendant la saisie (albums, catégories,
  * équipes, services, pages), surlignage, filtres, navigation au clavier,
  * recherches récentes et suggestions quand le champ est vide.
  */
-export function SearchDialog({ open, onClose, index }: Props) {
+export function SearchDialog({ open, onClose }: Props) {
   const router = useRouter();
   const dialogRef = useAnimatedDialog(open, onClose, 350);
   const listRef = useRef<HTMLDivElement>(null);
@@ -39,12 +39,28 @@ export function SearchDialog({ open, onClose, index }: Props) {
   const [recent, setRecent] = useState<SearchItem[]>([]);
   const listId = useId();
 
-  // Recherches récentes : lues dans le stockage local à la première ouverture.
+  // Première ouverture : le contenu (et ses vignettes) n'est monté qu'à ce moment-là, et
+  // l'index (/search-index.json) n'est téléchargé qu'alors — une palette fermée ne coûte rien.
   const [recentLoaded, setRecentLoaded] = useState(false);
-  if (open && !recentLoaded) {
-    setRecentLoaded(true);
-    setRecent(readRecent().filter((s) => index.some((i) => i.href === s.href)));
-  }
+  const [index, setIndex] = useState<SearchItem[]>([]);
+  if (open && !recentLoaded) setRecentLoaded(true);
+  useEffect(() => {
+    if (!recentLoaded || index.length) return;
+    let cancelled = false;
+    fetch(`${BASE_PATH}/search-index.json`)
+      .then((response) => response.json() as Promise<SearchItem[]>)
+      .then((items) => {
+        if (cancelled) return;
+        setIndex(items);
+        setRecent(readRecent().filter((s) => items.some((i) => i.href === s.href)));
+      })
+      .catch(() => {
+        /* hors ligne : la page /search reste disponible via « Voir tous les résultats » */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [recentLoaded, index.length]);
 
   const trimmed = query.trim();
   const allResults = useMemo(() => (trimmed ? searchItems(index, trimmed, 40) : []), [index, trimmed]);
@@ -55,7 +71,7 @@ export function SearchDialog({ open, onClose, index }: Props) {
   }, [allResults]);
   const results = filter === "Tout" ? allResults : allResults.filter((r) => r.type === filter);
 
-  const latest = useMemo(() => index.filter((i) => i.type === "Galerie").slice(0, 4), [index]);
+  const latest = useMemo(() => index.filter((i) => i.type === "Album").slice(0, 4), [index]);
   const categories = useMemo(() => index.filter((i) => i.type === "Catégorie"), [index]);
   const quickLinks = useMemo(() => index.filter((i) => i.type === "Page"), [index]);
 
@@ -68,7 +84,7 @@ export function SearchDialog({ open, onClose, index }: Props) {
       })).filter((s) => s.entries.length)
     : [
         ...(recent.length ? [{ title: "Récentes", layout: "rows" as const, entries: recent.map((item) => ({ key: `recent-${item.href}`, item, section: "recent" })) }] : []),
-        { title: "Dernières galeries", layout: "tiles" as const, entries: latest.map((item) => ({ key: `latest-${item.href}`, item, section: "latest" })) },
+        { title: "Derniers albums", layout: "tiles" as const, entries: latest.map((item) => ({ key: `latest-${item.href}`, item, section: "latest" })) },
         { title: "Catégories", layout: "rows" as const, entries: categories.map((item) => ({ key: `cat-${item.href}`, item, section: "cat" })) },
         { title: "Accès rapide", layout: "rows" as const, entries: quickLinks.map((item) => ({ key: `page-${item.href}`, item, section: "page" })) },
       ];
@@ -152,56 +168,57 @@ export function SearchDialog({ open, onClose, index }: Props) {
         if (event.target === event.currentTarget) close();
       }}
     >
-      <div className="search-panel flex h-dvh w-full flex-col overflow-hidden bg-ink sm:mx-auto sm:mt-[max(4.5rem,10vh)] sm:h-auto sm:max-h-[min(80vh,48rem)] sm:w-[calc(100%-2*var(--gutter))] sm:max-w-3xl sm:rounded-[var(--radius-card)] sm:border sm:border-line-strong">
-        {/* Champ */}
-        <form
-          role="search"
-          action={`${BASE_PATH}/search/`}
-          className="flex shrink-0 items-center gap-3 border-b border-line px-4 sm:px-6"
-          onSubmit={(event) => {
-            event.preventDefault();
-            showAll();
-          }}
-        >
-          <Search size={22} className="shrink-0 text-flamingo" />
-          <label htmlFor="site-search" className="sr-only">
-            Rechercher une galerie, une équipe, un match, une date
-          </label>
-          <input
-            id="site-search"
-            name="q"
-            type="search"
-            autoComplete="off"
-            spellCheck={false}
-            enterKeyHint="search"
-            placeholder="Équipe, match, date, catégorie…"
-            value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
-              setActive(0);
-              if (!event.target.value.trim()) setFilter("Tout");
+      {recentLoaded ? (
+        <div className="search-panel flex h-dvh w-full flex-col overflow-hidden bg-ink sm:mx-auto sm:mt-[max(4.5rem,10vh)] sm:h-auto sm:max-h-[min(80vh,48rem)] sm:w-[calc(100%-2*var(--gutter))] sm:max-w-3xl sm:rounded-[var(--radius-card)] sm:border sm:border-line-strong">
+          {/* Champ */}
+          <form
+            role="search"
+            action={`${BASE_PATH}/search/`}
+            className="flex shrink-0 items-center gap-3 border-b border-line px-4 sm:px-6"
+            onSubmit={(event) => {
+              event.preventDefault();
+              showAll();
             }}
-            onKeyDown={onKeyDown}
-            role="combobox"
-            aria-expanded={flat.length > 0}
-            aria-controls={listId}
-            aria-autocomplete="list"
-            aria-activedescendant={activeEntry ? `${listId}-${activeIndex}` : undefined}
-            className="h-16 w-full min-w-0 bg-transparent text-lg font-light tracking-[-0.015em] text-linen outline-none placeholder:text-ash sm:h-[4.5rem] sm:text-xl [&::-webkit-search-cancel-button]:hidden"
-          />
-          {query ? (
-            <button
-              type="button"
-              onClick={() => {
-                setQuery("");
-                setFilter("Tout");
+          >
+            <Search size={22} className="shrink-0 text-flamingo" />
+            <label htmlFor="site-search" className="sr-only">
+              Rechercher un album, une équipe, un match, une date
+            </label>
+            <input
+              id="site-search"
+              name="q"
+              type="search"
+              autoComplete="off"
+              spellCheck={false}
+              enterKeyHint="search"
+              placeholder="Équipe, match, date, catégorie…"
+              value={query}
+              onChange={(event) => {
+                setQuery(event.target.value);
                 setActive(0);
-                document.getElementById("site-search")?.focus();
+                if (!event.target.value.trim()) setFilter("Tout");
               }}
-              className="shrink-0 rounded-full px-3 py-1.5 text-[0.8125rem] text-taupe transition-colors hover:bg-wash-strong hover:text-linen"
-            >
-              Effacer
-            </button>
+              onKeyDown={onKeyDown}
+              role="combobox"
+              aria-expanded={flat.length > 0}
+              aria-controls={listId}
+              aria-autocomplete="list"
+              aria-activedescendant={activeEntry ? `${listId}-${activeIndex}` : undefined}
+              className="h-16 w-full min-w-0 bg-transparent text-lg font-light tracking-[-0.015em] text-linen outline-none placeholder:text-ash sm:h-[4.5rem] sm:text-xl [&::-webkit-search-cancel-button]:hidden"
+            />
+            {query ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery("");
+                  setFilter("Tout");
+                  setActive(0);
+                  document.getElementById("site-search")?.focus();
+                }}
+                className="shrink-0 rounded-full px-3 py-1.5 text-[0.8125rem] text-taupe transition-colors hover:bg-wash-strong hover:text-linen"
+              >
+                Effacer
+              </button>
           ) : null}
           <button
             type="button"
@@ -310,6 +327,7 @@ export function SearchDialog({ open, onClose, index }: Props) {
           )}
         </div>
       </div>
+      ) : null}
     </dialog>
   );
 }
@@ -378,8 +396,12 @@ function Tile({ entry, id, active, onHover, onSelect }: ItemProps) {
       }}
       className={`group relative block overflow-hidden rounded-[var(--radius-btn)] outline-offset-2 transition-[outline-color] ${active ? "outline-2 outline-flamingo outline-solid" : "outline-transparent"}`}
     >
-      <span className="relative block aspect-[4/5]" style={{ backgroundColor: item.thumb?.color }}>
-        {item.thumb ? (
+      <span className="relative grid aspect-[4/5] place-items-center bg-ink-soft" style={{ backgroundColor: item.thumb?.logo ? undefined : item.thumb?.color }}>
+        {item.thumb?.logo ? (
+          <span className="mb-10 grid size-16 place-items-center rounded-full bg-white">
+            <Image src={publicPath(item.thumb.src)} alt="" width={48} height={48} unoptimized className="h-[68%] w-[68%] object-contain" />
+          </span>
+        ) : item.thumb ? (
           <Image src={item.thumb.src} alt="" fill sizes="(min-width: 640px) 180px, 45vw" className={`object-cover transition-transform duration-700 ease-[var(--ease-out-expo)] ${active ? "scale-105" : ""}`} />
         ) : null}
         <span aria-hidden className="scrim-bottom absolute inset-0" />

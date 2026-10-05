@@ -3,8 +3,8 @@ import { Logo } from "@/components/brand/Logo";
 import { ButtonLink } from "@/components/ui/Button";
 import { socialIcons } from "@/components/ui/Icons";
 import { Todo } from "@/components/ui/Todo";
-import { getSocialLinks, isDev, mainNav, photoAccess, siteConfig } from "@/config/site";
-import { getCategories } from "@/lib/portfolio";
+import { getSocialLinks, isDev, mainNav, photoAccess, secondaryNav, siteConfig } from "@/config/site";
+import { getCategories } from "@/lib/albums";
 import { LiveClock } from "./LiveClock";
 
 /**
@@ -36,17 +36,14 @@ export function Footer() {
 
           <nav aria-label="Pied de page" className="grid grid-cols-2 gap-10 sm:grid-cols-4 lg:col-span-8">
             <FooterColumn title="Navigation">
-              <li>
-                <FooterLink href="/">Accueil</FooterLink>
-              </li>
-              {mainNav.map((item) => (
+              {[...mainNav, ...secondaryNav].map((item) => (
                 <li key={item.href}>
                   <FooterLink href={item.href}>{item.label}</FooterLink>
                 </li>
               ))}
             </FooterColumn>
 
-            <FooterColumn title="Portfolio">
+            <FooterColumn title="Albums">
               {categories.map((c) => (
                 <li key={c.href}>
                   <FooterLink href={c.href}>{c.title}</FooterLink>

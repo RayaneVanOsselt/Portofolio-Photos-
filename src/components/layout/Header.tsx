@@ -8,20 +8,19 @@ import { SearchDialog } from "@/components/search/SearchDialog";
 import { ButtonLink } from "@/components/ui/Button";
 import { ChevronDown, Search } from "@/components/ui/Icons";
 import { mainNav, photoAccess, siteConfig } from "@/config/site";
-import type { NavCategory } from "@/lib/navigation";
-import type { SearchItem } from "@/lib/search";
+import type { AlbumsNav } from "@/lib/navigation";
 import { isActivePath } from "@/lib/utils";
 import { MegaMenu } from "./MegaMenu";
 import { MobileMenu } from "./MobileMenu";
 
-type Props = { portfolioNav: NavCategory[]; searchIndex: SearchItem[] };
+type Props = { albumsNav: AlbumsNav };
 
 /**
  * Barre de navigation en verre dépoli : la photo du dessous reste visible.
  * Elle s'efface quand on descend (les photos prennent tout l'écran) et
  * revient dès qu'on remonte.
  */
-export function Header({ portfolioNav, searchIndex }: Props) {
+export function Header({ albumsNav }: Props) {
   const pathname = usePathname();
   const [hidden, setHidden] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
@@ -140,7 +139,7 @@ export function Header({ portfolioNav, searchIndex }: Props) {
                         type="button"
                         aria-expanded={megaOpen}
                         aria-controls="mega-menu"
-                        aria-label="Afficher les catégories du portfolio"
+                        aria-label="Afficher les catégories d'albums"
                         onClick={(event) => {
                           const opening = !megaOpen;
                           setMegaOpen(opening);
@@ -203,11 +202,11 @@ export function Header({ portfolioNav, searchIndex }: Props) {
           </div>
         </div>
 
-        <MegaMenu open={megaOpen} categories={portfolioNav} onNavigate={closeMega} onPointerEnter={() => window.clearTimeout(hoverTimer.current)} />
+        <MegaMenu open={megaOpen} nav={albumsNav} onNavigate={closeMega} onPointerEnter={() => window.clearTimeout(hoverTimer.current)} />
       </header>
 
-      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} categories={portfolioNav} pathname={pathname} />
-      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} index={searchIndex} />
+      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} nav={albumsNav} pathname={pathname} />
+      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }

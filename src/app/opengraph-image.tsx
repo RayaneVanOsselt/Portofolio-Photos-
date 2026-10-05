@@ -1,6 +1,6 @@
 import { homeContent } from "@/data/content";
 import { OG_SIZE, renderOgImage } from "@/lib/og";
-import { getPhotoById } from "@/lib/portfolio";
+import { getPhotoById } from "@/lib/albums";
 import { siteConfig } from "@/config/site";
 
 export const alt = `${siteConfig.name} — ${siteConfig.tagline}`;
@@ -8,7 +8,7 @@ export const size = OG_SIZE;
 export const contentType = "image/png";
 
 export default function Image() {
-  return renderOgImage({ kicker: "Photographe sportif", title: homeContent.hero.title.join(" "), photo: getPhotoById(homeContent.hero.photoId) });
+  return renderOgImage({ kicker: "Photographe sportif", title: homeContent.hero.title.join(" "), photo: getPhotoById(homeContent.hero.photoId, "site/home") });
 }
 
 export const dynamic = "force-static";

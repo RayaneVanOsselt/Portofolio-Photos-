@@ -9,7 +9,7 @@ import { SectionLabel, SectionStamp } from "@/components/ui/SectionLabel";
 import { Todo } from "@/components/ui/Todo";
 import { getSocialLinks, isDev, siteConfig } from "@/config/site";
 import { aboutContent } from "@/data/content";
-import { getPhotoById } from "@/lib/portfolio";
+import { getPhotoById } from "@/lib/albums";
 import { inArea, pageMetadata } from "@/lib/seo";
 import { pad } from "@/lib/utils";
 
@@ -22,8 +22,8 @@ export const metadata: Metadata = pageMetadata({
 const delay = (ms: number) => ({ "--delay": `${ms}ms` }) as CSSProperties;
 
 export default function AboutPage() {
-  const portrait = getPhotoById(aboutContent.portraitId);
-  const wide = getPhotoById(aboutContent.wideId);
+  const portrait = getPhotoById(aboutContent.portraitId, "site/about");
+  const wide = getPhotoById(aboutContent.wideId, "site/about");
   const stats = aboutContent.stats.filter((s) => s.value);
   const showStats = stats.length > 0 || isDev;
   const socials = getSocialLinks();
@@ -56,7 +56,7 @@ export default function AboutPage() {
             </ul>
           </div>
           <div className="anim-fade md:col-span-5" style={delay(300)}>
-            <PhotoImage photo={portrait} fill priority sizes="(min-width: 768px) 40vw, 100vw" className="aspect-[4/5] rounded-[var(--radius-card)]" />
+            {portrait ? <PhotoImage photo={portrait} fill priority sizes="(min-width: 768px) 40vw, 100vw" className="aspect-[4/5] rounded-[var(--radius-card)]" /> : null}
           </div>
         </div>
       </header>
@@ -119,7 +119,7 @@ export default function AboutPage() {
       <section aria-label="Photographie" className="container-wide section-sm">
         <div className="relative h-[min(80vh,52rem)] min-h-[22rem] overflow-hidden rounded-[var(--radius-card)]">
           <Parallax strength={80} className="absolute inset-x-0 -top-24 -bottom-24">
-            <PhotoImage photo={wide} fill sizes="(min-width: 1776px) 1680px, 100vw" className="h-full" />
+            {wide ? <PhotoImage photo={wide} fill sizes="(min-width: 1776px) 1680px, 100vw" className="h-full" /> : null}
           </Parallax>
         </div>
       </section>

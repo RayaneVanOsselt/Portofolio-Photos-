@@ -48,3 +48,6 @@ next-env.d.ts
 
 # déclinaisons WebP générées par npm run photos
 /public/_photos/
+
+# logos optimisés générés par npm run logos (sources : assets/logos/)
+/public/logos/

@@ -87,16 +87,23 @@ export function getSocialLinks() {
 }
 
 /**
- * Navigation principale. Le méga-menu Portfolio est généré depuis data/categories.
- * Le logo mène à l'accueil ; « Mes photos » (bouton orange) mène aux galeries.
+ * Navigation principale — volontairement courte. Le panneau « Albums »
+ * (catégories groupées par sport, FIH Pro League → Hommes / Femmes) est
+ * généré depuis src/data/albums.ts. Le logo mène aussi à l'accueil ;
+ * « Mes photos » (bouton orange) mène à la recherche de photos.
  */
 export const mainNav = [
-  { label: "Portfolio", href: "/portfolio", hasMegaMenu: true },
-  { label: "Football", href: "/football" },
-  { label: "Galeries", href: "/galeries" },
-  { label: "Services", href: "/services" },
+  { label: "Accueil", href: "/" },
+  { label: "Albums", href: "/albums", hasMegaMenu: true },
   { label: "À propos", href: "/about" },
   { label: "Contact", href: "/contact" },
+] as const;
+
+/** Pages secondaires : pied de page et recherche (hors du menu principal pour le garder léger). */
+export const secondaryNav = [
+  { label: "Retrouver mes photos", href: "/galeries" },
+  { label: "Football", href: "/football" },
+  { label: "Services", href: "/services" },
 ] as const;
 
 /** Accès aux photos : le parcours « je cherche mes photos », mis en avant partout. */
