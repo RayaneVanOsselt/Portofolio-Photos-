@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getSocialLinks, siteConfig } from "@/config/site";
 import { services } from "@/data/services";
 import { categoryContext, SPORT_LABEL } from "@/lib/albums";
+import { fallbackPath, isLocalPhoto } from "@/lib/photo-sources";
 import type { Album, Category, Photo } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
@@ -146,9 +147,14 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
   };
 }
 
-/** URL du fichier image d'origine (pour Google Images et le sitemap). */
+/**
+ * URL d'une photo pour Google Images et le sitemap : le JPEG haute qualité
+ * quand la galerie est téléchargeable, sinon la plus grande version WebP.
+ */
 export function photoUrl(photo: Photo) {
-  return photo.src.startsWith("http") ? photo.src : absoluteUrl(photo.src);
+  if (photo.src.startsWith("http")) return photo.src;
+  if (photo.download) return absoluteUrl(photo.download.url);
+  return absoluteUrl(isLocalPhoto(photo.src) ? fallbackPath(photo) : photo.src);
 }
 
 /**

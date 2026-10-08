@@ -10,7 +10,7 @@
 
 export const homeContent = {
   hero: {
-    photoId: "ph-1680010090687-6a5e4fe855b8",
+    photoId: "albums/fih-pro-league/hommes/27-06-2026-belgique-pays-bas-men/belgique/IMG_3563.jpg",
     eyebrow: "Photographe sportif — Hockey · Rugby · Football",
     /** Deux lignes, affichées en très grand (capitales étendues). */
     title: ["Au cœur", "du jeu."] as [string, string],
@@ -26,7 +26,7 @@ export const aboutContent = {
   specialties: ["Hockey sur gazon", "Rugby", "Football", "Portraits d'équipe", "Contenus pour clubs"],
   /** Matériel : laisser vide pour masquer la section (rien n'est inventé). Ex. "Sony A1", "70-200 mm f/2.8". */
   equipment: [] as string[],
-  wideId: "ph-1780509459807-d47e3571cc99",
+  wideId: "albums/rwdm-2026-2027/03-10-2026-union-sg-b-rwdm/IMG_6956.jpg",
   intro: "[VOTRE PRÉSENTATION — deux ou trois phrases authentiques : qui vous êtes, d'où vous venez, ce qui vous a amené à la photo de sport.]",
   approach: [
     { title: "Ma manière de travailler", body: "[COMMENT VOUS TRAVAILLEZ — préparation, placement au bord du terrain, échanges avec le club.]" },

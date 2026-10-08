@@ -1,11 +1,12 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { MatchTicket } from "@/components/albums/MatchTicket";
 import { ButtonLink } from "@/components/ui/Button";
 import { ArrowUpRight } from "@/components/ui/Icons";
+import { PhotoPicture } from "@/components/ui/PhotoPicture";
 import { siteConfig } from "@/config/site";
 import { categoryContext } from "@/lib/albums";
+import { fallbackUrl, isLocalPhoto } from "@/lib/photo-sources";
 import { inArea } from "@/lib/seo";
 import type { Album, Photo } from "@/lib/types";
 
@@ -26,6 +27,13 @@ type Props = {
 const delay = (ms: number) => ({ "--delay": `${ms}ms` }) as CSSProperties;
 
 /**
+ * Photo plein écran recadrée (object-cover) : sur un écran plus étroit que la
+ * photo (téléphone), elle est affichée plus large que l'écran — sa largeur
+ * suit alors la hauteur. Le navigateur choisit ainsi un fichier assez net.
+ */
+const coverSizes = (photo: Photo) => `(max-aspect-ratio: ${photo.width}/${photo.height}) ${Math.ceil((photo.width / photo.height) * 100)}vh, 100vw`;
+
+/**
  * Hero plein écran : une photo forte, le texte posé directement dessus,
  * et à droite le « billet » en verre de la dernière galerie.
  * Chorégraphie d'entrée en CSS (aucune attente de JavaScript).
@@ -41,11 +49,11 @@ export function Hero({ photo, latest, eyebrow, title, lead, primaryCta, secondar
       <div className="absolute inset-0 -z-10" style={{ backgroundColor: photo?.color }}>
         <div className="anim-hero-image absolute inset-0">
           {video ? (
-            <video className="h-full w-full object-cover" autoPlay muted loop playsInline poster={photo ? withBase(photo.src) : undefined} aria-hidden>
+            <video className="h-full w-full object-cover" autoPlay muted loop playsInline poster={photo ? (isLocalPhoto(photo.src) ? fallbackUrl(photo) : withBase(photo.src)) : undefined} aria-hidden>
               <source src={withBase(video.src)} type={video.type} />
             </video>
           ) : photo ? (
-            <Image src={photo.src} alt={photo.alt} fill preload fetchPriority="high" sizes="100vw" className="object-cover" />
+            <PhotoPicture photo={photo} sizes={coverSizes(photo)} priority className="absolute inset-0 h-full w-full object-cover" />
           ) : null}
         </div>
       </div>

@@ -3,7 +3,7 @@
 Portfolio de photographie sportive (hockey, rugby, football), publié comme **site statique sur GitHub Pages**. Le code est écrit avec Next.js 16, React 19, TypeScript et Tailwind CSS v4 ; une GitHub Action le compile et ne met en ligne que le site final (HTML, CSS, images).
 Direction artistique « billet de match à minuit » : la charte de la marque (Heavy Metal, Satin Linen, Taupe Gray, orange Flamingo · Tango · Jaffa) appliquée au style de la référence *dope.security* — canevas presque noir, **une seule couleur signal** (l'orange) rationnée, titres de section « tamponnés » en monospace très espacé, carte « billet » en verre sur le hero, filets fins au lieu des ombres, boutons pilule.
 
-> ⚠️ **Photos temporaires.** En attendant vos images, l'accueil, la page À propos et les Services affichent quelques photos libres de droits issues d'Unsplash (signalées « Photo temporaire »). Les **albums de matchs n'en utilisent jamais** : un album sans photo affiche « Photos à venir ». Remplacez-les via `public/images/site/` (voir §4 ter) avant la mise en ligne.
+> ⚠️ **Photo temporaire.** L'accueil, les Services et la grande photo de la page À propos utilisent vos photos de match. Seul le **portrait** de la page À propos est encore une photo libre de droits (Unsplash, signalée « Photo temporaire ») : remplacez-le par votre portrait via `public/images/site/about/` (voir §4 ter). Les albums de matchs n'utilisent jamais de photo temporaire.
 
 ---
 
@@ -30,7 +30,7 @@ Le site est disponible sur <http://localhost:3000>.
 | `npm run build`     | Compile le site statique dans `out/` (indexe aussi les photos) |
 | `npm run lint`      | ESLint                                                        |
 | `npm run typecheck` | Vérification TypeScript                                       |
-| `npm run photos`    | Indexe les photos de `public/images/` (dimensions, couleurs…) |
+| `npm run photos`    | Pipeline photo : versions AVIF/WebP, fichiers à télécharger, manifest |
 | `npm run logos`     | Optimise les logos de `assets/logos/` (WebP + PNG de partage) |
 
 ## 3. Variables d'environnement
@@ -64,31 +64,46 @@ Les matchs sont **triés automatiquement par date**, du plus récent au plus anc
 
 ### Ajouter un match
 
-1. Dans `src/data/albums.ts`, ajoutez une ligne dans les `albums` de la bonne catégorie :
+1. **Déposez les photos** dans `Dossier photos/`, rangées comme vous le souhaitez — un dossier par match :
+
+   ```
+   Dossier photos/DARING /Messieurs 1 /Daring - Orée 18:10:2026/
+   ```
+
+   Exportez-les en JPEG (2048 px sur le grand côté suffit : c'est la taille des fichiers à télécharger). Les sous-dossiers deviennent des **chapitres** (ex. `Belgique/`, `Pays Bas/`, ou `01-avant-match/`, `02-action/`…). Les vidéos ne sont jamais envoyées sur GitHub (voir « Vidéos » ci-dessous).
+
+2. **Une entrée** dans les `albums` de la bonne catégorie, dans `src/data/albums.ts`, avec le chemin de ce dossier copié tel quel (espaces compris) :
 
    ```ts
-   { slug: "18-10-2026-daring-h1-oree-h1", date: "2026-10-18", match: { home: "Daring H1", away: "Orée H1" } },
+   {
+     slug: "18-10-2026-daring-h1-oree-h1",
+     date: "2026-10-18",
+     match: { home: "Daring H1", away: "Orée H1" },
+     source: "DARING /Messieurs 1 /Daring - Orée 18:10:2026",
+   },
    ```
 
    - `date` : AAAA-MM-JJ — affichée « 18 octobre 2026 » ;
-   - `slug` : commence par la date en JJ-MM-AAAA, puis les équipes, en minuscules sans accents. C'est l'adresse **et** le nom du dossier photos. Une date et un slug incohérents, ou deux fois le même slug, **bloquent le build** avec un message clair ;
+   - `slug` : commence par la date en JJ-MM-AAAA, puis les équipes, en minuscules sans accents. C'est l'adresse de la page. Une date et un slug incohérents, ou deux fois le même slug, **bloquent le build** avec un message clair ;
    - le titre « Daring H1 vs Orée H1 » est déduit des équipes (ou `title: "Rugby Final D1"` pour un album sans affiche).
 
-   Facultatif — rien n'est affiché tant que ce n'est pas renseigné : `location` (lieu), `description`, `match.score`, `match.competition`, `match.round`, `cover: "12-but.jpg"` (photo de couverture, sinon la première), `featured: true` (mise en avant sur l'accueil).
+   Facultatif — rien n'est affiché tant que ce n'est pas renseigné : `location` (lieu), `description`, `match.score`, `match.competition`, `match.round`, `cover: "IMG_1234.jpg"` (photo de couverture, sinon la première ; `"belgique/IMG_1234.jpg"` dans un chapitre), `featured: true` (mise en avant sur l'accueil), `downloadEnabled: false` (consultation seule).
 
-2. Déposez les photos dans **le dossier qui porte le même chemin que l'adresse** :
+3. **`npm run dev`** ou **`npm run build`** (ou `npm run photos`) — ou simplement un push sur `main` : la galerie apparaît toute seule. Tant qu'un album n'a pas de photo, sa page affiche « Photos à venir », n'est pas indexée par Google et ne figure pas dans le plan du site ; tout cela bascule automatiquement dès l'ajout des photos. Un dossier de `Dossier photos/` relié à aucun album est signalé.
 
-   ```
-   public/images/albums/daring-h1/18-10-2026-daring-h1-oree-h1/
-   ```
+**Pipeline photo** (`scripts/photos.mjs`) — les originaux ne sont jamais modifiés ni publiés tels quels. Pour chaque photo, dans `public/_photos/` (généré, non commité) :
 
-3. `npm run dev` ou `npm run build` (ou `npm run photos`) : la galerie apparaît toute seule. Tant qu'un album n'a pas de photo, sa page affiche « Photos à venir », n'est pas indexée par Google et ne figure pas dans le plan du site ; tout cela bascule automatiquement dès l'ajout des photos.
+| Usage | Fichiers | Détail |
+| --- | --- | --- |
+| Affichage | AVIF 320 · 640 · 1080 · 1600 · 2048 px | qualité croissante avec la taille (50 → 58) ; ~30 % plus léger que le WebP |
+| Repli | WebP 320 · 640 · 1080 px | navigateurs anciens, vignettes de recherche, partage, Google |
+| Téléchargement | JPEG 2048 px, qualité 90, sRGB | nom propre : `rayvo-captures0808-2026-10-18-daring-h1-oree-h1-07.jpg` ; auteur et copyright inscrits |
 
-**Photos** — formats JPEG, PNG, WebP ou AVIF, **3000 px maximum** sur le grand côté. L'ordre d'affichage suit le nom de fichier (`01-…`, `02-…`). Préférez des noms descriptifs (`12-daring-h1-but-capitaine.jpg`) aux noms d'appareil (`DSC_1234.jpg`, signalés par `npm run photos`). Le texte alternatif est déduit du nom de fichier (modifiable dans `src/data/photo-manifest.json`, conservé ensuite) et complété par le match : « Célébration du but — Daring H1 vs Leo H1 ». Pour un nom d'appareil, il devient « Daring H1 vs Leo H1 — photo 12 (hockey sur gazon, 20 septembre 2026) ».
+Aucune métadonnée privée n'est publiée (ni GPS, ni numéro de série du boîtier) ; les réglages de prise de vue (boîtier, objectif, focale, ouverture, vitesse, ISO) sont affichés dans la visionneuse. Le traitement est **incrémental** : une photo dont le contenu n'a pas changé n'est jamais réencodée (y compris sur GitHub, grâce au cache de la publication), et les fichiers générés d'une photo retirée sont supprimés. Le script signale aussi les fichiers illisibles, les formats non pris en charge (RAW, HEIC : exportez en JPEG) et les doublons.
 
-Chaque photo est déclinée en WebP (320 à 2400 px, dans `public/_photos/`, non commité) : le navigateur charge la taille adaptée à l'écran, les images hors écran sont chargées en différé, et les galeries de plus de 24 photos s'affichent par lots. Les réglages de prise de vue (boîtier, objectif, focale, ouverture, vitesse, ISO) sont lus dans les EXIF ; la position GPS n'est jamais lue ni publiée.
+L'ordre d'affichage suit le nom de fichier. Le texte alternatif est déduit du nom de fichier (modifiable dans `src/data/photo-manifest.json`, conservé ensuite) et complété par le match : « Célébration du but — Daring H1 vs Leo H1 ». Pour un nom d'appareil (`IMG_1234.jpg`), il devient « Daring H1 vs Leo H1 — photo 12 (hockey sur gazon, 20 septembre 2026) ».
 
-**Reportage en chapitres** — rangez les photos dans des sous-dossiers numérotés du dossier de l'album (`01-avant-match/`, `02-action/`, `03-ambiance/`, `04-supporters/`, `05-coulisses/`, `06-apres-match/`) ; textes facultatifs : `chapters: { "avant-match": { text: "…" } }`.
+**Galerie** — vues « Éditorial » et « Planche », photos affichées par lots de 24 au défilement (une galerie de 500 photos reste instantanée), images différées hors écran, dimensions réservées (aucun décalage de mise en page), mini-aperçu flou pendant le chargement.
 
 ### Ajouter une catégorie (club, équipe, compétition, saison)
 
@@ -119,19 +134,42 @@ Un album peut être réservé à un client (séance, événement privé, club) :
   title: "Séance Club XYZ",
   private: true,
   accessCode: "XYZ-2026",                   // à communiquer au client
-  allowDownload: true,                      // bouton « Télécharger » dans la visionneuse
+  downloadEnabled: true,                    // téléchargement autorisé pour ce client
 }
 ```
 
 Il n'apparaît ni dans les listes, ni dans la recherche, ni dans le plan du site, et n'est pas indexé par Google. Le client le retrouve sur la page **Retrouver mes photos** (`/galeries`) → « Vous avez reçu un code d'accès ? » (seule l'empreinte du code est publiée). ⚠️ C'est de la **discrétion, pas une sécurité** : le site étant statique, les photos restent accessibles à qui connaît l'adresse exacte.
 
-### Visionneuse et demandes de photos
+### Visionneuse, partage et demandes de photos
 
-Chaque photo possède un lien permanent (`…/#photo-<slug>-<numéro>`) partageable. « Demander cette photo » ouvre le formulaire de contact pré-rempli ; la sélection (cœur dans la visionneuse) permet de demander plusieurs photos d'un coup. L'ancienne adresse `/portfolio` redirige vers `/albums`.
+Clavier (← → Échap), swipe sur mobile (gauche/droite pour naviguer, vers le bas pour fermer), zoom (clic ou double-tap), plein écran, photos voisines préchargées. Chaque photo possède un lien permanent (`…/#photo-<slug>-<numéro>`) ; « Partager » utilise le partage natif du téléphone, ou copie le lien sur ordinateur. « Demander en HD » ouvre le formulaire de contact pré-rempli. L'ancienne adresse `/portfolio` redirige vers `/albums`.
+
+### Téléchargement des photos
+
+Réglage global dans `src/config/site.ts` → `downloads.photos` (activé). Une catégorie ou un album peut le changer avec `downloadEnabled: false` (consultation seule) ou `true` — la règle la plus précise l'emporte (album → catégorie → réglage global). Une galerie en consultation seule n'expose aucun fichier à télécharger.
+
+Quand c'est autorisé :
+- **une photo** : bouton « Télécharger » dans la visionneuse — le JPEG haute qualité au nom propre, jamais la vignette ;
+- **plusieurs photos** : « Sélectionner » dans la barre de la galerie (ou le cœur dans la visionneuse), puis « Télécharger » : une archive ZIP `…-selection.zip` ;
+- **toute la galerie** : « Télécharger la galerie » — confirmation avec le nombre de photos et la taille estimée, progression réelle, annulation possible.
+
+Le site étant statique (GitHub Pages, sans serveur), l'archive est préparée dans le navigateur, sans dépendance : les JPEG sont rangés tels quels (aucune recompression), fichier par fichier. Elle est plafonnée à 400 Mo (`downloads.maxArchiveBytes`) : au-delà, le visiteur est invité à choisir moins de photos plutôt que de saturer son téléphone. Les fichiers ont des noms propres, regroupés dans un dossier au nom de l'événement.
+
+### Vidéos
+
+Les vidéos ne sont **jamais** envoyées sur GitHub (qui refuse les fichiers de plus de 100 Mo) : `.gitignore` les exclut (`.mp4`, `.mov`, `.webm`, `.avi`, `.mkv`…, majuscules comprises). Un garde-fou local refuse en plus tout commit contenant une vidéo ou un fichier de plus de 95 Mo, y compris depuis GitHub Desktop. Pour l'installer sur un nouvel ordinateur :
+
+```bash
+cp scripts/git-hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+```
+
+### Calendrier des matchs
+
+La page **Matchs** (`/matchs`) présente tous les matchs par année puis par mois — couverture, date, catégorie, nombre de photos — avec un accès direct à chaque mois. Elle est générée depuis `src/data/albums.ts`, comme le reste.
 
 ## 4 ter. Photos des pages (accueil, À propos, Services)
 
-Déposez vos images dans `public/images/site/home/` (photo du hero), `site/about/` (portrait et grande photo) et `site/services/` (une par prestation). Elles remplacent aussitôt les photos temporaires ; pour choisir précisément une photo, indiquez son identifiant (`site/about/portrait.jpg`) dans `src/data/content.ts` ou `src/data/services.ts`.
+Chaque photo de page est désignée par son identifiant dans `src/data/content.ts` (hero, À propos) et `src/data/services.ts` (une par prestation) : une photo de match (`albums/fih-pro-league/hommes/27-06-2026-belgique-pays-bas-men/belgique/IMG_3563.jpg` — dossier de l'adresse + nom du fichier) ou une image déposée dans `public/images/site/home/`, `site/about/` ou `site/services/` (`site/about/portrait.jpg`).
 
 ## 6. Modifier le nom du site
 
@@ -191,7 +229,9 @@ npm run build      # → dossier out/, le site prêt à publier
 
 **Une seule fois** : sur GitHub, **Settings → Pages → Build and deployment → Source : « GitHub Actions »** (et non « Deploy from a branch »).
 
-Ensuite, chaque mise à jour de la branche `main` publie automatiquement le site (onglet **Actions**, workflow « Publier le site », 1 à 2 minutes). Adresse : `https://<utilisateur>.github.io/<nom-du-dépôt>/`.
+Ensuite, chaque mise à jour de la branche `main` publie automatiquement le site (onglet **Actions**, workflow « Publier le site »). Adresse : `https://<utilisateur>.github.io/<nom-du-dépôt>/`. Les versions web des photos sont gardées en cache d'une publication à l'autre : seules les photos nouvelles sont encodées (quelques minutes) ; la toute première publication prend une quinzaine de minutes.
+
+**Hébergement — à surveiller.** GitHub Pages limite un site à **1 Go**. Avec les 795 photos actuelles, les versions web et les fichiers à télécharger pèsent environ 880 Mo : `npm run photos` affiche ce total et prévient au-delà de 850 Mo. Quand le site grandit, deux solutions sans changer le code : publier le même dossier `out/` sur **Cloudflare Pages** (gratuit, sans limite de taille totale), ou passer certaines galeries en `downloadEnabled: false` (environ −45 % de poids par photo).
 
 **Domaine personnalisé** (ex. `raivocapture.be`) : renseignez-le dans Settings → Pages → Custom domain ; l'Action adapte automatiquement les adresses du site.
 
@@ -209,6 +249,7 @@ src/
 ├── app/                      Routes (App Router)
 │   ├── page.tsx              Accueil
 │   ├── albums/               /albums + /albums/[...chemin] (catégories, sous-catégories, albums)
+│   ├── matchs/               Calendrier : tous les matchs par année et par mois
 │   ├── og/albums/            Images de partage des albums (PNG générés au build)
 │   ├── galeries/             Retrouver mes photos (recherche + code d'accès)
 │   ├── football/             Archive football
@@ -220,12 +261,14 @@ src/
 ├── components/
 │   ├── albums/               Page d'album, page de catégorie, cartes, lignes de calendrier, billet
 │   ├── clubs/                Logo de club (pastille) et paire de logos
-│   ├── gallery/              Galerie (vues éditoriale / planche) + visionneuse
+│   ├── gallery/              Galerie (vues éditoriale / planche, sélection), visionneuse, archive ZIP
 │   ├── layout/               Header, méga-menu Albums, menu mobile, footer, fil d'Ariane
 │   ├── home/                 Sections de l'accueil
 │   ├── galleries/            Recherche instantanée des albums, code d'accès, partage
 │   ├── search/               Palette de recherche (⌘K ou /)
-│   ├── sections/ contact/ effects/ brand/ seo/ football/ ui/
+│   ├── effects/              Animation d'entrée (IntroCurtain), apparitions au scroll…
+│   ├── ui/                   PhotoPicture (<picture> AVIF + WebP), PhotoImage, boutons, icônes
+│   ├── sections/ contact/ brand/ seo/ football/
 ├── config/site.ts            ← nom, coordonnées, réseaux, navigation
 ├── data/
 │   ├── albums.ts             ← l'arborescence : catégories et matchs
@@ -235,11 +278,16 @@ src/
 │   └── content.ts services.ts placeholder-photos.ts photos.ts
 └── lib/
     ├── albums.ts             Accès aux données (tri, validation, logos, textes alternatifs)
+    ├── downloads.ts          Règle de téléchargement et noms de fichiers (partagée avec le pipeline)
+    ├── photo-sources.ts      Adresses des versions AVIF / WebP
+    ├── zip.ts                Archive ZIP préparée dans le navigateur
     ├── seo.ts navigation.ts search-index.ts gallery-index.ts …
+Dossier photos/               ← vos photos de match, rangées à votre façon (reliées par `source`)
 assets/logos/                 Logos sources (un fichier par club : <identifiant>.png)
-public/images/albums/         Photos des albums (même chemin que l'adresse)
-public/images/site/           Photos des pages (accueil, À propos, Services)
-scripts/photos.mjs            Indexation des photos + versions WebP
+public/images/site/           Photos des pages (facultatif)
+public/_photos/               Versions web et fichiers à télécharger (générés, non commités)
+scripts/photos.mjs            Pipeline photo (AVIF, WebP, JPEG à télécharger, manifest)
+scripts/git-hooks/pre-commit  Garde-fou : refuse vidéos et fichiers de plus de 95 Mo
 scripts/logos.mjs             Optimisation des logos
 scripts/finalize-export.mjs   Finalisation de l'export statique
 .github/workflows/deploy.yml  Publication automatique sur GitHub Pages
@@ -253,6 +301,6 @@ scripts/finalize-export.mjs   Finalisation de l'export statique
 | Typographie | **Archivo** étendu 800 en capitales (`t-display`, `t-h1` : 2–3 grands moments par page) · **Poppins** (texte, `t-h2` léger, `t-h3`, `t-lead`, `t-label`) · **JetBrains Mono** très espacé (`t-stamp` : tampons de section, `t-mono` : métadonnées) |
 | Rayons      | 4 px (vignettes) · 6 px (petites commandes) · 8 px (bouton bordé) · 20 px (cartes, grandes images) · pilule (actions principales)                         |
 | Surfaces    | Plates : filets de lin à 14–30 % d'opacité et voiles translucides (`wash`, `glass`), aucune ombre                                                       |
-| Mouvement   | `--ease-out-expo`, apparitions au scroll, masques de titres, tampons qui se resserrent — tout est désactivé avec « réduire les animations »               |
+| Mouvement   | `--ease-out-expo`, rideau d'entrée à l'identité de la marque (une fois par visite, ~1,3 s), apparitions au scroll, masques de titres, tampons qui se resserrent — tout est désactivé avec « réduire les animations » |
 
 L'orange est **rationné** : une action principale par écran (bouton pilule `signal`) et un seul bloc orange par page (`PhotoAccessBand`, classe `theme-orange bloom`). Dans un titre, les mots entre `*astérisques*` passent en ton secondaire (Taupe).

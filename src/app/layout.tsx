@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, JetBrains_Mono, Poppins } from "next/font/google";
+import { INTRO_SCRIPT, IntroCurtain } from "@/components/effects/IntroCurtain";
 import { RevealObserver } from "@/components/effects/RevealObserver";
 import { ScrollTop } from "@/components/effects/ScrollTop";
 import { Footer } from "@/components/layout/Footer";
@@ -78,8 +79,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         {/* Active les animations d'apparition uniquement si JavaScript tourne. */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+        {/* Animation d'entrée : décidée avant le premier affichage (une fois par visite). */}
+        <script dangerouslySetInnerHTML={{ __html: INTRO_SCRIPT }} />
       </head>
       <body>
+        <IntroCurtain />
         <a
           href="#main"
           className="sr-only z-[400] rounded-full bg-flamingo px-5 py-3 t-label text-ink focus:not-sr-only focus:fixed focus:top-3 focus:left-3"

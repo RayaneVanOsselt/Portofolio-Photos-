@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Close, Download, Expand, Heart, Share, Shrink, ZoomIn, ZoomOut } from "@/components/ui/Icons";
+import { PhotoPicture } from "@/components/ui/PhotoPicture";
 import { useAnimatedDialog } from "@/hooks/useAnimatedDialog";
-import { pad } from "@/lib/utils";
+import { formatBytes, pad, publicPath } from "@/lib/utils";
 import type { GalleryItem } from "./Gallery";
 
 type Props = {
@@ -17,29 +17,19 @@ type Props = {
   index: number | null;
   onClose: () => void;
   onChange: (index: number) => void;
-  allowDownload?: boolean;
 };
 
 const SWIPE_THRESHOLD = 50;
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-
-/** Fichier d'origine d'une photo (téléchargement). */
-function originalUrl(src: string) {
-  if (src.startsWith("https://images.unsplash.com/")) {
-    const url = new URL(src);
-    url.searchParams.set("w", "2400");
-    url.searchParams.set("dl", "");
-    return url.toString();
-  }
-  return src.startsWith("/") ? `${BASE_PATH}${src}` : src;
-}
+/** Largeur occupée par la photo : tout l'écran sur mobile, moins les flèches au-delà. */
+const STAGE_SIZES = "(min-width: 768px) calc(100vw - 12rem), 100vw";
 
 /**
  * Visionneuse plein écran : clavier (← → Échap), swipe (gauche/droite pour
  * naviguer, bas pour fermer), zoom au clic, plein écran, partage, lien
- * permanent, préchargement des voisines, demande de la photo en HD.
+ * permanent, préchargement des voisines, téléchargement du fichier haute
+ * qualité (galeries autorisées) et demande de la photo en HD.
  */
-export function Lightbox({ items, favorite, permalink, index, onClose, onChange, allowDownload = false }: Props) {
+export function Lightbox({ items, favorite, permalink, index, onClose, onChange }: Props) {
   const open = index !== null;
   const dialogRef = useAnimatedDialog(open, onClose, 400);
   // Garde la dernière image affichée pendant l'animation de fermeture.
@@ -52,6 +42,7 @@ export function Lightbox({ items, favorite, permalink, index, onClose, onChange,
   const stageRef = useRef<HTMLDivElement>(null);
   const stripRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
+  const [downloaded, setDownloaded] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
 
   // Plein écran : on suit l'état réel (la touche Échap du navigateur le quitte aussi).
@@ -70,6 +61,7 @@ export function Lightbox({ items, favorite, permalink, index, onClose, onChange,
     setDirection(index > shownIndex ? 1 : -1);
     setShownIndex(index);
     setZoom(null);
+    setDownloaded(false);
   }
 
   const count = items.length;
@@ -126,6 +118,7 @@ export function Lightbox({ items, favorite, permalink, index, onClose, onChange,
   const neighbours = count > 1 ? [items[(shownIndex + 1) % count], items[(shownIndex - 1 + count) % count]] : [];
   // Sans propriété d'affichage : chaque bouton précise la sienne (grid, flex, hidden…).
   const iconButton = "size-11 place-items-center rounded-full text-linen/85 transition-colors duration-300 hover:bg-wash-strong hover:text-linen";
+  const download = photo.download;
 
   const toggleZoom = (clientX?: number, clientY?: number) => {
     if (zoom) return setZoom(null);
@@ -235,25 +228,23 @@ export function Lightbox({ items, favorite, permalink, index, onClose, onChange,
               data-direction={direction}
               style={{ transform: zoom ? "scale(2.2)" : undefined, transformOrigin: zoom ? `${zoom.x}% ${zoom.y}%` : "50% 50%" }}
             >
-              <Image
-                src={photo.src}
-                alt={photo.alt}
-                fill
-                sizes="100vw"
-                quality={90}
-                placeholder={photo.blurDataURL ? "blur" : "empty"}
-                blurDataURL={photo.blurDataURL}
-                className="object-contain"
+              <PhotoPicture
+                photo={photo}
+                sizes={STAGE_SIZES}
+                eager
                 draggable={false}
+                className="absolute inset-0 h-full w-full object-contain"
+                // Mini-aperçu flou à l'emplacement exact de la photo, le temps qu'elle arrive.
+                style={photo.blurDataURL ? { backgroundImage: `url("${photo.blurDataURL}")`, backgroundSize: "contain", backgroundPosition: "center", backgroundRepeat: "no-repeat" } : undefined}
               />
             </div>
           </div>
 
-          {/* Précharge les images voisines */}
+          {/* Précharge les photos voisines (même taille que la scène) */}
           {open ? (
             <div aria-hidden className="pointer-events-none absolute size-px overflow-hidden opacity-0">
               {neighbours.map((n) => (
-                <Image key={n.photo.id} src={n.photo.src} alt="" width={n.photo.width} height={n.photo.height} sizes="100vw" quality={90} loading="eager" />
+                <PhotoPicture key={n.photo.id} photo={n.photo} sizes={STAGE_SIZES} alt="" eager />
               ))}
             </div>
           ) : null}
@@ -282,7 +273,7 @@ export function Lightbox({ items, favorite, permalink, index, onClose, onChange,
                 }`}
                 style={{ aspectRatio: `${it.photo.width} / ${it.photo.height}`, backgroundColor: it.photo.color }}
               >
-                {open ? <Image src={it.photo.src} alt="" fill sizes="100px" className="object-cover" /> : null}
+                {open ? <PhotoPicture photo={it.photo} sizes="100px" alt="" className="absolute inset-0 h-full w-full object-cover" /> : null}
               </button>
             ))}
           </div>
@@ -305,23 +296,32 @@ export function Lightbox({ items, favorite, permalink, index, onClose, onChange,
             ) : null}
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            {allowDownload ? (
+            {download ? (
               <a
-                href={originalUrl(photo.src)}
-                download
-                className="grid size-12 place-items-center rounded-full bg-wash-strong text-linen transition-colors hover:bg-[rgb(231_231_216/0.16)] sm:flex sm:w-auto sm:gap-2.5 sm:px-5"
-                aria-label="Télécharger cette photo"
+                href={publicPath(download.url)}
+                download={download.filename}
+                onClick={() => {
+                  setDownloaded(true);
+                  window.setTimeout(() => setDownloaded(false), 2600);
+                }}
+                className="group grid size-12 place-items-center rounded-full bg-flamingo text-ink transition-colors hover:bg-tango sm:flex sm:w-auto sm:gap-2.5 sm:px-5"
+                aria-label={`Télécharger cette photo (JPEG, ${formatBytes(download.bytes)})`}
               >
-                <Download size={18} />
-                <span className="hidden text-[0.9375rem] font-medium sm:inline">Télécharger</span>
+                {downloaded ? <Check size={18} /> : <Download size={18} />}
+                <span className="hidden text-[0.9375rem] font-medium sm:inline" aria-live="polite">
+                  {downloaded ? "Téléchargement lancé" : "Télécharger"}
+                </span>
+                <span className="hidden font-mono text-[0.6875rem] tracking-[0.08em] opacity-70 lg:inline">{downloaded ? "" : formatBytes(download.bytes)}</span>
               </a>
             ) : null}
             <Link
               href={requestHref}
-              className="group grid size-12 place-items-center rounded-full bg-flamingo text-ink transition-colors hover:bg-tango sm:flex sm:w-auto sm:gap-2.5 sm:px-5"
+              className={`group grid size-12 place-items-center rounded-full transition-colors sm:flex sm:w-auto sm:gap-2.5 sm:px-5 ${
+                download ? "border border-line-strong text-linen hover:bg-wash-strong" : "bg-flamingo text-ink hover:bg-tango"
+              }`}
               aria-label="Demander cette photo en haute définition"
             >
-              <span className="hidden text-[0.9375rem] font-medium sm:inline">Demander cette photo</span>
+              <span className="hidden text-[0.9375rem] font-medium sm:inline">{download ? "Demander en HD" : "Demander cette photo"}</span>
               <ArrowUpRight size={18} className="transition-transform duration-500 group-hover:rotate-45" />
             </Link>
             {count > 1 ? (

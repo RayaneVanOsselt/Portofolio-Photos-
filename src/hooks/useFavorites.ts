@@ -62,5 +62,7 @@ export function useFavorites(galleryId: string) {
     [galleryId],
   );
   const clear = useCallback(() => write(galleryId, []), [galleryId]);
-  return { favorites, has: (index: number) => favorites.includes(index), toggle, clear };
+  /** Remplace la sélection (ex. « Tout sélectionner »). */
+  const set = useCallback((indices: number[]) => write(galleryId, [...new Set(indices)].sort((a, b) => a - b)), [galleryId]);
+  return { favorites, has: (index: number) => favorites.includes(index), toggle, clear, set };
 }

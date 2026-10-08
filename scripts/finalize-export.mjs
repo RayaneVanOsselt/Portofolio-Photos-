@@ -8,7 +8,7 @@
  * pour que les réseaux sociaux les reconnaissent comme des images.
  */
 import { existsSync } from "node:fs";
-import { readdir, readFile, rename, writeFile } from "node:fs/promises";
+import { readdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const OUT = join(process.cwd(), "out");
@@ -44,6 +44,9 @@ for (const file of files) {
     updated += 1;
   }
 }
+
+// Fichier interne du pipeline photo (réglages d'encodage) : inutile en ligne.
+await rm(join(OUT, "_photos", ".pipeline.json"), { force: true });
 
 // Le site est déjà compilé : GitHub Pages ne doit pas le retraiter avec Jekyll.
 await writeFile(join(OUT, ".nojekyll"), "");

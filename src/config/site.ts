@@ -67,6 +67,18 @@ export const siteConfig = {
 
   /** Vidéo d'arrière-plan du hero (fichier dans /public), sinon null. */
   heroVideo: null as null | { src: string; type: string },
+
+  /**
+   * Téléchargement des photos par les visiteurs (bouton « Télécharger »,
+   * sélection en ZIP, galerie complète) : JPEG haute qualité au nom propre.
+   * Réglage par défaut — chaque catégorie ou album peut le changer avec
+   * `downloadEnabled: true | false` dans src/data/albums.ts.
+   */
+  downloads: {
+    photos: true as boolean,
+    /** Au-delà, l'archive ZIP est refusée (elle est préparée dans le navigateur). */
+    maxArchiveBytes: 400 * 1024 * 1024,
+  },
 } as const;
 
 export type SocialKey = keyof typeof siteConfig.socials;
@@ -95,6 +107,7 @@ export function getSocialLinks() {
 export const mainNav = [
   { label: "Accueil", href: "/" },
   { label: "Albums", href: "/albums", hasMegaMenu: true },
+  { label: "Matchs", href: "/matchs" },
   { label: "À propos", href: "/about" },
   { label: "Contact", href: "/contact" },
 ] as const;

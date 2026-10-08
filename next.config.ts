@@ -18,13 +18,14 @@ const nextConfig: NextConfig = {
   basePath,
   trailingSlash: true,
   images: {
-    // Pas de serveur d'images : chaque photo est déclinée à l'avance en WebP
-    // (npm run photos) et ce chargeur choisit la bonne taille.
+    // Pas de serveur d'images : chaque photo est déclinée à l'avance (npm run photos).
+    // Les photos principales passent par <PhotoPicture> (AVIF + WebP) ; next/image ne
+    // sert plus que de petites vignettes, en WebP, via ce chargeur.
     loader: "custom",
     loaderFile: "./src/lib/image-loader.ts",
-    // Largeurs du srcset = déclinaisons réellement générées (scripts/photos.mjs) :
+    // Largeurs du srcset = versions WebP réellement générées (scripts/photos.mjs) :
     // aucune entrée en double, le navigateur choisit le bon fichier du premier coup.
-    deviceSizes: [640, 1080, 1600, 2400],
+    deviceSizes: [640, 1080],
     imageSizes: [320],
   },
   poweredByHeader: false,
