@@ -62,11 +62,6 @@ export const Plus = (p: IconProps) => (
     <path d="M12 4v16M4 12h16" />
   </Base>
 );
-export const Minus = (p: IconProps) => (
-  <Base {...p}>
-    <path d="M4 12h16" />
-  </Base>
-);
 export const ZoomIn = (p: IconProps) => (
   <Base {...p}>
     <circle cx="10.5" cy="10.5" r="6.5" />
@@ -143,17 +138,6 @@ export const Key = (p: IconProps) => (
   <Base {...p}>
     <circle cx="8" cy="15" r="4" />
     <path d="m11 12 8.5-8.5M16 7l2.5 2.5M14 9l1.5 1.5" />
-  </Base>
-);
-export const Calendar = (p: IconProps) => (
-  <Base {...p}>
-    <path d="M4 6h16v14H4zM4 10.5h16M8.5 3.5V8M15.5 3.5V8" />
-  </Base>
-);
-export const Pin = (p: IconProps) => (
-  <Base {...p}>
-    <path d="M12 20.5s6.5-5.6 6.5-10.5a6.5 6.5 0 0 0-13 0c0 4.9 6.5 10.5 6.5 10.5z" />
-    <circle cx="12" cy="10" r="2.25" />
   </Base>
 );
 export const Images = (p: IconProps) => (

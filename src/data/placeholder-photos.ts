@@ -1,15 +1,15 @@
 /**
- * ⚠️ PHOTOS TEMPORAIRES — À REMPLACER AVANT LA MISE EN LIGNE.
+ * ⚠️ PHOTO TEMPORAIRE — À REMPLACER PAR VOTRE PORTRAIT.
  *
- * Ces images proviennent d'Unsplash (licence Unsplash) et servent uniquement
- * à habiller les pages du site (accueil, À propos, Services) tant que vos
- * photos ne sont pas ajoutées. Elles ne représentent PAS le travail du
- * photographe. Les albums de matchs n'en utilisent jamais : un album sans
- * photo affiche « Photos à venir ».
+ * L'accueil, les Services et la grande photo de la page À propos utilisent
+ * déjà vos photos de match (src/data/content.ts, services.ts). Reste le
+ * portrait de la page À propos : une image Unsplash (licence Unsplash) qui ne
+ * représente PAS le photographe. Les albums de matchs n'en utilisent jamais :
+ * un album sans photo affiche « Photos à venir ».
  *
- * Dès qu'un dossier de public/images/site/ contient des photos (et que
- * `npm run photos` a été lancé), elles remplacent automatiquement ces
- * images (voir src/data/photos.ts).
+ * Dès que public/images/site/about/ contient votre portrait (et que
+ * `npm run photos` a été lancé), il remplace automatiquement cette image :
+ * indiquez son identifiant (« site/about/portrait.jpg ») dans `portraitId`.
  */
 import type { Photo } from "@/lib/types";
 
@@ -30,20 +30,9 @@ const toPhoto = ([id, width, height, color, alt, author, username]: Row): Photo 
 };
 
 const site: Record<string, Row[]> = {
-  // Hero de l'accueil
-  "site/home": [["photo-1680010090687-6a5e4fe855b8", 6000, 4000, "#8ca6c0", "jeunes joueurs de hockey sur gazon", "Guillaume Didelet", "mejlivg"]],
-  // Portrait et photo large de la page À propos
+  // Portrait de la page À propos (et de l'accueil)
   "site/about": [
     ["photo-1777304012262-594db955dce9", 2563, 3845, "#595959", "photographe avec un appareil professionnel au bord d'un terrain", "Leo_Visions", "leo_visions_"],
-    ["photo-1656603020708-e3810e667f97", 7952, 5304, "#262626", "photographe agenouillé tenant son appareil", "Yuanzhe Ma", "myz"],
-    ["photo-1780509459807-d47e3571cc99", 5472, 3648, "#0c268c", "terrain bleu sous les projecteurs et un ciel violet", "Glen Carrie", "glencarrie"],
-  ],
-  // Une photo par prestation (src/data/services.ts)
-  "site/services": [
-    ["photo-1639509249768-cbf320b9dec7", 8256, 5504, "#408c40", "deux joueurs de hockey sur gazon en duel", "Pablo Arenas", "pabloarenas"],
-    ["photo-1764967116421-342cb89025bf", 5760, 3840, "#d9d9f3", "joueur tenant son stick sur le gazon", "Arjun Baroi", "arjunbaroi365"],
-    ["photo-1537752895990-7040fb41a932", 6000, 4000, "#262626", "équipe féminine réunie sur le terrain", "Jeffrey F Lin", "jeffreyflin"],
-    ["photo-1629217855633-79a6925d6c47", 5377, 3585, "#262626", "supporters dans un stade de football", "Krzysztof Dubiel", "kris1902"],
   ],
 };
 

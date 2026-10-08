@@ -1,6 +1,9 @@
 /**
  * Textes des pages. Tout ce qui est entre crochets [ … ] est un emplacement
- * réservé à remplacer par le vrai contenu — rien n'a été inventé.
+ * réservé à remplacer par le vrai contenu — rien n'a été inventé. Tant qu'il
+ * n'est pas remplacé, il n'est visible qu'en développement : en ligne, la
+ * présentation est remplacée par la description du site et un principe
+ * d'« Approche » non rédigé est masqué.
  *
  * Les références aux photos utilisent leur identifiant (voir src/data/photos.ts),
  * ex. « site/home/hero.jpg » ou « albums/daring-h1/20-09-2026-daring-h1-leo-h1/12-but.jpg ».

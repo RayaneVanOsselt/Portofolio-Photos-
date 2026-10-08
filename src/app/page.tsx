@@ -9,10 +9,12 @@ import { ClosingCta } from "@/components/sections/ClosingCta";
 import { PhotoAccessBand } from "@/components/sections/PhotoAccessBand";
 import { ArrowLink } from "@/components/ui/Button";
 import { SectionStamp } from "@/components/ui/SectionLabel";
+import { isDev, siteConfig } from "@/config/site";
 import { aboutContent, homeContent } from "@/data/content";
 import { toIndexEntries } from "@/lib/index-entries";
 import { categoryContext, getAlbums, getCategories, getFeaturedAlbums, getPhotoById } from "@/lib/albums";
 import { homeTitle, inArea, pageMetadata } from "@/lib/seo";
+import { isPlaceholder } from "@/lib/utils";
 
 export const metadata: Metadata = pageMetadata({
   title: homeTitle,
@@ -35,6 +37,8 @@ export default function HomePage() {
   // Le dernier album qui a des photos s'affiche en grand ; les autres en liste.
   const spotlight = albums.find((a) => a.cover);
   const recent = albums.filter((a) => a !== spotlight).slice(0, spotlight ? 4 : 6);
+  // Présentation encore entre crochets : jamais publiée, la description du site la remplace.
+  const aboutIntro = isDev || !isPlaceholder(aboutContent.intro) ? aboutContent.intro : siteConfig.description;
 
   return (
     <>
@@ -86,7 +90,7 @@ export default function HomePage() {
 
       <PhotoAccessBand />
 
-      <AboutTeaser portrait={getPhotoById(aboutContent.portraitId, "site/about")} intro={aboutContent.intro} specialties={aboutContent.specialties} />
+      <AboutTeaser portrait={getPhotoById(aboutContent.portraitId, "site/about")} intro={aboutIntro} specialties={aboutContent.specialties} />
 
       <ClosingCta />
     </>

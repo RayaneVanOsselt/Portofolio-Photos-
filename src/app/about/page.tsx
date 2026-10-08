@@ -11,7 +11,7 @@ import { getSocialLinks, isDev, siteConfig } from "@/config/site";
 import { aboutContent } from "@/data/content";
 import { getPhotoById } from "@/lib/albums";
 import { inArea, pageMetadata } from "@/lib/seo";
-import { pad } from "@/lib/utils";
+import { isPlaceholder, pad } from "@/lib/utils";
 
 export const metadata: Metadata = pageMetadata({
   title: `À propos — photographe sportif${inArea}`,
@@ -28,6 +28,15 @@ export default function AboutPage() {
   const showStats = stats.length > 0 || isDev;
   const socials = getSocialLinks();
   const { equipment } = aboutContent;
+  // Textes encore entre crochets : visibles en développement, jamais publiés.
+  const intro = isDev || !isPlaceholder(aboutContent.intro) ? aboutContent.intro : siteConfig.description;
+  const approach = aboutContent.approach.filter((item) => isDev || !isPlaceholder(item.body));
+  const showEquipment = equipment.length > 0 || isDev;
+  const showSocials = socials.length > 0 || isDev;
+  const showClients = aboutContent.clients.length > 0 || isDev;
+  // Numéros des tampons de section, selon les sections réellement affichées.
+  const stamps = [approach.length ? "approach" : null, "values", showClients ? "clients" : null].filter(Boolean);
+  const stampIndex = (id: string) => pad(stamps.indexOf(id) + 1);
 
   return (
     <>
@@ -45,7 +54,7 @@ export default function AboutPage() {
               </span>
             </h1>
             <p className="anim-rise mt-10 max-w-xl t-lead text-linen/85" style={delay(420)}>
-              {aboutContent.intro}
+              {intro}
             </p>
             <ul className="anim-rise mt-8 flex flex-wrap gap-2" style={delay(520)} aria-label="Spécialités">
               {aboutContent.specialties.map((s) => (
@@ -61,24 +70,26 @@ export default function AboutPage() {
         </div>
       </header>
 
-      {/* Approche */}
-      <section aria-labelledby="approach-title" className="container-wide section">
-        <SectionStamp id="approach-title" index="01" meta={`${aboutContent.approach.length} principes`} className="mb-12 md:mb-16">
-          Approche
-        </SectionStamp>
-        <ol className="grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-          {aboutContent.approach.map((item, i) => (
-            <li key={item.title} className="relative border-t border-line pt-6" data-reveal style={{ "--reveal-delay": `${(i % 3) * 80}ms` } as CSSProperties}>
-              <span aria-hidden className="pointer-events-none absolute top-5 right-0 font-display text-[4rem] leading-none font-extrabold text-linen/[0.05] [font-stretch:125%]">
-                {pad(i + 1)}
-              </span>
-              <span className="t-mono text-flamingo">{pad(i + 1)}</span>
-              <h3 className="relative mt-4 t-h3 text-linen">{item.title}</h3>
-              <p className="relative mt-3 t-small text-taupe">{item.body}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
+      {/* Approche — uniquement les principes rédigés */}
+      {approach.length ? (
+        <section aria-labelledby="approach-title" className="container-wide section">
+          <SectionStamp id="approach-title" index={stampIndex("approach")} meta={`${approach.length} principe${approach.length > 1 ? "s" : ""}`} className="mb-12 md:mb-16">
+            Approche
+          </SectionStamp>
+          <ol className="grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+            {approach.map((item, i) => (
+              <li key={item.title} className="relative border-t border-line pt-6" data-reveal style={{ "--reveal-delay": `${(i % 3) * 80}ms` } as CSSProperties}>
+                <span aria-hidden className="pointer-events-none absolute top-5 right-0 font-display text-[4rem] leading-none font-extrabold text-linen/[0.05] [font-stretch:125%]">
+                  {pad(i + 1)}
+                </span>
+                <span className="t-mono text-flamingo">{pad(i + 1)}</span>
+                <h3 className="relative mt-4 t-h3 text-linen">{item.title}</h3>
+                <p className="relative mt-3 t-small text-taupe">{item.body}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
 
       {/* Chiffres — uniquement s'ils sont renseignés (jamais inventés) */}
       {showStats ? (
@@ -96,7 +107,7 @@ export default function AboutPage() {
 
       {/* Valeurs */}
       <section aria-labelledby="values-title" className="container-wide section-sm">
-        <SectionStamp id="values-title" index="02" meta="Ce qui guide chaque image">
+        <SectionStamp id="values-title" index={stampIndex("values")} meta="Ce qui guide chaque image">
           Valeurs
         </SectionStamp>
         <ul className="mt-10">
@@ -124,58 +135,62 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Matériel et réseaux */}
-      <section aria-labelledby="kit-title" className="container-wide section-sm">
-        <div className="grid gap-10 md:grid-cols-2">
-          {equipment.length || isDev ? (
-            <div className="rounded-[var(--radius-card)] border border-line p-6 md:p-8">
-              <h2 id="kit-title" className="t-mono text-ash">
-                + Matériel
-              </h2>
-              {equipment.length ? (
-                <ul className="mt-6 divide-y divide-line">
-                  {equipment.map((item) => (
-                    <li key={item} className="py-3 font-mono text-[0.875rem] tracking-[0.04em] text-linen">
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="mt-6">
-                  <Todo>Boîtiers, objectifs (data/content.ts)</Todo>
-                </p>
-              )}
-            </div>
+      {/* Matériel et réseaux — uniquement ce qui est renseigné */}
+      {showEquipment || showSocials ? (
+        <section aria-label="Matériel et réseaux" className="container-wide section-sm">
+          <div className="grid gap-10 md:grid-cols-2">
+            {showEquipment ? (
+              <div className="rounded-[var(--radius-card)] border border-line p-6 md:p-8">
+                <h2 id="kit-title" className="t-mono text-ash">
+                  + Matériel
+                </h2>
+                {equipment.length ? (
+                  <ul className="mt-6 divide-y divide-line">
+                    {equipment.map((item) => (
+                      <li key={item} className="py-3 font-mono text-[0.875rem] tracking-[0.04em] text-linen">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-6">
+                    <Todo>Boîtiers, objectifs (data/content.ts)</Todo>
+                  </p>
+                )}
+              </div>
+            ) : null}
+            {showSocials ? (
+              <div className="rounded-[var(--radius-card)] border border-line p-6 md:p-8">
+                <h2 className="t-mono text-ash">+ Me suivre</h2>
+                {socials.length ? (
+                  <ul className="mt-6 flex flex-wrap gap-2">
+                    {socials.map((s) => {
+                      const Icon = socialIcons[s.key];
+                      return (
+                        <li key={s.key}>
+                          <a href={s.href} target="_blank" rel="noopener noreferrer" className="flex h-11 items-center gap-2.5 rounded-full bg-wash-strong px-5 text-[0.9375rem] text-linen transition-colors hover:bg-[rgb(231_231_216/0.16)]">
+                            <Icon size={17} />
+                            {s.label}
+                          </a>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <p className="mt-6">
+                    <Todo>Réseaux sociaux (config/site.ts)</Todo>
+                  </p>
+                )}
+              </div>
           ) : null}
-          <div className="rounded-[var(--radius-card)] border border-line p-6 md:p-8">
-            <h2 className="t-mono text-ash">+ Me suivre</h2>
-            {socials.length ? (
-              <ul className="mt-6 flex flex-wrap gap-2">
-                {socials.map((s) => {
-                  const Icon = socialIcons[s.key];
-                  return (
-                    <li key={s.key}>
-                      <a href={s.href} target="_blank" rel="noopener noreferrer" className="flex h-11 items-center gap-2.5 rounded-full bg-wash-strong px-5 text-[0.9375rem] text-linen transition-colors hover:bg-[rgb(231_231_216/0.16)]">
-                        <Icon size={17} />
-                        {s.label}
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <p className="mt-6">
-                <Todo>Réseaux sociaux (config/site.ts)</Todo>
-              </p>
-            )}
           </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       {/* Références : seulement de vraies références */}
-      {aboutContent.clients.length || isDev ? (
+      {showClients ? (
         <section aria-labelledby="clients-title" className="container-wide section-sm">
-          <SectionStamp id="clients-title" index="03" meta="Références">
+          <SectionStamp id="clients-title" index={stampIndex("clients")} meta="Références">
             Confiance
           </SectionStamp>
           {aboutContent.clients.length ? (

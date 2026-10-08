@@ -176,7 +176,7 @@ Chaque photo de page est désignée par son identifiant dans `src/data/content.t
 Dans **`src/config/site.ts`** : `name`, `logo.primary`, `logo.secondary`, `tagline`, `description`.
 Le logo, les titres, les metadata, le footer, les e-mails et les images de partage se mettent à jour.
 Le monogramme (bloc orange au coin coupé, initiales « RV » en réserve) se trouve dans `src/components/brand/Monogram.tsx` ; les fichiers de marque statiques (logo horizontal, compact, monogramme, filigrane — versions pour fond clair `-dark` et fond sombre `-light`) sont dans `public/brand/`.
-Le pied de page affiche l'heure locale en direct (`timeZone`) et votre zone (`seo.area` ou `contact.location`).
+Le pied de page se met à jour tout seul : les 4 derniers matchs publiés, le nombre de matchs et de photos, les albums groupés par sport, vos coordonnées et réseaux dès qu'ils sont renseignés (§7), l'heure locale en direct (`timeZone`) et votre zone (`seo.area` ou `contact.location`).
 
 ## 7. Réseaux sociaux et coordonnées
 
@@ -229,11 +229,11 @@ npm run build      # → dossier out/, le site prêt à publier
 
 **Une seule fois** : sur GitHub, **Settings → Pages → Build and deployment → Source : « GitHub Actions »** (et non « Deploy from a branch »).
 
-Ensuite, chaque mise à jour de la branche `main` publie automatiquement le site (onglet **Actions**, workflow « Publier le site »). Adresse : `https://<utilisateur>.github.io/<nom-du-dépôt>/`. Les versions web des photos sont gardées en cache d'une publication à l'autre : seules les photos nouvelles sont encodées (quelques minutes) ; la toute première publication prend une quinzaine de minutes.
+Ensuite, chaque mise à jour de la branche `main` publie automatiquement le site (onglet **Actions**, workflow « Publier le site »). Adresse : <https://rayvocaptures0808.be> (domaine personnalisé ; sans lui, `https://<utilisateur>.github.io/<nom-du-dépôt>/`). Les versions web des photos sont gardées en cache d'une publication à l'autre : seules les photos nouvelles sont encodées (quelques minutes) ; la toute première publication prend une quinzaine de minutes.
 
 **Hébergement — à surveiller.** GitHub Pages limite un site à **1 Go**. Avec les 795 photos actuelles, les versions web et les fichiers à télécharger pèsent environ 880 Mo : `npm run photos` affiche ce total et prévient au-delà de 850 Mo. Quand le site grandit, deux solutions sans changer le code : publier le même dossier `out/` sur **Cloudflare Pages** (gratuit, sans limite de taille totale), ou passer certaines galeries en `downloadEnabled: false` (environ −45 % de poids par photo).
 
-**Domaine personnalisé** (ex. `raivocapture.be`) : renseignez-le dans Settings → Pages → Custom domain ; l'Action adapte automatiquement les adresses du site.
+**Domaine personnalisé** (actuellement `rayvocaptures0808.be`) : il se règle dans Settings → Pages → Custom domain ; l'Action adapte automatiquement les adresses du site.
 
 Après la mise en ligne :
 - soumettez `…/sitemap.xml` dans Google Search Console ;
