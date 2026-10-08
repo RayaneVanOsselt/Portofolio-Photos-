@@ -40,7 +40,7 @@ export function Footer() {
             <Link href="/" className="inline-block text-linen" aria-label={`${siteConfig.name} — accueil`}>
               <Logo />
             </Link>
-            <p className="mt-6 max-w-xs t-small text-taupe">{siteConfig.tagline}</p>
+            <p className="mt-6 max-w-sm t-small text-taupe">{siteConfig.tagline}</p>
             {published.length ? (
               <p className="mt-6 t-mono text-ash">
                 {number.format(published.length)} match{published.length > 1 ? "s" : ""} · {number.format(photoCount)} photo{photoCount > 1 ? "s" : ""}
@@ -109,7 +109,7 @@ export function Footer() {
           </FooterColumn>
 
           <FooterColumn title="Albums" className="col-span-2">
-            <div className="gap-8 sm:columns-2">
+            <div className="columns-2 gap-8">
               {groups.map((group) => (
                 <div key={group.sport} className="mb-7 break-inside-avoid">
                   <p className="t-mono text-taupe">{group.label}</p>
