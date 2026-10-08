@@ -51,3 +51,22 @@ next-env.d.ts
 
 # logos optimisés générés par npm run logos (sources : assets/logos/)
 /public/logos/
+
+# vidéos : jamais dans Git (GitHub refuse les fichiers > 100 Mo)
+# motifs [xX] : insensibles à la casse aussi sur GitHub et Linux (.mp4 comme .MP4)
+*.[mM][pP]4
+*.[mM][oO][vV]
+*.[mM]4[vV]
+*.[wW][eE][bB][mM]
+*.[aA][vV][iI]
+*.[mM][kK][vV]
+*.[mM][tT][sS]
+*.[mM]2[tT][sS]
+*.[wW][mM][vV]
+*.[fF][lL][vV]
+*.3[gG][pP]
+*.[mM][pP][gG]
+*.[mM][pP][eE][gG]
+
+# macOS : icônes personnalisées de dossier (fichier « Icon » + retour chariot)
+Icon?
