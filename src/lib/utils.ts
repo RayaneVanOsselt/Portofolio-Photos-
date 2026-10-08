@@ -73,3 +73,11 @@ export function formatBytes(bytes: number) {
   const digits = unit >= 2 && value < 10 ? 1 : 0;
   return `${new Intl.NumberFormat("fr-BE", { maximumFractionDigits: digits }).format(value)} ${units[unit]}`;
 }
+
+/**
+ * Emplacement encore à rédiger dans src/data/content.ts (« [VOTRE PRÉSENTATION — …] ») :
+ * à afficher en développement pour le repérer, jamais en ligne.
+ */
+export function isPlaceholder(text: string) {
+  return /^\s*\[[^\]]*\]\s*$/.test(text);
+}

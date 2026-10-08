@@ -15,7 +15,7 @@ import type { ClubInput } from "@/lib/types";
 
 export const clubs = {
   daring: { name: "Daring" },
-  leopold: { name: "Léopold", aliases: ["Leopold"] },
+  leopold: { name: "Léopold", aliases: ["Leopold", "Leo"] },
   "louvain-la-neuve": { name: "Louvain-la-Neuve" },
   rwdm: { name: "RWDM" },
   "white-star": { name: "White Star" },
