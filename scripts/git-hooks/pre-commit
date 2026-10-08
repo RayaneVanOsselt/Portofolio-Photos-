@@ -1,0 +1,22 @@
+#!/bin/sh
+# Garde-fou local : refuse tout commit contenant une vidéo ou un fichier de plus de 95 Mo
+# (GitHub refuse les fichiers de plus de 100 Mo). Exception volontaire : git commit --no-verify
+max=$((95 * 1024 * 1024))
+fail=0
+set -f
+IFS='
+'
+for path in $(git -c core.quotepath=false diff --cached --name-only --diff-filter=ACMR); do
+  case "$path" in
+    *.[mM][pP]4|*.[mM][oO][vV]|*.[mM]4[vV]|*.[wW][eE][bB][mM]|*.[aA][vV][iI]|*.[mM][kK][vV]|*.[mM][tT][sS]|*.[mM]2[tT][sS]|*.[wW][mM][vV]|*.[fF][lL][vV]|*.3[gG][pP]|*.[mM][pP][gG]|*.[mM][pP][eE][gG])
+      echo "✖ Vidéo refusée : $path"; fail=1; continue ;;
+  esac
+  size=$(git cat-file -s ":0:$path" 2>/dev/null || echo 0)
+  if [ "$size" -gt "$max" ]; then
+    echo "✖ Fichier trop lourd ($((size / 1048576)) Mo, limite GitHub : 100 Mo) : $path"; fail=1
+  fi
+done
+if [ "$fail" -ne 0 ]; then
+  echo "Commit annulé. Retirez ces fichiers avec : git restore --staged \"<fichier>\""
+  exit 1
+fi

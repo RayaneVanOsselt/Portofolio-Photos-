@@ -36,6 +36,16 @@ jobs:
       - name: Installer les dépendances
         run: npm ci
 
+      # Versions web des photos (AVIF, WebP, JPEG à télécharger) : gardées d'une
+      # publication à l'autre. Seules les photos nouvelles ou modifiées sont encodées
+      # (la toute première publication prend une quinzaine de minutes).
+      - name: Restaurer les versions web des photos
+        uses: actions/cache@v4
+        with:
+          path: public/_photos
+          key: photos-${{ hashFiles('Dossier photos*/**', 'public/images/**', 'scripts/photos.mjs', 'src/data/albums.ts', 'src/config/site.ts') }}
+          restore-keys: photos-
+
       - name: Compiler le site
         run: npm run build
         env:

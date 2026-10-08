@@ -15,6 +15,11 @@ export type Photo = {
   exif?: { camera?: string; lens?: string; focal?: string; aperture?: string; shutter?: string; iso?: string; date?: string };
   /** Crédit — uniquement pour les photos temporaires. */
   credit?: { name: string; url: string };
+  /**
+   * Fichier haute qualité à télécharger (JPEG, nom propre), présent seulement
+   * si la galerie autorise le téléchargement. `url` sans le sous-dossier de publication.
+   */
+  download?: { url: string; filename: string; bytes: number };
 };
 
 export type Sport = "hockey" | "rugby" | "football";
@@ -65,6 +70,8 @@ export type CategoryInput = {
   albums?: AlbumInput[];
   /** Sous-catégories (FIH Pro League → Hommes / Femmes ; plus tard : saisons, compétitions…). */
   children?: CategoryInput[];
+  /** Téléchargement des photos pour toute la catégorie (et ses sous-catégories). Voir src/lib/downloads.ts. */
+  downloadEnabled?: boolean;
 };
 
 /** Catégorie résolue : chemin complet, parent, logo, couverture. */
@@ -83,6 +90,8 @@ export type Category = {
   children: Category[];
   /** Logo du club ou de la compétition (null si aucun). */
   crest: Crest | null;
+  /** Réglage de téléchargement propre à la catégorie (non résolu ; hérité par les albums). */
+  downloadEnabled?: boolean;
   /** Photo de couverture : celle de l'album le plus récent qui a des photos. */
   cover: Photo | null;
   /** Albums publics, sous-catégories comprises. */
@@ -171,7 +180,18 @@ export type AlbumInput = {
   private?: boolean;
   /** Code à communiquer au client (insensible à la casse et aux espaces). */
   accessCode?: string;
-  /** Affiche un bouton « Télécharger » dans la visionneuse (photo d'origine). */
+  /**
+   * Dossier des photos dans « Dossier photos/ » (chemin relatif, tel quel) :
+   * « DARING /Messieurs 1 /Daring - Namur 23:05:2026 ». Les sous-dossiers deviennent
+   * des chapitres. Sans `source`, les photos sont lues dans public/images/albums/<chemin>/.
+   */
+  source?: string;
+  /**
+   * Téléchargement des photos (bouton « Télécharger », sélection en ZIP, galerie complète).
+   * Par défaut : réglage de la catégorie, sinon `siteConfig.downloads.photos`.
+   */
+  downloadEnabled?: boolean;
+  /** Ancien nom de `downloadEnabled` (toujours accepté). */
   allowDownload?: boolean;
   /** Textes des chapitres (sous-dossiers 01-avant-match/, 02-action/…). */
   chapters?: Record<string, ChapterNote>;
@@ -179,7 +199,7 @@ export type AlbumInput = {
   photographer?: string;
 };
 
-export type Album = Omit<AlbumInput, "match" | "chapters" | "cover" | "title" | "location" | "event"> & {
+export type Album = Omit<AlbumInput, "match" | "chapters" | "cover" | "title" | "location" | "event" | "source" | "downloadEnabled" | "allowDownload"> & {
   title: string;
   href: string;
   /** Chemin complet depuis /albums : catégories puis slug de l'album. */
@@ -196,6 +216,8 @@ export type Album = Omit<AlbumInput, "match" | "chapters" | "cover" | "title" | 
   chapters: Chapter[];
   /** Photo de couverture, ou null tant que l'album n'a pas de photos. */
   cover: Photo | null;
+  /** Téléchargement autorisé (règle résolue : album → catégorie → réglage global). */
+  downloadEnabled: boolean;
 };
 
 export type Service = {

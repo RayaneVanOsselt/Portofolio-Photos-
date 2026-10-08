@@ -24,6 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     page("/", 1, "weekly", albums.map((a) => a.cover)),
     page(ALBUMS_HREF, 0.9, "weekly", albums.map((a) => a.cover)),
+    page("/matchs", 0.8, "weekly", albums.map((a) => a.cover)),
     ...getAllCategories()
       .filter((c) => c.albumCount)
       .map((c) => page(c.href, c.parent ? 0.7 : 0.8, "weekly", getCategoryAlbums(c).map((a) => a.cover))),

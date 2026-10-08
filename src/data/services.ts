@@ -14,7 +14,7 @@ export const services: Service[] = [
     description:
       "Une rencontre racontée de bout en bout : l'échauffement, les temps forts, les visages et l'ambiance autour du terrain.",
     deliverables: ["Sélection d'images retouchées", "Galerie de livraison en ligne", "Formats web et réseaux sociaux"],
-    photoId: "ph-1639509249768-cbf320b9dec7",
+    photoId: "albums/rwdm-2026-2027/03-10-2026-union-sg-b-rwdm/IMG_7016.jpg",
   },
   {
     slug: "portraits-equipe",
@@ -23,7 +23,7 @@ export const services: Service[] = [
     description:
       "Photos officielles d'équipe, portraits individuels et media days, pensés pour la saison, la presse et les supports du club.",
     deliverables: ["Photo d'équipe", "Portraits individuels", "Déclinaisons pour la communication"],
-    photoId: "ph-1764967116421-342cb89025bf",
+    photoId: "albums/rwdm-2026-2027/12-09-2026-rwdm-charleroi-b/IMG_5905.jpg",
   },
   {
     slug: "contenus-clubs-partenaires",
@@ -32,7 +32,7 @@ export const services: Service[] = [
     description:
       "Des images pour faire vivre un club toute la saison : annonces, réseaux sociaux, visibilité des partenaires et sponsors.",
     deliverables: ["Visuels pour réseaux sociaux", "Images pour partenaires", "Banque d'images de saison"],
-    photoId: "ph-1537752895990-7040fb41a932",
+    photoId: "albums/white-star-h1/04-10-2026-white-star-h1-louvain-la-neuve-h1/IMG_7865.jpg",
   },
   {
     slug: "evenements-sportifs",
@@ -41,6 +41,6 @@ export const services: Service[] = [
     description:
       "Tournois, stages, remises de prix et soirées de club : l'événement couvert dans sa totalité, sur le terrain comme en dehors.",
     deliverables: ["Couverture de l'événement", "Sélection retouchée", "Galerie partageable"],
-    photoId: "ph-1629217855633-79a6925d6c47",
+    photoId: "albums/rugby/16-05-2026-rugby-final-d1/IMG_2147.jpg",
   },
 ];

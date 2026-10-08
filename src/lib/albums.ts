@@ -10,10 +10,12 @@
  * ou un slug qui ne correspond pas à la date du match bloque la compilation
  * avec un message clair, plutôt que de publier une page fausse.
  */
+import { siteConfig } from "@/config/site";
 import { albumTree } from "@/data/albums";
 import { clubs, type ClubId } from "@/data/clubs";
 import logoManifest from "@/data/logo-manifest.json";
 import { getFolderChapters, getFolderPhotos } from "@/data/photos";
+import { isDownloadEnabled } from "@/lib/downloads";
 import type { Album, AlbumInput, Category, CategoryInput, Chapter, ClubInput, Crest, MatchInfo, MatchInput, Photo, Sport } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
@@ -94,6 +96,7 @@ function resolveCategory(input: CategoryInput, parent?: Category): Category {
     parent,
     children: [],
     crest: input.club ? crestOf(input.club) : (parent?.crest ?? null),
+    downloadEnabled: input.downloadEnabled,
     cover: null,
     albumCount: 0,
     photoCount: 0,
@@ -208,11 +211,14 @@ function buildAlbum({ input, category }: { input: AlbumInput; category: Category
     photos: [],
     chapters: [],
     cover: null,
+    downloadEnabled: isDownloadEnabled(input, getCategoryTrail(category), siteConfig.downloads.photos),
   };
 
   const chapters = buildChapters(folder, notes);
   const raw = chapters.length ? chapters.flatMap((c) => c.photos) : getFolderPhotos(folder);
-  const described = new Map(raw.map((photo, i) => [photo.id, withContextAlt(photo, album, i + 1)]));
+  // Galerie en consultation seule : aucun fichier à télécharger n'est exposé.
+  const allowed = (photo: Photo): Photo => (album.downloadEnabled ? photo : { ...photo, download: undefined });
+  const described = new Map(raw.map((photo, i) => [photo.id, allowed(withContextAlt(photo, album, i + 1))]));
   album.photos = raw.map((photo) => described.get(photo.id)!);
   album.chapters = chapters.map((chapter) => ({ ...chapter, photos: chapter.photos.map((photo) => described.get(photo.id)!) }));
 

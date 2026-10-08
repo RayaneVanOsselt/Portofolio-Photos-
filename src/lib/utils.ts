@@ -60,3 +60,16 @@ export function dateKeywords(iso: string | null) {
     iso,
   ].join(" ");
 }
+
+/** Taille lisible : 512 000 → « 500 Ko », 1 800 000 000 → « 1,7 Go ». */
+export function formatBytes(bytes: number) {
+  const units = ["octets", "Ko", "Mo", "Go"];
+  let value = bytes;
+  let unit = 0;
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024;
+    unit += 1;
+  }
+  const digits = unit >= 2 && value < 10 ? 1 : 0;
+  return `${new Intl.NumberFormat("fr-BE", { maximumFractionDigits: digits }).format(value)} ${units[unit]}`;
+}

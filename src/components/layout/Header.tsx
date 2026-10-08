@@ -87,6 +87,11 @@ export function Header({ albumsNav }: Props) {
 
   const tucked = hidden && !megaOpen && !menuOpen && !searchOpen;
 
+  // Les barres collées sous l'en-tête (.sticky-below-header) remontent avec lui.
+  useEffect(() => {
+    document.documentElement.toggleAttribute("data-header-tucked", tucked);
+  }, [tucked]);
+
   return (
     <>
       <header

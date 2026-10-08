@@ -2,12 +2,13 @@
 
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import Link from "next/link";
-import { GridIcon, Heart, RowsIcon } from "@/components/ui/Icons";
+import { Check, Download, GridIcon, Heart, RowsIcon } from "@/components/ui/Icons";
 import { useFavorites } from "@/hooks/useFavorites";
 import { PhotoImage } from "@/components/ui/PhotoImage";
 import { composeGallery, flexFor, sizesFor, type GalleryRow } from "@/lib/gallery-layout";
 import type { Photo } from "@/lib/types";
 import { pad } from "@/lib/utils";
+import { ArchiveDialog } from "./ArchiveDialog";
 import { Lightbox } from "./Lightbox";
 
 export type GalleryItem = {
@@ -33,10 +34,13 @@ type Props = {
   priorityCount?: number;
   /** Vue par défaut, tant que le visiteur n'en a pas choisi une. */
   defaultView?: GalleryView;
-  /** Affiche la barre (nombre de photos + choix de la vue). */
+  /** Affiche la barre (nombre de photos, sélection, téléchargement, choix de la vue). */
   toolbar?: boolean;
-  /** Bouton « Télécharger » dans la visionneuse. */
-  allowDownload?: boolean;
+  /**
+   * Galerie téléchargeable : « Télécharger la galerie » et « Télécharger ma sélection »
+   * (archive ZIP nommée `archiveName`). Chaque photo garde son bouton dans la visionneuse.
+   */
+  download?: { archiveName: string; date?: string };
   /** Chapitres (reportage de match) : la visionneuse reste continue d'un chapitre à l'autre. */
   sections?: GallerySection[];
 };
@@ -72,7 +76,9 @@ function saveView(view: GalleryView) {
   window.dispatchEvent(new Event(VIEW_EVENT));
 }
 
-export function Gallery({ id, items, label, priorityCount = 0, defaultView = "editorial", toolbar = false, allowDownload = false, sections }: Props) {
+const pill = "flex h-10 items-center gap-2 rounded-full px-4 text-[0.8125rem] font-medium transition-colors duration-300";
+
+export function Gallery({ id, items, label, priorityCount = 0, defaultView = "editorial", toolbar = false, download, sections }: Props) {
   const stored = useSyncExternalStore(subscribeView, readView, () => null);
   const [localView, setLocalView] = useState<GalleryView | null>(null);
   const view = toolbar ? (localView ?? stored ?? defaultView) : defaultView;
@@ -90,6 +96,8 @@ export function Gallery({ id, items, label, priorityCount = 0, defaultView = "ed
   }, [items, sections]);
   const [shown, setShown] = useState(BATCH);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [selecting, setSelecting] = useState(false);
+  const [archive, setArchive] = useState<"gallery" | "selection" | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const fav = useFavorites(id);
   const selection = fav.favorites.filter((i) => i < items.length);
@@ -98,6 +106,7 @@ export function Gallery({ id, items, label, priorityCount = 0, defaultView = "ed
   const hashRead = useRef(false);
   const visible = Math.min(shown, items.length);
   const remaining = items.length - visible;
+  const downloadable = Boolean(download) && items.some((item) => item.photo.download);
 
   // Lien permanent : /page/#photo-<id>-3 ouvre directement la 3e photo.
   useEffect(() => {
@@ -143,6 +152,9 @@ export function Gallery({ id, items, label, priorityCount = 0, defaultView = "ed
     setOpenIndex(index);
   }, []);
 
+  // Mode sélection : un toucher coche la photo au lieu de l'ouvrir.
+  const activate = selecting ? fav.toggle : setOpenIndex;
+
   if (!items.length) {
     return (
       <div className="rounded-[var(--radius-card)] border border-dashed border-line-strong px-6 py-14 text-center">
@@ -152,42 +164,77 @@ export function Gallery({ id, items, label, priorityCount = 0, defaultView = "ed
     );
   }
 
+  const tile = { total: items.length, onActivate: activate, selecting, isSelected: fav.has };
+
   return (
     <>
       {toolbar ? (
-        <div className="mb-8 flex items-center justify-between gap-4 border-y border-line py-3 md:mb-10">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-y border-line py-3 md:mb-10">
           <p className="t-mono text-taupe">
             <span className="text-linen">{pad(items.length)}</span> photo{items.length > 1 ? "s" : ""}
           </p>
-          <div role="radiogroup" aria-label="Affichage des photos" className="flex items-center gap-1 rounded-full bg-wash p-1">
-            {(
-              [
-                { value: "editorial", label: "Éditorial", Icon: RowsIcon },
-                { value: "mosaic", label: "Planche", Icon: GridIcon },
-              ] as const
-            ).map(({ value, label: viewLabel, Icon }) => {
-              const checked = view === value;
-              return (
-                <button
-                  key={value}
-                  type="button"
-                  role="radio"
-                  aria-checked={checked}
-                  onClick={() => {
-                    setLocalView(value);
-                    saveView(value);
-                  }}
-                  className={`flex h-9 items-center gap-2 rounded-full px-3.5 text-[0.8125rem] font-medium transition-colors duration-300 ${
-                    checked ? "bg-linen text-ink" : "text-taupe hover:text-linen"
-                  }`}
-                >
-                  <Icon size={15} />
-                  <span className="hidden sm:inline">{viewLabel}</span>
-                  <span className="sr-only sm:hidden">{viewLabel}</span>
-                </button>
-              );
-            })}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setSelecting((s) => !s)}
+              aria-pressed={selecting}
+              className={`${pill} ${selecting ? "bg-linen text-ink" : "border border-line-strong text-linen hover:bg-wash-strong"}`}
+            >
+              {selecting ? <Check size={15} /> : <Heart size={15} />}
+              {selecting ? "Terminer" : "Sélectionner"}
+            </button>
+            {downloadable ? (
+              <button
+                type="button"
+                onClick={() => setArchive("gallery")}
+                className={`${pill} border border-line-strong text-linen hover:bg-wash-strong`}
+                aria-haspopup="dialog"
+                aria-label="Télécharger la galerie"
+              >
+                <Download size={15} />
+                <span aria-hidden className="sm:hidden">
+                  Galerie
+                </span>
+                <span aria-hidden className="hidden sm:inline">
+                  Télécharger la galerie
+                </span>
+              </button>
+            ) : null}
+            <div role="radiogroup" aria-label="Affichage des photos" className="flex items-center gap-1 rounded-full bg-wash p-1">
+              {(
+                [
+                  { value: "editorial", label: "Éditorial", Icon: RowsIcon },
+                  { value: "mosaic", label: "Planche", Icon: GridIcon },
+                ] as const
+              ).map(({ value, label: viewLabel, Icon }) => {
+                const checked = view === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    role="radio"
+                    aria-checked={checked}
+                    onClick={() => {
+                      setLocalView(value);
+                      saveView(value);
+                    }}
+                    className={`flex h-9 items-center gap-2 rounded-full px-3.5 text-[0.8125rem] font-medium transition-colors duration-300 ${
+                      checked ? "bg-linen text-ink" : "text-taupe hover:text-linen"
+                    }`}
+                  >
+                    <Icon size={15} />
+                    <span className="hidden lg:inline">{viewLabel}</span>
+                    <span className="sr-only lg:hidden">{viewLabel}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
+          {selecting ? (
+            <p className="w-full t-small text-taupe" role="status">
+              Touchez les photos pour les ajouter à votre sélection{downloadable ? ", puis téléchargez-les en une fois." : "."}
+            </p>
+          ) : null}
         </div>
       ) : null}
 
@@ -201,7 +248,7 @@ export function Gallery({ id, items, label, priorityCount = 0, defaultView = "ed
                   const index = group.start + k;
                   return (
                     <div key={item.photo.id} role="listitem" className="mosaic-item" style={{ "--r": (item.photo.width / item.photo.height).toFixed(4) } as CSSProperties}>
-                      <TileButton item={item} index={index} total={items.length} onOpen={setOpenIndex} selected={fav.has(index)}>
+                      <TileButton item={item} index={index} {...tile}>
                         <PhotoImage
                           photo={item.photo}
                           sizes="(min-width: 1280px) 30vw, (min-width: 640px) 40vw, 60vw"
@@ -218,7 +265,7 @@ export function Gallery({ id, items, label, priorityCount = 0, defaultView = "ed
                 {group.rows
                   .filter((row) => row.items[0] < visible)
                   .map((row) => (
-                    <Row key={`${group.id}-${row.items[0]}`} row={row} items={items} total={items.length} priorityCount={priorityCount} onOpen={setOpenIndex} isSelected={fav.has} />
+                    <Row key={`${group.id}-${row.items[0]}`} row={row} items={items} priorityCount={priorityCount} tile={tile} />
                   ))}
               </div>
             )}
@@ -240,31 +287,55 @@ export function Gallery({ id, items, label, priorityCount = 0, defaultView = "ed
       ) : null}
 
       {selection.length ? (
-        <div role="region" aria-label="Ma sélection" className="selection-bar sticky bottom-4 z-30 mx-auto mt-10 flex w-fit max-w-full flex-wrap items-center gap-2 rounded-full border border-line-strong bg-night/90 py-2 pr-2 pl-5 backdrop-blur-xl">
+        <div role="region" aria-label="Ma sélection" className="selection-bar sticky bottom-4 z-30 mx-auto mt-10 flex w-fit max-w-full flex-wrap items-center justify-center gap-2 rounded-[1.75rem] border border-line-strong bg-night/90 p-2 pl-5 backdrop-blur-xl">
           <span className="flex items-center gap-2 text-[0.875rem] text-linen">
             <Heart size={16} filled className="text-flamingo" />
             <span>
               <span className="font-mono">{pad(selection.length)}</span> photo{selection.length > 1 ? "s" : ""} sélectionnée{selection.length > 1 ? "s" : ""}
             </span>
           </span>
-          <button type="button" onClick={fav.clear} className="h-10 rounded-full px-4 text-[0.8125rem] text-taupe transition-colors hover:text-linen">
+          <button type="button" onClick={fav.clear} className="h-10 rounded-full px-3 text-[0.8125rem] text-taupe transition-colors hover:text-linen">
             Vider
           </button>
+          {selection.length < items.length ? (
+            <button type="button" onClick={() => fav.set(items.map((_, i) => i))} className="h-10 rounded-full px-3 text-[0.8125rem] text-taupe transition-colors hover:text-linen">
+              Tout
+            </button>
+          ) : null}
+          {downloadable ? (
+            <button type="button" onClick={() => setArchive("selection")} aria-haspopup="dialog" className="flex h-10 items-center gap-2 rounded-full bg-flamingo px-5 text-[0.875rem] font-medium text-ink transition-colors hover:bg-tango">
+              <Download size={16} />
+              Télécharger
+            </button>
+          ) : null}
           <Link
             href={`/contact/?photo=${encodeURIComponent(`n° ${selection.map((i) => i + 1).join(", ")} — ${items[0]?.title ?? label}`)}&lien=${encodeURIComponent(typeof window === "undefined" ? "" : `${location.origin}${location.pathname}`)}`}
-            className="flex h-10 items-center rounded-full bg-flamingo px-5 text-[0.875rem] font-medium text-ink transition-colors hover:bg-tango"
+            className={`flex h-10 items-center rounded-full px-5 text-[0.875rem] font-medium transition-colors ${downloadable ? "border border-line-strong text-linen hover:bg-wash-strong" : "bg-flamingo text-ink hover:bg-tango"}`}
           >
-            Demander ma sélection
+            {downloadable ? "Demander en HD" : "Demander ma sélection"}
           </Link>
         </div>
       ) : null}
 
-      <Lightbox items={items} favorite={{ has: fav.has, toggle: fav.toggle }} permalink={permalink} index={openIndex} onClose={() => setOpenIndex(null)} onChange={changeIndex} allowDownload={allowDownload} />
+      <Lightbox items={items} favorite={{ has: fav.has, toggle: fav.toggle }} permalink={permalink} index={openIndex} onClose={() => setOpenIndex(null)} onChange={changeIndex} />
+
+      {downloadable && download ? (
+        <ArchiveDialog
+          open={archive !== null}
+          onClose={() => setArchive(null)}
+          title={archive === "selection" ? "Télécharger ma sélection" : "Télécharger la galerie"}
+          archiveName={archive === "selection" ? `${download.archiveName}-selection` : download.archiveName}
+          photos={archive === "selection" ? selection.map((i) => items[i].photo) : items.map((item) => item.photo)}
+          date={download.date}
+        />
+      ) : null}
     </>
   );
 }
 
-function Row({ row, items, total, priorityCount, onOpen, isSelected }: { row: GalleryRow; items: GalleryItem[]; total: number; priorityCount: number; onOpen: (index: number) => void; isSelected: (index: number) => boolean }) {
+type TileProps = { total: number; onActivate: (index: number) => void; selecting: boolean; isSelected: (index: number) => boolean };
+
+function Row({ row, items, priorityCount, tile }: { row: GalleryRow; items: GalleryItem[]; priorityCount: number; tile: TileProps }) {
   const rowPhotos = row.items.map((i) => items[i].photo);
   const portraits = rowPhotos.filter((p) => p.width < p.height).length;
 
@@ -278,7 +349,7 @@ function Row({ row, items, total, priorityCount, onOpen, isSelected }: { row: Ga
         className="gallery-tile"
         style={{ "--flex": flexFor(item.photo), "--ratio": `${item.photo.width / item.photo.height}` } as CSSProperties}
       >
-        <TileButton item={item} index={index} total={total} onOpen={onOpen} selected={isSelected(index)}>
+        <TileButton item={item} index={index} {...tile}>
           <div data-reveal={priority ? undefined : "image"} style={{ "--reveal-delay": `${k * 90}ms` } as CSSProperties}>
             <PhotoImage photo={item.photo} sizes={sizesFor(row.kind, item.photo, rowPhotos)} priority={priority} className="rounded-[var(--radius-xs)]" />
           </div>
@@ -295,7 +366,7 @@ function Row({ row, items, total, priorityCount, onOpen, isSelected }: { row: Ga
         {tiles}
         <div className="gallery-aside" data-reveal style={{ "--reveal-delay": "180ms" } as CSSProperties}>
           <p className="t-mono text-ash">
-            <span className="text-flamingo">{pad(row.items[0] + 1)}</span> / {pad(total)}
+            <span className="text-flamingo">{pad(row.items[0] + 1)}</span> / {pad(tile.total)}
           </p>
           {item.title ? <p className="mt-3 text-lg font-medium tracking-[-0.015em] text-linen">{item.title}</p> : null}
           {item.context ? <p className="mt-1 t-small text-taupe">{item.context}</p> : null}
@@ -311,33 +382,30 @@ function Row({ row, items, total, priorityCount, onOpen, isSelected }: { row: Ga
   );
 }
 
-function TileButton({
-  item,
-  index,
-  total,
-  onOpen,
-  selected,
-  children,
-}: {
-  item: GalleryItem;
-  index: number;
-  total: number;
-  onOpen: (index: number) => void;
-  selected: boolean;
-  children: React.ReactNode;
-}) {
+function TileButton({ item, index, total, onActivate, selecting, isSelected, children }: TileProps & { item: GalleryItem; index: number; children: React.ReactNode }) {
+  const selected = isSelected(index);
   return (
     <button
       type="button"
-      onClick={() => onOpen(index)}
-      className="photo-hover group relative block w-full rounded-[var(--radius-xs)] text-left"
-      aria-label={`Agrandir la photo ${index + 1} sur ${total}${selected ? " (dans ma sélection)" : ""} : ${item.photo.alt}`}
-      aria-haspopup="dialog"
+      onClick={() => onActivate(index)}
+      className={`photo-hover group relative block w-full rounded-[var(--radius-xs)] text-left ${selecting && selected ? "outline-2 outline-offset-2 outline-flamingo outline-solid" : ""}`}
+      aria-label={
+        selecting
+          ? `${selected ? "Retirer de" : "Ajouter à"} ma sélection la photo ${index + 1} sur ${total} : ${item.photo.alt}`
+          : `Agrandir la photo ${index + 1} sur ${total}${selected ? " (dans ma sélection)" : ""} : ${item.photo.alt}`
+      }
+      aria-pressed={selecting ? selected : undefined}
+      aria-haspopup={selecting ? undefined : "dialog"}
     >
       {children}
-      {selected ? (
-        <span aria-hidden className="pointer-events-none absolute top-2 left-2 grid size-8 place-items-center rounded-full bg-flamingo text-ink">
-          <Heart size={15} filled />
+      {selected || selecting ? (
+        <span
+          aria-hidden
+          className={`pointer-events-none absolute top-2 left-2 grid size-8 place-items-center rounded-full transition-colors duration-200 ${
+            selected ? "bg-flamingo text-ink" : "border-2 border-linen/90 bg-ink/40 backdrop-blur-sm"
+          }`}
+        >
+          {selected ? selecting ? <Check size={15} /> : <Heart size={15} filled /> : null}
         </span>
       ) : null}
       <span

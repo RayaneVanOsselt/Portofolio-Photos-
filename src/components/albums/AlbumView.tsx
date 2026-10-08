@@ -10,6 +10,7 @@ import { PhotoImage } from "@/components/ui/PhotoImage";
 import { SectionStamp } from "@/components/ui/SectionLabel";
 import { siteConfig } from "@/config/site";
 import { categoryContext, SPORT_NAME, teamShort } from "@/lib/albums";
+import { downloadFolderName } from "@/lib/downloads";
 import type { Album, Crest } from "@/lib/types";
 import { formatDate, pad } from "@/lib/utils";
 import { matchContext, photoCountLabel, scoreLine } from "./match-format";
@@ -141,7 +142,7 @@ export function AlbumView({ album, crumbs }: { album: Album; crumbs: Crumb[] }) 
                 toolbar
                 defaultView={count > 24 ? "mosaic" : "editorial"}
                 sections={sections}
-                allowDownload={album.allowDownload}
+                download={album.downloadEnabled ? { archiveName: downloadFolderName({ brand: siteConfig.name, date: album.date, slug: album.slug }), date: album.date } : undefined}
               />
             </div>
           </section>
@@ -177,7 +178,11 @@ function MatchHeadline({ album }: { album: Album }) {
   const away = teamShort(album, "away");
   // Noms longs (« Louvain-la-Neuve D1 ») : un corps un peu plus petit, pour tenir sur mobile.
   const long = Math.max(home.length, away.length) > 13;
-  const size = long ? "text-[clamp(1.75rem,0.75rem+4.2vw,5.25rem)]" : "text-[length:var(--text-h1)]";
+  const base = long ? "clamp(1.75rem, 0.75rem + 4.2vw, 5.25rem)" : "var(--text-h1)";
+  // Le mot le plus long tient sur une ligne, même sur un petit téléphone :
+  // le corps diminue au besoin plutôt que de couper « CHARLEROI » en deux.
+  const longest = Math.max(...`${home} ${away}`.split(/[\s-]+/).map((word) => word.length));
+  const size = `min(${base}, calc((100vw - 9rem) / ${(longest * 0.84).toFixed(2)}))`;
   return (
     <span className="grid grid-cols-[auto_1fr_auto] items-center gap-x-4 gap-y-2 md:gap-x-6">
       <TeamLine name={home} crest={match.homeCrest} goals={match.score?.[0]} wait={180} size={size} />{" "}
@@ -202,13 +207,13 @@ function TeamLine({ name, crest, goals, wait, size }: { name: string; crest: Cre
         {crest ? <ClubCrest crest={crest} eager /> : <span className="block size-[var(--crest)]" />}
       </span>
       <span className="line-mask min-w-0">
-        <span className={`block font-display leading-[0.95] font-extrabold tracking-[-0.02em] break-words text-linen uppercase [font-stretch:125%] ${size}`} style={delay(wait)}>
+        <span className="block font-display leading-[0.95] font-extrabold tracking-[-0.02em] break-words text-linen uppercase [font-stretch:125%]" style={{ ...delay(wait), fontSize: size }}>
           {name}
         </span>
       </span>
       <span aria-hidden className="line-mask">
         {goals !== undefined ? (
-          <span className={`block text-right font-display leading-[0.95] font-extrabold text-linen tabular-nums ${size}`} style={delay(wait + 260)}>
+          <span className="block text-right font-display leading-[0.95] font-extrabold text-linen tabular-nums" style={{ ...delay(wait + 260), fontSize: size }}>
             {goals}
           </span>
         ) : (

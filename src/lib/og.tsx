@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { MONOGRAM_PATH } from "@/components/brand/Monogram";
 import { siteConfig } from "@/config/site";
+import { getPhotoSourceFile } from "@/data/photos";
 import type { Crest, Photo } from "@/lib/types";
 
 export const OG_SIZE = { width: 1200, height: 630 };
@@ -38,9 +39,11 @@ async function photoSource(photo?: Photo): Promise<string | null> {
       url.searchParams.set("q", "70");
       return url.toString();
     }
-    if (/\.(jpe?g|png)$/i.test(photo.src) && photo.src.startsWith("/")) {
-      const data = await readFile(join(process.cwd(), "public", photo.src));
-      return `data:image/${photo.src.toLowerCase().endsWith("png") ? "png" : "jpeg"};base64,${data.toString("base64")}`;
+    // Fichier source (« Dossier photos/… » ou public/images/…), lu au build.
+    const file = getPhotoSourceFile(photo.id);
+    if (file && /\.(jpe?g|png)$/i.test(file)) {
+      const data = await readFile(join(process.cwd(), file));
+      return `data:image/${file.toLowerCase().endsWith("png") ? "png" : "jpeg"};base64,${data.toString("base64")}`;
     }
   } catch {
     return null;
