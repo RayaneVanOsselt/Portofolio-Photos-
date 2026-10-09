@@ -2,17 +2,24 @@
 /**
  * Exécuté automatiquement après `next build` (voir package.json).
  *
- * Next.js génère les images de partage (Open Graph / Twitter) sans extension
- * de fichier. GitHub Pages déduit le type d'un fichier de son extension :
- * on les renomme en .png et on met à jour les références dans les pages,
- * pour que les réseaux sociaux les reconnaissent comme des images.
+ * Next.js génère les images de partage (Open Graph / Twitter) et les icônes
+ * sans extension de fichier. GitHub Pages déduit le type d'un fichier de son
+ * extension : on les renomme en .png et on met à jour les références dans les
+ * pages, pour que navigateurs et réseaux sociaux les reconnaissent comme des images.
+ *
+ * Les liens des icônes (<link rel="icon">, apple-touch-icon) sont écrits par
+ * Next.js sans le sous-dossier de publication (NEXT_PUBLIC_BASE_PATH) : il est
+ * ajouté ici, sinon le favicon est introuvable sur GitHub Pages.
  */
 import { existsSync } from "node:fs";
 import { readdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const OUT = join(process.cwd(), "out");
-const IMAGE_ROUTES = ["opengraph-image", "twitter-image", "apple-icon"];
+const IMAGE_ROUTES = ["opengraph-image", "twitter-image", "apple-icon", "icon"];
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+/** Lien relatif d'une icône (« "/icon.png?…" »), sans le sous-dossier de publication. */
+const ICON_LINK = /"\/(icon|apple-icon)\.png(?=\?)/g;
 
 if (!existsSync(OUT)) {
   console.error("Dossier out/ introuvable : lancez d'abord `next build`.");
@@ -38,7 +45,8 @@ let updated = 0;
 for (const file of files) {
   if (!/\.(html|txt|xml)$/.test(file)) continue;
   const content = await readFile(file, "utf8");
-  const next = content.replace(pattern, "/$1.png");
+  let next = content.replace(pattern, "/$1.png");
+  if (BASE_PATH) next = next.replace(ICON_LINK, `"${BASE_PATH}/$1.png`);
   if (next !== content) {
     await writeFile(file, next);
     updated += 1;
