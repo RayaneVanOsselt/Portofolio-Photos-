@@ -16,8 +16,6 @@ export const siteConfig = {
   logo: {
     primary: "rayvo.",
     secondary: "captures0808",
-    /** Initiales dessinées dans le monogramme (voir components/brand). */
-    monogram: "RV",
   },
   /** Signature affichée sous le nom. */
   tagline: "Photographe sportif — Hockey · Rugby · Football",

@@ -51,6 +51,8 @@ next-env.d.ts
 
 # logos optimisés générés par npm run logos (sources : assets/logos/)
 /public/logos/
+# logo du site décliné par npm run brand (source : assets/brand/)
+/public/brand/
 
 # vidéos : jamais dans Git (GitHub refuse les fichiers > 100 Mo)
 # motifs [xX] : insensibles à la casse aussi sur GitHub et Linux (.mp4 comme .MP4)

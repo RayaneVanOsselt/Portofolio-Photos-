@@ -1,5 +1,6 @@
-import { Monogram } from "@/components/brand/Monogram";
+import brand from "@/data/brand-manifest.json";
 import { siteConfig } from "@/config/site";
+import { publicPath } from "@/lib/utils";
 
 /**
  * Animation d'entrée : rideau à l'identité de la marque, joué une seule fois
@@ -11,21 +12,16 @@ import { siteConfig } from "@/config/site";
  * attribut (ou sans JavaScript), le rideau n'est jamais affiché.
  */
 export function IntroCurtain() {
-  const { primary, secondary } = siteConfig.logo;
   return (
     <div className="intro" aria-hidden>
       <div className="intro-content">
         <div className="intro-brand">
-          <Monogram className="intro-mark" />
-          <div>
-            <span className="intro-line">
-              <span className="intro-name">
-                {primary.replace(/\.$/, "")}
-                <span className="text-flamingo">.</span>
-              </span>
-            </span>
-            <span className="intro-sub">{secondary}</span>
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element -- fichiers de marque déjà optimisés (npm run brand) */}
+          <img className="intro-mark" src={publicPath(brand.mark.src)} width={brand.mark.width} height={brand.mark.height} alt="" />
+          <span className="intro-line">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="intro-name" src={publicPath(brand.wordmark.src)} width={brand.wordmark.width} height={brand.wordmark.height} alt="" />
+          </span>
         </div>
         <p className="intro-meta">{siteConfig.tagline}</p>
       </div>

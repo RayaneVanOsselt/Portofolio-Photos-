@@ -1,7 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
-import { MONOGRAM_PATH } from "@/components/brand/Monogram";
+import brand from "@/data/brand-manifest.json";
+import { brandImageSource } from "@/lib/brand";
 import { siteConfig } from "@/config/site";
 import { getPhotoSourceFile } from "@/data/photos";
 import type { Crest, Photo } from "@/lib/types";
@@ -63,12 +64,14 @@ async function crestSource(crest: Crest): Promise<string | null> {
 
 /** Image de partage : la charte (Heavy Metal, Satin Linen, Flamingo) et le style « billet ». */
 export async function renderOgImage({ kicker, title, photo, crests = [] }: { kicker: string; title: string; photo?: Photo | null; crests?: Crest[] }) {
-  const [display, mono, sans, image, logos] = await Promise.all([
+  const [display, mono, sans, image, logos, mark, wordmark] = await Promise.all([
     loadFont("Archivo:wdth,wght@125,800"),
     loadFont("JetBrains+Mono:wght@400"),
     loadFont("Poppins:wght@400"),
     photoSource(photo ?? undefined),
     Promise.all(crests.slice(0, 2).map(crestSource)),
+    brandImageSource(brand.mark),
+    brandImageSource(brand.wordmark),
   ]);
   const crestImages = logos.filter((src): src is string => Boolean(src));
   const fonts = [
@@ -77,7 +80,6 @@ export async function renderOgImage({ kicker, title, photo, crests = [] }: { kic
     ...(sans ? [{ name: "Poppins", data: sans, weight: 400 as const, style: "normal" as const }] : []),
   ];
   const host = siteConfig.url.replace(/^https?:\/\//, "");
-  const name = siteConfig.logo.primary.replace(/\.$/, "").toUpperCase();
 
   return new ImageResponse(
     (
@@ -100,16 +102,16 @@ export async function renderOgImage({ kicker, title, photo, crests = [] }: { kic
         <div style={{ position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 64, width: "100%" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-            <svg width="56" height="56" viewBox="0 0 64 64">
-              <path d={MONOGRAM_PATH} fill="#eb642b" fillRule="evenodd" />
-            </svg>
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <span style={{ fontFamily: "Archivo", fontSize: 26, fontWeight: 800, letterSpacing: 0.5 }}>
-                {name}
-                <span style={{ color: "#eb642b" }}>.</span>
-              </span>
-              <span style={{ fontFamily: "JetBrains Mono", fontSize: 13, letterSpacing: 4, textTransform: "uppercase", color: "#afac96", marginTop: 4 }}>{siteConfig.logo.secondary}</span>
-            </div>
+            {mark ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={mark} alt="" width={Math.round((64 * brand.mark.width) / brand.mark.height)} height={64} />
+            ) : null}
+            {wordmark ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={wordmark} alt="" width={Math.round((20 * brand.wordmark.width) / brand.wordmark.height)} height={20} />
+            ) : (
+              <span style={{ fontFamily: "Archivo", fontSize: 26, fontWeight: 800, letterSpacing: 0.5 }}>{siteConfig.name.toUpperCase()}</span>
+            )}
           </div>
           {crestImages.length ? (
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>

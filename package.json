@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "predev": "npm run photos && npm run logos",
+    "predev": "npm run photos && npm run logos && npm run brand",
     "build": "next build && node scripts/finalize-export.mjs",
-    "prebuild": "npm run photos && npm run logos",
+    "prebuild": "npm run photos && npm run logos && npm run brand",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "photos": "node --experimental-strip-types --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/photos.mjs",
-    "logos": "node scripts/logos.mjs"
+    "logos": "node scripts/logos.mjs",
+    "brand": "node scripts/brand.mjs"
   },
   "dependencies": {
     "next": "16.3.8",

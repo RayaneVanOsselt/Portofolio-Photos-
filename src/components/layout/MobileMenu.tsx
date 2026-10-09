@@ -37,7 +37,7 @@ export function MobileMenu({ open, onClose, nav, pathname }: Props) {
       <div className="mobile-menu-panel flex h-full flex-col overflow-y-auto overscroll-contain bg-ink">
         <div className="container-wide flex h-[var(--header-height)] shrink-0 items-center justify-between border-b border-line">
           <Link href="/" onClick={onClose} className="-m-2 p-2 text-linen" aria-label={`${siteConfig.name} — accueil`}>
-            <Logo />
+            <Logo eager />
           </Link>
           <button type="button" onClick={onClose} data-autofocus className="-mr-2 flex h-11 items-center gap-3 rounded-full px-3 text-linen" aria-label="Fermer le menu">
             <span className="t-label hidden sm:inline">Fermer</span>

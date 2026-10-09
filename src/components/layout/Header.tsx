@@ -114,7 +114,7 @@ export function Header({ albumsNav }: Props) {
 
         <div className="container-wide relative flex h-[var(--header-height)] items-center justify-between gap-6">
           <Link href="/" className="relative z-10 -m-2 p-2 text-linen" aria-label={`${siteConfig.name} — accueil`} onClick={closeMega}>
-            <Logo />
+            <Logo eager compactOnLaptop />
           </Link>
 
           <nav aria-label="Navigation principale" className="absolute left-1/2 hidden -translate-x-1/2 lg:block">
