@@ -2,17 +2,17 @@ import { ImageResponse } from "next/og";
 import brand from "@/data/brand-manifest.json";
 import { brandImageSource } from "@/lib/brand";
 
-/** Icône d'écran d'accueil (iOS) : l'emblème du logo sur Heavy Metal. */
-export const size = { width: 180, height: 180 };
+/** Favicon : l'emblème du logo sur un carré arrondi Heavy Metal (lisible sur les onglets clairs comme sombres). */
+export const size = { width: 64, height: 64 };
 export const contentType = "image/png";
 export const dynamic = "force-static";
 
-export default async function AppleIcon() {
+export default async function Icon() {
   const mark = await brandImageSource(brand.mark);
-  const width = 136;
+  const width = 54;
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#131412" }}>
+      <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#131412", borderRadius: 14 }}>
         {mark ? (
           <img src={mark} alt="" width={width} height={Math.round((width * brand.mark.height) / brand.mark.width)} />
         ) : null}

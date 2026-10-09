@@ -488,13 +488,13 @@ html[data-intro] .intro {
 }
 .intro-brand {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: clamp(0.875rem, 0.5rem + 1.5vw, 1.5rem);
+  gap: clamp(1.25rem, 0.75rem + 2vw, 2rem);
 }
 .intro-mark {
-  width: clamp(3.25rem, 2.25rem + 4vw, 5.5rem);
+  width: clamp(6rem, 4rem + 8vw, 10rem);
   height: auto;
-  color: var(--color-flamingo);
   animation: intro-mark-in 700ms var(--ease-out-expo) 80ms both;
 }
 .intro-line {
@@ -504,23 +504,9 @@ html[data-intro] .intro {
 }
 .intro-name {
   display: block;
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-stretch: 125%;
-  font-size: clamp(2.25rem, 1.25rem + 5vw, 4.75rem);
-  line-height: 0.95;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
+  width: min(80vw, 30rem);
+  height: auto;
   animation: line-mask-in 900ms var(--ease-out-expo) 220ms both;
-}
-.intro-sub {
-  display: block;
-  margin-top: 0.6rem;
-  font-family: var(--font-mono);
-  font-size: clamp(0.6875rem, 0.6rem + 0.35vw, 0.875rem);
-  text-transform: uppercase;
-  opacity: 0.75;
-  animation: intro-stamp 1s var(--ease-out-expo) 420ms both;
 }
 .intro-meta {
   font-family: var(--font-mono);

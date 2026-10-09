@@ -38,7 +38,7 @@ export function Footer() {
         <div className="grid gap-14 lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-4">
             <Link href="/" className="inline-block text-linen" aria-label={`${siteConfig.name} — accueil`}>
-              <Logo />
+              <Logo variant="full" />
             </Link>
             <p className="mt-6 max-w-sm t-small text-taupe">{siteConfig.tagline}</p>
             {published.length ? (

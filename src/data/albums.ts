@@ -58,7 +58,6 @@ export const albumTree: CategoryInput[] = [
     sport: "hockey",
     club: "daring",
     albums: [
-      { slug: "20-09-2026-daring-d1-embourg-d1", date: "2026-09-20", match: { home: "Daring D1", away: "Embourg D1" } },
       {
         slug: "30-05-2026-daring-d1-lara-d1",
         date: "2026-05-30",

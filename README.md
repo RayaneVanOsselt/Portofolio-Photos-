@@ -32,6 +32,7 @@ Le site est disponible sur <http://localhost:3000>.
 | `npm run typecheck` | Vérification TypeScript                                       |
 | `npm run photos`    | Pipeline photo : versions AVIF/WebP, fichiers à télécharger, manifest |
 | `npm run logos`     | Optimise les logos de `assets/logos/` (WebP + PNG de partage) |
+| `npm run brand`     | Décline le logo du site (`assets/brand/`) → `public/brand/` |
 
 ## 3. Variables d'environnement
 
@@ -175,7 +176,7 @@ Chaque photo de page est désignée par son identifiant dans `src/data/content.t
 
 Dans **`src/config/site.ts`** : `name`, `logo.primary`, `logo.secondary`, `tagline`, `description`.
 Le logo, les titres, les metadata, le footer, les e-mails et les images de partage se mettent à jour.
-Le monogramme (bloc orange au coin coupé, initiales « RV » en réserve) se trouve dans `src/components/brand/Monogram.tsx` ; les fichiers de marque statiques (logo horizontal, compact, monogramme, filigrane — versions pour fond clair `-dark` et fond sombre `-light`) sont dans `public/brand/`.
+Le logo (image) se trouve dans **`assets/brand/logo-rayvo-captures0808.png`** : c'est le seul fichier à remplacer pour changer de logo (même nom, PNG transparent, logo clair pour fond sombre). `npm run brand` — lancé automatiquement par `npm run dev` et `npm run build` — en tire le logo complet, l'emblème seul et le nom seul (`public/brand/`, fichiers générés), utilisés par l'en-tête, le menu mobile, le pied de page, le rideau d'intro, le favicon, l'icône iOS et les images de partage.
 Le pied de page se met à jour tout seul : les 4 derniers matchs publiés, le nombre de matchs et de photos, les albums groupés par sport, vos coordonnées et réseaux dès qu'ils sont renseignés (§7), l'heure locale en direct (`timeZone`) et votre zone (`seo.area` ou `contact.location`).
 
 ## 7. Réseaux sociaux et coordonnées
@@ -256,7 +257,7 @@ src/
 │   ├── search-index.json/    Index de la recherche ⌘K (chargé à la première ouverture)
 │   ├── portfolio/            Redirection de l'ancienne adresse vers /albums
 │   ├── about/ services/ contact/ search/ privacy/ legal/
-│   ├── sitemap.ts robots.ts manifest.ts opengraph-image.tsx icon.svg …
+│   ├── sitemap.ts robots.ts manifest.ts opengraph-image.tsx icon.tsx …
 │   └── globals.css           Design system (tokens, typographie, animations)
 ├── components/
 │   ├── albums/               Page d'album, page de catégorie, cartes, lignes de calendrier, billet
@@ -283,6 +284,7 @@ src/
     ├── zip.ts                Archive ZIP préparée dans le navigateur
     ├── seo.ts navigation.ts search-index.ts gallery-index.ts …
 Dossier photos/               ← vos photos de match, rangées à votre façon (reliées par `source`)
+assets/brand/                 Logo du site (fichier source unique)
 assets/logos/                 Logos sources (un fichier par club : <identifiant>.png)
 public/images/site/           Photos des pages (facultatif)
 public/_photos/               Versions web et fichiers à télécharger (générés, non commités)

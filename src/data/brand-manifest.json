@@ -1,0 +1,20 @@
+{
+  "logo": {
+    "src": "/brand/logo.webp",
+    "png": "/brand/logo.png",
+    "width": 720,
+    "height": 385
+  },
+  "mark": {
+    "src": "/brand/logo-mark.webp",
+    "png": "/brand/logo-mark.png",
+    "width": 320,
+    "height": 244
+  },
+  "wordmark": {
+    "src": "/brand/logo-wordmark.webp",
+    "png": "/brand/logo-wordmark.png",
+    "width": 720,
+    "height": 44
+  }
+}
