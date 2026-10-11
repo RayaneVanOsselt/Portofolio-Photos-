@@ -171,17 +171,29 @@ export const albumTree: CategoryInput[] = [
     ],
   },
   {
-    slug: "leopold-h1",
-    title: "Léopold H1",
+    // Club découpé en équipes : menu « Léopold » → Messieurs / Dames.
+    slug: "leopold",
+    title: "Léopold",
     sport: "hockey",
     club: "leopold",
-    albums: [
+    children: [
       {
-        slug: "20-09-2026-daring-h1-leopold-h1",
-        date: "2026-09-20",
-        match: { home: "Daring H1", away: "Léopold H1" },
-        source: "Léopold/Vs Daring 200926",
-        cover: "IMG_6544.jpg",
+        slug: "messieurs",
+        title: "Messieurs",
+        albums: [
+          {
+            slug: "20-09-2026-daring-h1-leopold-h1",
+            date: "2026-09-20",
+            match: { home: "Daring H1", away: "Léopold H1" },
+            source: "Léopold/Vs Daring 200926",
+            cover: "IMG_6544.jpg",
+          },
+        ],
+      },
+      {
+        slug: "dames",
+        title: "Dames",
+        albums: [],
       },
     ],
   },
@@ -199,14 +211,6 @@ export const albumTree: CategoryInput[] = [
         cover: "IMG_7378.jpg",
       },
     ],
-  },
-  {
-    // Les albums arrivent : ajoutez-les dans `albums` (ou découpez en équipes avec `children`, comme le Daring).
-    slug: "racing",
-    title: "Racing",
-    sport: "hockey",
-    club: "racing",
-    albums: [],
   },
   {
     slug: "rugby",
@@ -319,4 +323,5 @@ export const legacyPaths: Record<string, string> = {
   "daring-dames-1": "daring/dames-1",
   "daring-h1": "daring/h1",
   "daring-u19b1": "daring/u19b1",
+  "leopold-h1": "leopold/messieurs",
 };
