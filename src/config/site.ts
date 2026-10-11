@@ -74,6 +74,8 @@ export const siteConfig = {
    */
   downloads: {
     photos: true as boolean,
+    /** Vidéos (src/data/videos.ts) : bouton « Télécharger », enregistrement dans Photos / la galerie sur téléphone. */
+    videos: true as boolean,
     /** Au-delà, l'archive ZIP est refusée (elle est préparée dans le navigateur). */
     maxArchiveBytes: 400 * 1024 * 1024,
   },
@@ -106,6 +108,7 @@ export const mainNav = [
   { label: "Accueil", href: "/" },
   { label: "Albums", href: "/albums", hasMegaMenu: true },
   { label: "Matchs", href: "/matchs" },
+  { label: "Vidéos", href: "/videos" },
   { label: "À propos", href: "/about" },
   { label: "Contact", href: "/contact" },
 ] as const;

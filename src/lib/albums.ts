@@ -11,7 +11,7 @@
  * avec un message clair, plutôt que de publier une page fausse.
  */
 import { siteConfig } from "@/config/site";
-import { albumTree } from "@/data/albums";
+import { albumTree, legacyPaths } from "@/data/albums";
 import { clubs, type ClubId } from "@/data/clubs";
 import logoManifest from "@/data/logo-manifest.json";
 import { getFolderChapters, getFolderPhotos } from "@/data/photos";
@@ -47,7 +47,8 @@ function fail(message: string): never {
 const logos = logoManifest as Record<string, { src: string; png: string; width: number; height: number }>;
 const clubList = Object.entries(clubs) as [ClubId, ClubInput][];
 
-function crestOf(id: ClubId | null | undefined): Crest | null {
+/** Logo d'un club ou d'une compétition (null sans fichier logo). */
+export function crestOf(id: ClubId | null | undefined): Crest | null {
   if (!id) return null;
   const logo = logos[id];
   return logo ? { id, name: clubs[id].name, ...logo } : null;
@@ -275,6 +276,28 @@ export function getCategoryByPath(path: string[]): Category | undefined {
 export function getCategoryGroups(): { sport: Sport; label: string; categories: Category[] }[] {
   const sports = [...new Set(categories.map((c) => c.sport))];
   return sports.map((sport) => ({ sport, label: SPORT_NAME[sport], categories: categories.filter((c) => c.sport === sport) }));
+}
+
+/**
+ * Anciennes adresses (catégorie déplacée, ex. /albums/daring-h1 → /albums/daring/h1)
+ * et celles de leurs albums : chacune devient une page de redirection.
+ */
+export function getLegacyRedirects(): { path: string[]; to: string }[] {
+  return Object.entries(legacyPaths).flatMap(([from, to]) => {
+    const category = categoryByPath.get(to);
+    if (!category) fail(`ancienne adresse « ${from} » : la catégorie « ${to} » n'existe pas`);
+    if (categoryByPath.has(from)) fail(`ancienne adresse « ${from} » : une catégorie porte encore ce chemin`);
+    const prefix = from.split("/");
+    const inside = albums.filter((a) => a.path.join("/").startsWith(`${to}/`));
+    return [
+      { path: prefix, to: `${category.href}/` },
+      ...inside.map((a) => ({ path: [...prefix, ...a.path.slice(category.path.length)], to: `${a.href}/` })),
+    ];
+  });
+}
+
+export function getLegacyRedirect(path: string[]): string | undefined {
+  return getLegacyRedirects().find((r) => r.path.join("/") === path.join("/"))?.to;
 }
 
 /** Albums publics, les plus récents d'abord. */

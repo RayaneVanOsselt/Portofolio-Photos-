@@ -1,30 +1,38 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ClientRedirect } from "@/components/effects/ClientRedirect";
 import { AlbumView } from "@/components/albums/AlbumView";
 import { CategoryView } from "@/components/albums/CategoryView";
 import { PhotoAccessBand } from "@/components/sections/PhotoAccessBand";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { ArrowLeft, ArrowRight } from "@/components/ui/Icons";
-import { ALBUMS_HREF, getAdjacentAlbums, getAlbumByPath, getAllAlbums, getAllCategories, getCategoryByPath, getCategoryTrail } from "@/lib/albums";
+import { ALBUMS_HREF, getAdjacentAlbums, getAlbumByPath, getAllAlbums, getAllCategories, getCategoryByPath, getCategoryTrail, getLegacyRedirect, getLegacyRedirects } from "@/lib/albums";
 import { albumDescription, albumJsonLd, albumTitle, categoryDescription, categoryTitle, ogImageHref, pageMetadata } from "@/lib/seo";
 import type { Album } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
 /**
  * Toute la section Albums, sur autant de niveaux que l'arborescence en compte :
- *   /albums/daring-h1                                   → catégorie
- *   /albums/fih-pro-league/femmes                       → sous-catégorie
- *   /albums/daring-h1/20-09-2026-daring-h1-leo-h1       → album (match)
+ *   /albums/rugby                                       → catégorie
+ *   /albums/daring/h1                                   → sous-catégorie
+ *   /albums/daring/h1/20-09-2026-daring-h1-leo-h1       → album (match)
+ * Les anciennes adresses (/albums/daring-h1/…) redirigent vers les nouvelles.
  */
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return [...getAllCategories().map((c) => ({ path: c.path })), ...getAllAlbums().map((a) => ({ path: a.path }))];
+  return [
+    ...getAllCategories().map((c) => ({ path: c.path })),
+    ...getAllAlbums().map((a) => ({ path: a.path })),
+    ...getLegacyRedirects().map((r) => ({ path: r.path })),
+  ];
 }
 
 export async function generateMetadata({ params }: PageProps<"/albums/[...path]">): Promise<Metadata> {
   const { path } = await params;
+  const legacy = getLegacyRedirect(path);
+  if (legacy) return { alternates: { canonical: legacy }, robots: { index: false, follow: true } };
   const album = getAlbumByPath(path);
   if (album) {
     return pageMetadata({
@@ -49,11 +57,31 @@ export async function generateMetadata({ params }: PageProps<"/albums/[...path]"
 
 export default async function AlbumsPathPage({ params }: PageProps<"/albums/[...path]">) {
   const { path } = await params;
+  const legacy = getLegacyRedirect(path);
+  if (legacy) return <LegacyRedirect to={legacy} />;
   const album = getAlbumByPath(path);
   if (album) return <AlbumPage album={album} />;
   const category = getCategoryByPath(path);
   if (!category) notFound();
   return <CategoryView category={category} />;
+}
+
+/** Ancienne adresse : redirection immédiate (lien de secours si JavaScript est désactivé). */
+function LegacyRedirect({ to }: { to: string }) {
+  return (
+    <section className="container-site page-top section-sm">
+      <meta httpEquiv="refresh" content={`0; url=${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${to}`} />
+      <ClientRedirect to={to} />
+      <p className="t-mono text-ash">Cette page a déménagé</p>
+      <p className="mt-4 t-lead text-taupe">
+        Redirection vers{" "}
+        <Link href={to} className="text-linen underline underline-offset-4">
+          la nouvelle adresse
+        </Link>
+        …
+      </p>
+    </section>
+  );
 }
 
 /** Un album : en-tête, photos, puis les matchs voisins de la même catégorie. */

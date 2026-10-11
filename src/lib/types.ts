@@ -229,3 +229,35 @@ export type Service = {
   deliverables: string[];
   photoId: string;
 };
+
+/* ----------------------------------------------------------------- vidéos */
+
+/** Une vidéo telle que déclarée dans src/data/videos.ts. */
+export type VideoInput = {
+  /** Fin de l'adresse (/videos#<slug>), commence par la date : « 18-10-2026-daring-h1-oree-h1-resume ». */
+  slug: string;
+  title: string;
+  /** AAAA-MM-JJ */
+  date: string;
+  /** Adresse complète du fichier MP4 (H.264). */
+  src: string;
+  /** Image d'aperçu affichée avant la lecture. */
+  poster?: string;
+  description?: string;
+  club?: ClubId;
+  sport?: Sport;
+  /** Durée affichée, ex. « 1:24 ». */
+  duration?: string;
+  /** Poids du fichier en octets (affiché sur le bouton « Télécharger »). */
+  bytes?: number;
+  /** Format vertical 9:16 (Reels, TikTok). */
+  vertical?: boolean;
+  downloadEnabled?: boolean;
+};
+
+export type Video = Omit<VideoInput, "club" | "downloadEnabled"> & {
+  crest: Crest | null;
+  /** Nom du fichier enregistré : rayvo-captures0808-2026-10-18-daring-h1-oree-h1-resume.mp4 */
+  filename: string;
+  downloadEnabled: boolean;
+};
