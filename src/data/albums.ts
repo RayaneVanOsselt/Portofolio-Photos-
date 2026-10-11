@@ -171,7 +171,7 @@ export const albumTree: CategoryInput[] = [
     ],
   },
   {
-    // Club découpé en équipes : menu « Léopold » → Messieurs / Dames.
+    // Club découpé en équipes : menu « Léopold » → Messieurs 1.
     slug: "leopold",
     title: "Léopold",
     sport: "hockey",
@@ -179,8 +179,15 @@ export const albumTree: CategoryInput[] = [
     children: [
       {
         slug: "messieurs",
-        title: "Messieurs",
+        title: "Messieurs 1",
         albums: [
+          {
+            slug: "11-10-2026-leopold-h1-racing-h1",
+            date: "2026-10-11",
+            match: { home: "Léopold H1", away: "Racing H1" },
+            source: "Léopold/Leopold vs Racing 11:10:2026",
+            cover: "IMG_8099.jpg",
+          },
           {
             slug: "20-09-2026-daring-h1-leopold-h1",
             date: "2026-09-20",
@@ -189,11 +196,6 @@ export const albumTree: CategoryInput[] = [
             cover: "IMG_6544.jpg",
           },
         ],
-      },
-      {
-        slug: "dames",
-        title: "Dames",
-        albums: [],
       },
     ],
   },
