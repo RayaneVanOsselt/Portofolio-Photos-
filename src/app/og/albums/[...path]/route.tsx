@@ -4,7 +4,7 @@ import { formatDate } from "@/lib/utils";
 
 /**
  * Images de partage (réseaux sociaux, messageries) de la section Albums,
- * générées au build : /og/albums/daring-h1/20-09-2026-daring-h1-leo-h1.png
+ * générées au build : /og/albums/daring/h1/20-09-2026-daring-h1-leo-h1.png
  * (équipes, date, logos, et la photo de couverture dès qu'elle existe).
  * Référencées par les métadonnées des pages (src/app/albums/[...path]/page.tsx).
  */

@@ -14,7 +14,7 @@
  *      { slug: "18-10-2026-daring-h1-oree-h1", date: "2026-10-18",
  *        match: { home: "Daring H1", away: "Orée H1" },
  *        source: "DARING /Messieurs 1 /Daring - Orée 18:10:2026" },
- *    → titre « Daring H1 vs Orée H1 », adresse /albums/daring-h1/18-10-2026-daring-h1-oree-h1
+ *    → titre « Daring H1 vs Orée H1 », adresse /albums/daring/h1/18-10-2026-daring-h1-oree-h1
  *      (le slug commence par la date JJ-MM-AAAA : une incohérence bloque le build).
  * 3. `npm run dev` / `npm run build` (ou `npm run photos`) : les versions web
  *    (AVIF, WebP, toutes tailles) et les fichiers à télécharger sont générés
@@ -53,70 +53,74 @@ const NATIONS = { belgique: { title: "Belgique" }, "pays-bas": { title: "Pays-Ba
 
 export const albumTree: CategoryInput[] = [
   {
-    slug: "daring-dames-1",
-    title: "Daring Dames 1",
+    // Club découpé en équipes : menu « Daring » → Dames 1 / H1 / U19B1.
+    // Anciennes adresses (/albums/daring-h1/…) redirigées : voir `legacyPaths` plus bas.
+    slug: "daring",
+    title: "Daring",
     sport: "hockey",
     club: "daring",
-    albums: [
+    children: [
       {
-        slug: "30-05-2026-daring-d1-lara-d1",
-        date: "2026-05-30",
-        match: { home: "Daring D1", away: "Lara D1" },
-        source: "DARING /Dames 1 /Daring - Lara (30:05:2026)",
-        cover: "IMG_2786.jpg",
+        slug: "dames-1",
+        title: "Dames 1",
+        albums: [
+          {
+            slug: "30-05-2026-daring-d1-lara-d1",
+            date: "2026-05-30",
+            match: { home: "Daring D1", away: "Lara D1" },
+            source: "DARING /Dames 1 /Daring - Lara (30:05:2026)",
+            cover: "IMG_2786.jpg",
+          },
+          {
+            // Dossier « Daring - Rapid » (sans date) : photos prises le 17/05/2026 (EXIF).
+            slug: "17-05-2026-daring-d1-rapid-d1",
+            date: "2026-05-17",
+            match: { home: "Daring D1", away: "Rapid D1" },
+            source: "DARING /Dames 1 /Daring - Rapid",
+            cover: "IMG_2187.jpg",
+          },
+        ],
       },
       {
-        // Dossier « Daring - Rapid » (sans date) : photos prises le 17/05/2026 (EXIF).
-        slug: "17-05-2026-daring-d1-rapid-d1",
-        date: "2026-05-17",
-        match: { home: "Daring D1", away: "Rapid D1" },
-        source: "DARING /Dames 1 /Daring - Rapid",
-        cover: "IMG_2187.jpg",
-      },
-    ],
-  },
-  {
-    slug: "daring-h1",
-    title: "Daring H1",
-    sport: "hockey",
-    club: "daring",
-    albums: [
-      {
-        slug: "20-09-2026-daring-h1-leo-h1",
-        date: "2026-09-20",
-        match: { home: "Daring H1", away: "Leo H1" },
-        source: "DARING /Messieurs 1 /Daring - Léo 20:09:26",
-        cover: "IMG_6725.jpg",
-      },
-      {
-        slug: "23-05-2026-daring-h1-namur-h1",
-        date: "2026-05-23",
-        match: { home: "Daring H1", away: "Namur H1" },
-        source: "DARING /Messieurs 1 /Daring - Namur 23:05:2026",
-        cover: "IMG_2582.jpg",
+        slug: "h1",
+        title: "H1",
+        albums: [
+          {
+            slug: "20-09-2026-daring-h1-leo-h1",
+            date: "2026-09-20",
+            match: { home: "Daring H1", away: "Leo H1" },
+            source: "DARING /Messieurs 1 /Daring - Léo 20:09:26",
+            cover: "IMG_6725.jpg",
+          },
+          {
+            slug: "23-05-2026-daring-h1-namur-h1",
+            date: "2026-05-23",
+            match: { home: "Daring H1", away: "Namur H1" },
+            source: "DARING /Messieurs 1 /Daring - Namur 23:05:2026",
+            cover: "IMG_2582.jpg",
+          },
+          {
+            slug: "17-05-2026-daring-h1-victory-h1",
+            date: "2026-05-17",
+            match: { home: "Daring H1", away: "Victory H1" },
+            source: "DARING /Messieurs 1 /Daring - Victory 17:05:2026",
+            cover: "IMG_2489.jpg",
+          },
+        ],
       },
       {
-        slug: "17-05-2026-daring-h1-victory-h1",
-        date: "2026-05-17",
-        match: { home: "Daring H1", away: "Victory H1" },
-        source: "DARING /Messieurs 1 /Daring - Victory 17:05:2026",
-        cover: "IMG_2489.jpg",
-      },
-    ],
-  },
-  {
-    slug: "daring-u19b1",
-    title: "Daring U19B1",
-    sport: "hockey",
-    club: "daring",
-    albums: [
-      {
-        // Dossier « DARING/U19 » : photos prises le 19/09/2026 (EXIF).
-        slug: "19-09-2026-daring-u19b1-taxandria-h1",
-        date: "2026-09-19",
-        match: { home: "Daring U19B1", away: "Taxandria H1" },
-        source: "DARING /U19",
-        cover: "IMG_6074.jpg",
+        slug: "u19b1",
+        title: "U19B1",
+        albums: [
+          {
+            // Dossier « DARING/U19 » : photos prises le 19/09/2026 (EXIF).
+            slug: "19-09-2026-daring-u19b1-taxandria-h1",
+            date: "2026-09-19",
+            match: { home: "Daring U19B1", away: "Taxandria H1" },
+            source: "DARING /U19",
+            cover: "IMG_6074.jpg",
+          },
+        ],
       },
     ],
   },
@@ -195,6 +199,14 @@ export const albumTree: CategoryInput[] = [
         cover: "IMG_7378.jpg",
       },
     ],
+  },
+  {
+    // Les albums arrivent : ajoutez-les dans `albums` (ou découpez en équipes avec `children`, comme le Daring).
+    slug: "racing",
+    title: "Racing",
+    sport: "hockey",
+    club: "racing",
+    albums: [],
   },
   {
     slug: "rugby",
@@ -297,3 +309,14 @@ export const albumTree: CategoryInput[] = [
     ],
   },
 ];
+
+/**
+ * Anciennes adresses de catégories → nouvelles, pour ne casser aucun lien déjà
+ * partagé. Les albums qu'elles contenaient sont redirigés aussi
+ * (/albums/daring-h1/<match> → /albums/daring/h1/<match>).
+ */
+export const legacyPaths: Record<string, string> = {
+  "daring-dames-1": "daring/dames-1",
+  "daring-h1": "daring/h1",
+  "daring-u19b1": "daring/u19b1",
+};
