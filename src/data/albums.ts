@@ -283,10 +283,9 @@ export const albumTree: CategoryInput[] = [
     club: "woluwe",
     albums: [
       {
-        // ⚠ Le dossier s'appelle « Woluwe - Langeveld » : adversaire à confirmer (Sukel ou Langeveld).
-        slug: "30-05-2026-woluwe-h1-sukel-h1",
+        slug: "30-05-2026-woluwe-h1-langeveld-h1",
         date: "2026-05-30",
-        match: { home: "Woluwe H1", away: "Sukel H1" },
+        match: { home: "Woluwe H1", away: "Langeveld H1" },
         source: "WOLUWE Hockey Club/Woluwe - Langeveld 30-05-26",
         cover: "IMG_2881.jpg",
       },
@@ -317,13 +316,16 @@ export const albumTree: CategoryInput[] = [
 ];
 
 /**
- * Anciennes adresses de catégories → nouvelles, pour ne casser aucun lien déjà
- * partagé. Les albums qu'elles contenaient sont redirigés aussi
- * (/albums/daring-h1/<match> → /albums/daring/h1/<match>).
+ * Anciennes adresses → nouvelles, pour ne casser aucun lien déjà partagé :
+ * - une catégorie déplacée, avec tous ses albums
+ *   (/albums/daring-h1/<match> → /albums/daring/h1/<match>) ;
+ * - un album renommé (adversaire corrigé…).
  */
 export const legacyPaths: Record<string, string> = {
   "daring-dames-1": "daring/dames-1",
   "daring-h1": "daring/h1",
   "daring-u19b1": "daring/u19b1",
   "leopold-h1": "leopold/messieurs",
+  // Adversaire corrigé le 13/10/2026 : Langeveld (et non Sukel).
+  "woluwe-hockey-club-h1/30-05-2026-woluwe-h1-sukel-h1": "woluwe-hockey-club-h1/30-05-2026-woluwe-h1-langeveld-h1",
 };

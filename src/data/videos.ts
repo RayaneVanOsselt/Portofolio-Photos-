@@ -55,7 +55,7 @@ export const videos: VideoInput[] = [
     title: "Woluwe – Langeveld",
     date: "2026-05-30",
     source: "Woluwe - Langeveld 30-05-26.mp4",
-    album: "30-05-2026-woluwe-h1-sukel-h1",
+    album: "30-05-2026-woluwe-h1-langeveld-h1",
     posterAt: 16,
     teaser: [16, 28, 36, 52],
   },
