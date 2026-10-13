@@ -279,14 +279,16 @@ export function getCategoryGroups(): { sport: Sport; label: string; categories: 
 }
 
 /**
- * Anciennes adresses (catégorie déplacée, ex. /albums/daring-h1 → /albums/daring/h1)
- * et celles de leurs albums : chacune devient une page de redirection.
+ * Anciennes adresses (catégorie déplacée, ex. /albums/daring-h1 → /albums/daring/h1,
+ * avec ses albums ; ou album renommé) : chacune devient une page de redirection.
  */
 export function getLegacyRedirects(): { path: string[]; to: string }[] {
   return Object.entries(legacyPaths).flatMap(([from, to]) => {
+    if (categoryByPath.has(from) || albumByPath.has(from)) fail(`ancienne adresse « ${from} » : une catégorie ou un album porte encore ce chemin`);
+    const album = albumByPath.get(to);
+    if (album) return [{ path: from.split("/"), to: `${album.href}/` }];
     const category = categoryByPath.get(to);
-    if (!category) fail(`ancienne adresse « ${from} » : la catégorie « ${to} » n'existe pas`);
-    if (categoryByPath.has(from)) fail(`ancienne adresse « ${from} » : une catégorie porte encore ce chemin`);
+    if (!category) fail(`ancienne adresse « ${from} » : aucune catégorie ni aucun album « ${to} »`);
     const prefix = from.split("/");
     const inside = albums.filter((a) => a.path.join("/").startsWith(`${to}/`));
     return [
