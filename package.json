@@ -10,6 +10,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "photos": "node --experimental-strip-types --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/photos.mjs",
+    "videos": "node --experimental-strip-types --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/videos.mjs",
     "logos": "node scripts/logos.mjs",
     "brand": "node scripts/brand.mjs"
   },

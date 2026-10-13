@@ -8,9 +8,10 @@ import { PhotoAccessBand } from "@/components/sections/PhotoAccessBand";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { ArrowLeft, ArrowRight } from "@/components/ui/Icons";
 import { ALBUMS_HREF, getAdjacentAlbums, getAlbumByPath, getAllAlbums, getAllCategories, getCategoryByPath, getCategoryTrail, getLegacyRedirect, getLegacyRedirects } from "@/lib/albums";
-import { albumDescription, albumJsonLd, albumTitle, categoryDescription, categoryTitle, ogImageHref, pageMetadata } from "@/lib/seo";
+import { albumDescription, albumJsonLd, albumTitle, categoryDescription, categoryTitle, ogImageHref, pageMetadata, videoObjectJsonLd } from "@/lib/seo";
 import type { Album } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
+import { getAlbumVideo } from "@/lib/videos";
 
 /**
  * Toute la section Albums, sur autant de niveaux que l'arborescence en compte :
@@ -87,6 +88,7 @@ function LegacyRedirect({ to }: { to: string }) {
 /** Un album : en-tête, photos, puis les matchs voisins de la même catégorie. */
 function AlbumPage({ album }: { album: Album }) {
   const { older, newer } = getAdjacentAlbums(album);
+  const video = getAlbumVideo(album);
   const crumbs = album.private
     ? [
         { name: "Galeries", path: "/galeries" },
@@ -96,7 +98,7 @@ function AlbumPage({ album }: { album: Album }) {
 
   return (
     <>
-      <AlbumView album={album} crumbs={crumbs} />
+      <AlbumView album={album} crumbs={crumbs} video={video} />
 
       {album.photos.length ? <PhotoAccessBand context={album.title} withSearch={false} /> : null}
 
@@ -110,6 +112,7 @@ function AlbumPage({ album }: { album: Album }) {
       <div className="h-[var(--section-space-sm)]" />
 
       {!album.private ? <JsonLd data={albumJsonLd(album)} /> : null}
+      {video && !album.private ? <JsonLd data={{ "@context": "https://schema.org", ...videoObjectJsonLd(video) }} /> : null}
     </>
   );
 }

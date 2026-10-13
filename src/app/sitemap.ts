@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { ALBUMS_HREF, getAlbums, getAllCategories, getCategoryAlbums } from "@/lib/albums";
-import { absoluteUrl, photoUrl } from "@/lib/seo";
+import { absoluteUrl, photoUrl, videoSitemapEntry } from "@/lib/seo";
 import type { Photo } from "@/lib/types";
+import { getVideos, VIDEOS_HREF } from "@/lib/videos";
 
 /**
  * Plan du site pour Google, avec les images de chaque page (Google Images).
@@ -20,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   };
 
   const albums = getAlbums();
+  const videos = getVideos();
 
   return [
     page("/", 1, "weekly", albums.map((a) => a.cover)),
@@ -29,7 +31,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       .filter((c) => c.albumCount)
       .map((c) => page(c.href, c.parent ? 0.7 : 0.8, "weekly", getCategoryAlbums(c).map((a) => a.cover))),
     ...albums.filter((a) => a.photos.length).map((a) => page(a.href, 0.7, "monthly", a.photos, new Date(`${a.date}T12:00:00Z`))),
-    page("/videos", 0.7, "weekly"),
+    { ...page(VIDEOS_HREF, 0.8, "weekly"), ...(videos.length ? { videos: videos.map(videoSitemapEntry) } : {}) },
     page("/galeries", 0.8, "weekly"),
     page("/football", 0.7, "weekly"),
     page("/about", 0.7),

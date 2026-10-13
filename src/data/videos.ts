@@ -1,37 +1,71 @@
 /**
- * VIDÉOS — la page /videos, en un seul endroit.
- *
- * Les vidéos ne peuvent pas être mises dans GitHub (fichiers trop lourds : la
- * limite est de 100 Mo, et .gitignore les refuse toutes). Elles sont donc
- * hébergées ailleurs, et ce fichier donne simplement leur adresse.
- *
- * ─── Héberger une vidéo (une seule fois : créer l'espace) ─────────────────
- * Conseillé : Cloudflare R2 (10 Go gratuits, aucun frais de bande passante).
- *   1. Créez un « bucket », activez l'accès public (« Public Development URL »
- *      ou votre sous-domaine, ex. videos.rayvocaptures0808.be).
- *   2. Réglages du bucket → CORS : autorisez GET depuis https://rayvocaptures0808.be
- *      [{ "AllowedOrigins": ["https://rayvocaptures0808.be"], "AllowedMethods": ["GET"] }]
- *      Indispensable pour le bouton « Télécharger » sur téléphone (enregistrement
- *      dans Photos / la galerie). Sans CORS, la vidéo s'ouvre simplement dans un onglet.
- *   3. Déposez vos fichiers MP4 (format H.264 : lisible partout, iPhone compris).
+ * VIDÉOS — page /videos, accueil et pages d'albums, en un seul endroit.
  *
  * ─── Ajouter une vidéo ────────────────────────────────────────────────────
- * Une entrée ci-dessous, dans n'importe quel ordre (le site trie par date) :
- *   {
- *     slug: "18-10-2026-daring-h1-oree-h1-resume",
- *     title: "Daring H1 vs Orée H1 — résumé",
- *     date: "2026-10-18",
- *     src: "https://videos.rayvocaptures0808.be/daring-oree-resume.mp4",
- *     poster: "https://videos.rayvocaptures0808.be/daring-oree-resume.jpg",
- *     club: "daring",
- *   },
- * Le slug commence par la date JJ-MM-AAAA (une incohérence bloque le build).
+ *   1. Déposez le fichier (MP4 ou MOV, tel qu'exporté) dans le dossier
+ *      « Vidéo à rajouter », à la racine du projet. Il ne part jamais sur GitHub.
+ *   2. Ajoutez sa fiche ci-dessous (n'importe quel ordre : le site trie par date).
+ *      `npm run videos` propose la fiche toute prête, titre et date lus dans le nom
+ *      du fichier (« Léo - Racing 11:10:26.mp4 »).
+ *   3. Lancez `npm run videos` : version web 720p, aperçu animé, images, dans
+ *      public/_videos/ (une quinzaine de secondes par vidéo).
+ *   4. Commitez et publiez comme d'habitude : public/_videos/ part avec le site
+ *      (le total photos + vidéos doit rester sous 1 Go, voir README, « Vidéos »).
  *
- * Facultatif : `poster` (image d'aperçu), `description`, `club` (logo, voir
- * src/data/clubs.ts), `sport`, `duration` (« 1:24 »), `bytes` (taille affichée
- * sur le bouton), `vertical: true` (format 9:16, type Reels / TikTok),
- * `downloadEnabled: false` (lecture seule ; par défaut : siteConfig.downloads.videos).
+ * Champs facultatifs : `album` (slug de l'album photo du même match : logos, sport,
+ * lien « Photos du match », et la vidéo apparaît sur la page de l'album),
+ * `description`, `posterAt` (seconde de l'image d'aperçu), `teaser` (début des
+ * 4 extraits de l'aperçu animé), `featured: true` (« À la une » ; par défaut la plus
+ * récente), `club` / `sport` (sans album), `downloadEnabled: false` (lecture seule ;
+ * par défaut : siteConfig.downloads.videos).
+ * Le slug commence par la date JJ-MM-AAAA (une incohérence bloque le build).
  */
 import type { VideoInput } from "@/lib/types";
 
-export const videos: VideoInput[] = [];
+export const videos: VideoInput[] = [
+  {
+    slug: "11-10-2026-leo-racing",
+    title: "Léo – Racing",
+    date: "2026-10-11",
+    source: "Léo - Racing 11:10:26.mp4",
+    album: "11-10-2026-leopold-h1-racing-h1",
+    posterAt: 58,
+    teaser: [10, 23, 40, 50],
+  },
+  {
+    slug: "27-06-2026-belgique-pays-bas",
+    title: "Belgique – Pays-Bas",
+    date: "2026-06-27",
+    source: "Belgique - Pays Bas 27:06:26.mp4",
+    album: "27-06-2026-belgique-pays-bas-men",
+    posterAt: 35,
+    teaser: [35, 46, 64, 98],
+  },
+  {
+    slug: "27-06-2026-australie-pays-bas-femmes",
+    title: "Australie – Pays-Bas Femmes",
+    date: "2026-06-27",
+    source: "Australie - Pays Bas Femmes.mp4",
+    album: "27-06-2026-pays-bas-australie-women",
+    posterAt: 14,
+    teaser: [14, 18, 28, 50],
+  },
+  {
+    slug: "30-05-2026-woluwe-langeveld",
+    title: "Woluwe – Langeveld",
+    date: "2026-05-30",
+    source: "Woluwe - Langeveld 30-05-26.mp4",
+    album: "30-05-2026-woluwe-h1-sukel-h1",
+    posterAt: 16,
+    teaser: [16, 28, 36, 52],
+  },
+  {
+    slug: "23-05-2026-daring-namur-h1",
+    title: "Daring – Namur H1",
+    date: "2026-05-23",
+    source: "Daring - Namur H1 23:05:26.mp4",
+    album: "23-05-2026-daring-h1-namur-h1",
+    posterAt: 36,
+    teaser: [6, 30, 36, 44],
+  },
+];
