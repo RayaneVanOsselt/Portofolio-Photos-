@@ -67,6 +67,14 @@ export const siteConfig = {
   heroVideo: null as null | { src: string; type: string },
 
   /**
+   * Vidéos : vide = servies par le site lui-même (public/_videos/, préparé par
+   * `npm run videos`). Pour les héberger ailleurs plus tard (le site approche de la
+   * limite de 1 Go de GitHub Pages), y copier le contenu de public/_videos/ et
+   * indiquer ici son adresse, sans « / » final, ex. "https://videos.rayvocaptures0808.be".
+   */
+  videoHost: "" as string,
+
+  /**
    * Téléchargement des photos par les visiteurs (bouton « Télécharger »,
    * sélection en ZIP, galerie complète) : JPEG haute qualité au nom propre.
    * Réglage par défaut — chaque catégorie ou album peut le changer avec

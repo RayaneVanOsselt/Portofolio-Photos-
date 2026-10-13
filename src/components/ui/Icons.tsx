@@ -147,6 +147,40 @@ export const Images = (p: IconProps) => (
   </Base>
 );
 
+/* --- Lecteur vidéo (glyphes pleins : lisibles en petit sur l'image) ----- */
+
+export const Play = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M7.5 4.75v14.5L19.5 12z" fill="currentColor" strokeLinejoin="round" />
+  </Base>
+);
+export const Pause = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M7 4.5h3.5v15H7zM13.5 4.5H17v15h-3.5z" fill="currentColor" />
+  </Base>
+);
+export const Replay = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M4.5 12a7.5 7.5 0 1 0 2.3-5.4M4.5 4v4.5H9" />
+  </Base>
+);
+export const Volume = ({ muted, ...p }: IconProps & { muted?: boolean }) => (
+  <Base {...p}>
+    <path d="M3.5 9.5h3.5l5-4v13l-5-4H3.5z" fill="currentColor" strokeLinejoin="round" />
+    {muted ? <path d="m15.5 9.5 5 5M20.5 9.5l-5 5" /> : <path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" />}
+  </Base>
+);
+export const Film = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M3.5 5.5h17v13h-17zM3.5 9.5h17M3.5 14.5h17M7.5 5.5v4M7.5 14.5v4M16.5 5.5v4M16.5 14.5v4" />
+  </Base>
+);
+export const LinkIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M10 14a3.5 3.5 0 0 0 5 0l3.5-3.5a3.5 3.5 0 0 0-5-5L12.5 6.5M14 10a3.5 3.5 0 0 0-5 0l-3.5 3.5a3.5 3.5 0 0 0 5 5l1-1" />
+  </Base>
+);
+
 export const Heart = ({ filled, ...p }: IconProps & { filled?: boolean }) => (
   <Base {...p}>
     <path d="M12 20s-7.5-4.6-7.5-10.1A4.4 4.4 0 0 1 12 7.2a4.4 4.4 0 0 1 7.5 2.7C19.5 15.4 12 20 12 20z" fill={filled ? "currentColor" : "none"} />

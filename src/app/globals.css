@@ -896,6 +896,234 @@ dialog::backdrop {
 }
 
 /* ==========================================================================
+   Vidéos — cartes et aperçus animés, lecteur, salle de projection
+   ========================================================================== */
+
+/* Carte : l'image s'avance au survol, l'aperçu animé apparaît en fondu par-dessus */
+.video-poster,
+.video-teaser {
+  transition:
+    opacity 600ms var(--ease-out-quart),
+    transform 1.1s var(--ease-out-expo);
+}
+.video-teaser {
+  opacity: 0;
+}
+.video-teaser[data-on="true"] {
+  opacity: 1;
+}
+.video-frame:hover :is(.video-poster, .video-teaser),
+.video-frame:focus-visible :is(.video-poster, .video-teaser) {
+  transform: scale(1.04);
+}
+.video-scrim {
+  background: linear-gradient(180deg, rgb(19 20 18 / 0.5) 0%, rgb(19 20 18 / 0) 24%, rgb(19 20 18 / 0) 58%, rgb(19 20 18 / 0.72) 100%);
+}
+
+/* Segments « stories » de l'aperçu : --t (0 → 1) est posé par useTeaser */
+.teaser-segments {
+  opacity: 0;
+  transition: opacity 400ms var(--ease-out-quart);
+}
+.video-frame:has(.video-teaser[data-on="true"]) .teaser-segments {
+  opacity: 1;
+}
+.teaser-segments > span > span {
+  transform-origin: left;
+  transform: scaleX(clamp(0, calc(var(--t, 0) * 4 - var(--i)), 1));
+}
+
+.video-play {
+  transition:
+    transform 600ms var(--ease-out-expo),
+    background-color 300ms var(--ease-out-quart);
+}
+.video-frame:hover .video-play,
+.video-frame:focus-visible .video-play {
+  transform: scale(1.12);
+  background-color: var(--color-flamingo);
+}
+
+/* Grand bouton « lecture » : deux ondes qui s'éloignent, comme un signal */
+.player-start-button {
+  transition: transform 600ms var(--ease-out-expo);
+}
+.player-start-button::before,
+.player-start-button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1.5px solid var(--color-flamingo);
+  animation: play-ring 2.6s var(--ease-out-quart) infinite;
+  pointer-events: none;
+}
+.player-start-button::after {
+  animation-delay: 1.3s;
+}
+.player-start:hover .player-start-button,
+.video-frame:hover .video-play-big {
+  transform: scale(1.08);
+}
+@keyframes play-ring {
+  from {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.75);
+  }
+}
+
+/* --- Lecteur ------------------------------------------------------------ */
+.player {
+  --progress: 0;
+}
+.player[data-idle="true"] {
+  cursor: none;
+}
+.player-poster {
+  transition: opacity 500ms var(--ease-out-quart);
+}
+.player-controls {
+  background: linear-gradient(180deg, rgb(19 20 18 / 0) 0%, rgb(19 20 18 / 0.78) 100%);
+  transition:
+    opacity 350ms var(--ease-out-quart),
+    transform 500ms var(--ease-out-expo);
+}
+.player[data-controls="hidden"] .player-controls:not(:focus-within) {
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+}
+.player-rail {
+  height: 3px;
+  transition: height 200ms var(--ease-out-quart);
+}
+.player-track:is(:hover, :focus-visible, :active) .player-rail {
+  height: 6px;
+}
+.player-track:focus-visible {
+  outline-offset: 4px;
+}
+.player-played {
+  transform: scaleX(var(--progress));
+}
+.player-thumb {
+  left: calc(var(--progress) * 100%);
+  scale: 0;
+  transition: scale 200ms var(--ease-out-quart);
+}
+.player-track:is(:hover, :focus-visible, :active) .player-thumb {
+  scale: 1;
+}
+@media (hover: none) {
+  .player-rail {
+    height: 4px;
+  }
+  .player-thumb {
+    scale: 1;
+  }
+  /* Le volume se règle avec les boutons du téléphone */
+  .player-volume {
+    display: none;
+  }
+}
+.player-spinner {
+  border: 3px solid rgb(231 231 216 / 0.2);
+  border-top-color: var(--color-flamingo);
+  animation: spin 0.85s linear infinite;
+}
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}
+.player-bezel {
+  translate: -50% -50%;
+  animation: bezel 650ms var(--ease-out-quart) both;
+}
+@keyframes bezel {
+  from {
+    opacity: 1;
+    scale: 0.8;
+  }
+  to {
+    opacity: 0;
+    scale: 1.3;
+  }
+}
+.player-end > * {
+  animation: fade-in 450ms var(--ease-out-quart) both;
+}
+
+/* --- Salle de projection (lecteur plein écran) -------------------------- */
+.theater-bg {
+  opacity: 0;
+  transition: opacity 420ms var(--ease-out-quart);
+}
+.theater[data-state="open"] .theater-bg {
+  opacity: 1;
+}
+.theater-chrome,
+.theater-info {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 400ms var(--ease-out-quart) 90ms,
+    transform 700ms var(--ease-out-expo) 90ms;
+}
+.theater-stage {
+  opacity: 0;
+  transform: scale(0.94);
+  transition:
+    opacity 420ms var(--ease-out-quart),
+    transform 750ms var(--ease-out-expo);
+}
+.theater[data-state="open"] :is(.theater-chrome, .theater-info, .theater-stage) {
+  opacity: 1;
+  transform: none;
+}
+/* Changement de vidéo : la fiche se réécrit en cascade */
+.theater-sheet > * {
+  animation: rise-in 700ms var(--ease-out-expo) both;
+}
+.theater-sheet > :nth-child(2) {
+  animation-delay: 60ms;
+}
+.theater-sheet > :nth-child(n + 3) {
+  animation-delay: 120ms;
+}
+
+/* --- Bandeau défilant des titres ---------------------------------------- */
+.marquee-track {
+  animation: marquee 55s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+.marquee-item {
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-weight: 800;
+  font-size: clamp(1.75rem, 1rem + 3.4vw, 4.25rem);
+  line-height: 1;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.marquee-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(231 231 216 / 0.5);
+}
+@keyframes marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* ==========================================================================
    Préférence « réduire les animations »
    ========================================================================== */
 

@@ -158,7 +158,19 @@ Le site étant statique (GitHub Pages, sans serveur), l'archive est préparée d
 
 ### Vidéos
 
-Les vidéos ne sont **jamais** envoyées sur GitHub (qui refuse les fichiers de plus de 100 Mo) : `.gitignore` les exclut (`.mp4`, `.mov`, `.webm`, `.avi`, `.mkv`…, majuscules comprises). Un garde-fou local refuse en plus tout commit contenant une vidéo ou un fichier de plus de 95 Mo, y compris depuis GitHub Desktop. Pour l'installer sur un nouvel ordinateur :
+La page **Vidéos** (`/videos`) met en avant la dernière vidéo (aperçu animé en boucle), puis toutes les autres en cartes : au survol (ou quand la carte occupe l'écran du téléphone), un aperçu muet de 5 s se lance. Un clic ouvre le lecteur plein écran : son, barre de lecture avec aperçu des images, clavier (Espace, ← →, M, F), vidéo suivante, téléchargement (iPhone : « Enregistrer la vidéo » → Photos ; Android : galerie), lien direct partageable (`/videos/#<slug>`). La vidéo apparaît aussi sur l'accueil et sur la page de l'album photo du même match.
+
+**Rapide par construction** : rien n'est téléchargé avant « Lecture » (seulement l'image d'aperçu, en AVIF) ; les MP4 démarrent dès les premiers octets ; 720p à ~2 Mb/s, fluide même en 4G moyenne.
+
+**Ajouter une vidéo** :
+1. déposez le fichier dans le dossier **`Vidéo à rajouter`** (à la racine du projet ; ces originaux ne partent jamais sur GitHub) ;
+2. ajoutez sa fiche dans **`src/data/videos.ts`** (titre, date, `source` = nom du fichier, `album` = slug de l'album du même match) — `npm run videos` propose la fiche toute prête, titre et date lus dans le nom du fichier ;
+3. lancez **`npm run videos`** : version web 720p (~14 Mo par minute), aperçu animé, images d'aperçu et vignettes, dans `public/_videos/` (≈ 15 s par vidéo ; seules les nouveautés sont traitées) ;
+4. commitez et publiez comme d'habitude : `public/_videos/` part avec le site.
+
+**Poids** : les vidéos sont publiées avec le site, que GitHub Pages limite à 1 Go (photos ≈ 840 Mo + vidéos ≈ 90 Mo en octobre 2026). `npm run videos` et `npm run photos` affichent le total : au-delà de ~900 Mo, il faudra héberger les vidéos ailleurs (Cloudflare R2, par exemple) — copier `public/_videos/` sur cet hébergement et indiquer son adresse dans `src/config/site.ts` → `videoHost` suffit. Éviter aussi de réencoder les vidéos déjà publiées (changer les réglages de `scripts/videos.mjs`) : chaque nouvelle version alourdit l'historique GitHub.
+
+Les vidéos d'**origine** ne sont **jamais** envoyées sur GitHub (qui refuse les fichiers de plus de 100 Mo) : `.gitignore` les exclut (`.mp4`, `.mov`, `.webm`, `.avi`, `.mkv`…, majuscules comprises), sauf les versions web de `public/_videos/`. Un garde-fou local refuse en plus tout commit contenant une vidéo hors de `public/_videos/` ou un fichier de plus de 95 Mo, y compris depuis GitHub Desktop. Pour l'installer (ou le mettre à jour) sur un ordinateur :
 
 ```bash
 cp scripts/git-hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
@@ -251,7 +263,7 @@ src/
 │   ├── page.tsx              Accueil
 │   ├── albums/               /albums + /albums/[...chemin] (catégories, sous-catégories, albums)
 │   ├── matchs/               Calendrier : tous les matchs par année et par mois
-│   ├── og/albums/            Images de partage des albums (PNG générés au build)
+│   ├── og/albums/            Images de partage des albums (JPEG générés au build)
 │   ├── galeries/             Retrouver mes photos (recherche + code d'accès)
 │   ├── football/             Archive football
 │   ├── search-index.json/    Index de la recherche ⌘K (chargé à la première ouverture)
@@ -274,7 +286,9 @@ src/
 ├── data/
 │   ├── albums.ts             ← l'arborescence : catégories et matchs
 │   ├── clubs.ts              ← clubs et compétitions (nom, logo)
+│   ├── videos.ts             ← les vidéos (titre, date, fichier source, album du match)
 │   ├── photo-manifest.json   généré par npm run photos
+│   ├── video-manifest.json   généré par npm run videos
 │   ├── logo-manifest.json    généré par npm run logos
 │   └── content.ts services.ts placeholder-photos.ts photos.ts
 └── lib/
@@ -288,8 +302,11 @@ assets/brand/                 Logo du site (fichier source unique)
 assets/logos/                 Logos sources (un fichier par club : <identifiant>.png)
 public/images/site/           Photos des pages (facultatif)
 public/_photos/               Versions web et fichiers à télécharger (générés, non commités)
+Vidéo à rajouter/             ← vos vidéos d'origine (jamais envoyées sur GitHub)
+public/_videos/               Versions web des vidéos (générées par npm run videos, commitées)
 scripts/photos.mjs            Pipeline photo (AVIF, WebP, JPEG à télécharger, manifest)
-scripts/git-hooks/pre-commit  Garde-fou : refuse vidéos et fichiers de plus de 95 Mo
+scripts/videos.mjs            Pipeline vidéo (720p, aperçu animé, images, manifest)
+scripts/git-hooks/pre-commit  Garde-fou : refuse vidéos d'origine et fichiers de plus de 95 Mo
 scripts/logos.mjs             Optimisation des logos
 scripts/finalize-export.mjs   Finalisation de l'export statique
 .github/workflows/deploy.yml  Publication automatique sur GitHub Pages

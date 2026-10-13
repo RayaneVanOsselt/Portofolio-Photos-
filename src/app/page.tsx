@@ -9,12 +9,14 @@ import { ClosingCta } from "@/components/sections/ClosingCta";
 import { PhotoAccessBand } from "@/components/sections/PhotoAccessBand";
 import { ArrowLink } from "@/components/ui/Button";
 import { SectionStamp } from "@/components/ui/SectionLabel";
+import { VideoRail } from "@/components/videos/VideoRail";
 import { isDev, siteConfig } from "@/config/site";
 import { aboutContent, homeContent } from "@/data/content";
 import { toIndexEntries } from "@/lib/index-entries";
 import { categoryContext, getAlbums, getCategories, getFeaturedAlbums, getPhotoById } from "@/lib/albums";
 import { homeTitle, inArea, pageMetadata } from "@/lib/seo";
-import { isPlaceholder } from "@/lib/utils";
+import { isPlaceholder, pad } from "@/lib/utils";
+import { getVideos, VIDEOS_HREF } from "@/lib/videos";
 
 export const metadata: Metadata = pageMetadata({
   title: homeTitle,
@@ -39,6 +41,10 @@ export default function HomePage() {
   const recent = albums.filter((a) => a !== spotlight).slice(0, spotlight ? 4 : 6);
   // Présentation encore entre crochets : jamais publiée, la description du site la remplace.
   const aboutIntro = isDev || !isPlaceholder(aboutContent.intro) ? aboutContent.intro : siteConfig.description;
+  const videos = getVideos();
+  // Numéros des sections, selon celles qui sont affichées.
+  const order = ["latest", ...(videos.length ? ["videos"] : []), ...(featured.length ? ["featured"] : []), "categories", "about"];
+  const number = (key: string) => pad(order.indexOf(key) + 1);
 
   return (
     <>
@@ -73,10 +79,25 @@ export default function HomePage() {
         </ul>
       </section>
 
-      <FeaturedWork albums={featured} index="02" />
+      {videos.length ? (
+        <section aria-labelledby="videos-title" className="container-wide pb-[var(--section-space)]">
+          <SectionStamp id="videos-title" index={number("videos")} meta={`${pad(videos.length)} vidéo${videos.length > 1 ? "s" : ""} · Le match en mouvement`}>
+            Vidéos
+          </SectionStamp>
+          <div className="mt-8 mb-10 flex flex-col gap-6 md:mt-10 md:mb-14 md:flex-row md:items-end md:justify-between">
+            <p className="max-w-lg t-lead text-taupe" data-reveal>
+              Résumés et coulisses des matchs, à regarder en plein écran ou à garder sur votre téléphone.
+            </p>
+            <ArrowLink href={VIDEOS_HREF}>Toutes les vidéos</ArrowLink>
+          </div>
+          <VideoRail videos={videos.slice(0, 5)} />
+        </section>
+      ) : null}
+
+      {featured.length ? <FeaturedWork albums={featured} index={number("featured")} /> : null}
 
       <section aria-labelledby="categories-title" className="container-wide pb-[var(--section-space)]">
-        <SectionStamp id="categories-title" index={featured.length ? "03" : "02"} meta={`${categories.length} catégories`}>
+        <SectionStamp id="categories-title" index={number("categories")} meta={`${categories.length} catégories`}>
           Albums
         </SectionStamp>
         <div className="mt-8 mb-12 flex flex-col gap-6 md:mt-10 md:mb-16 md:flex-row md:items-end md:justify-between">
@@ -90,7 +111,7 @@ export default function HomePage() {
 
       <PhotoAccessBand />
 
-      <AboutTeaser portrait={getPhotoById(aboutContent.portraitId, "site/about")} intro={aboutIntro} specialties={aboutContent.specialties} />
+      <AboutTeaser portrait={getPhotoById(aboutContent.portraitId, "site/about")} intro={aboutIntro} specialties={aboutContent.specialties} index={number("about")} />
 
       <ClosingCta />
     </>

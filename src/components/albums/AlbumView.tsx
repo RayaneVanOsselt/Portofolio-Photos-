@@ -8,10 +8,11 @@ import { Breadcrumbs, type Crumb } from "@/components/layout/Breadcrumbs";
 import { ArrowLink } from "@/components/ui/Button";
 import { PhotoImage } from "@/components/ui/PhotoImage";
 import { SectionStamp } from "@/components/ui/SectionLabel";
+import { AlbumVideo } from "@/components/videos/AlbumVideo";
 import { siteConfig } from "@/config/site";
 import { categoryContext, SPORT_NAME, teamShort } from "@/lib/albums";
 import { downloadFolderName } from "@/lib/downloads";
-import type { Album, Crest } from "@/lib/types";
+import type { Album, Crest, Video } from "@/lib/types";
 import { formatDate, pad } from "@/lib/utils";
 import { matchContext, photoCountLabel, scoreLine } from "./match-format";
 
@@ -23,7 +24,7 @@ const delay = (ms: number) => ({ "--delay": `${ms}ms` }) as CSSProperties;
  * logos des équipes) → quand (date en toutes lettres) → où / quelle compétition
  * (si renseigné) → les photos. Les informations restent sobres : les photos dominent.
  */
-export function AlbumView({ album, crumbs }: { album: Album; crumbs: Crumb[] }) {
+export function AlbumView({ album, crumbs, video }: { album: Album; crumbs: Crumb[]; video?: Video }) {
   const { match, category } = album;
   const context = matchContext(album);
   const chapters = album.chapters;
@@ -84,10 +85,11 @@ export function AlbumView({ album, crumbs }: { album: Album; crumbs: Crumb[] }) 
               {context ? <p className="t-mono text-taupe">{context}</p> : null}
               {album.description ? <p className="mt-4 t-lead text-taupe">{album.description}</p> : null}
             </div>
-            {count ? (
-              <div className="flex flex-wrap items-center gap-3">
-                <ArrowLink href="#photos">Voir les {count} photos</ArrowLink>
-                <ShareGalleryButton title={album.title} />
+            {count || video ? (
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+                {count ? <ArrowLink href="#photos">Voir les {count} photos</ArrowLink> : null}
+                {video ? <ArrowLink href="#video">Regarder la vidéo</ArrowLink> : null}
+                {count ? <ShareGalleryButton title={album.title} /> : null}
               </div>
             ) : null}
           </div>
@@ -108,6 +110,8 @@ export function AlbumView({ album, crumbs }: { album: Album; crumbs: Crumb[] }) 
           </figure>
 
           {match ? <MatchSheet album={album} /> : <div className="h-[clamp(2.5rem,5vw,4.5rem)]" />}
+
+          {video ? <AlbumVideo video={video} /> : null}
 
           {/* ----------------------------------------------------------- Galerie */}
           <section id="photos" aria-labelledby="photos-title" className="container-wide scroll-mt-20 pb-[var(--section-space)]">
@@ -148,6 +152,8 @@ export function AlbumView({ album, crumbs }: { album: Album; crumbs: Crumb[] }) 
           </section>
         </>
       ) : (
+        <>
+        {video ? <AlbumVideo video={video} /> : null}
         <section aria-labelledby="photos-title" className="container-wide pb-[var(--section-space)]">
           <div className="anim-rise grid gap-8 rounded-[var(--radius-card)] border border-dashed border-line-strong px-6 py-10 md:grid-cols-12 md:items-end md:px-12 md:py-14" style={delay(620)}>
             <div className="md:col-span-7">
@@ -163,6 +169,7 @@ export function AlbumView({ album, crumbs }: { album: Album; crumbs: Crumb[] }) 
             </div>
           </div>
         </section>
+        </>
       )}
     </>
   );

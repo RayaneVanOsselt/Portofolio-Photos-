@@ -1,0 +1,194 @@
+{
+  "11-10-2026-leo-racing": {
+    "source": "Léo - Racing 11:10:26.mp4",
+    "hash": "2599f68dc4acecf3",
+    "width": 1080,
+    "height": 1920,
+    "duration": 74.97,
+    "fps": 29.97,
+    "color": "#586858",
+    "blurDataURL": "data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAABwBACdASoQABwAPt1apkyopSOiMAgBEBuJYgAAXGTcG/IchTFTl+C4c86o4AD2HtF4H8bXC6ipRSYm0T5+FUH3fPcMg3jqHHfWjyPH3gskZOl+9ulDVmCSQ0Q0FCF5OrBSnkpJZV2C1Y1SbfK6gAz8rdPodj1ZgOKu45NcLQK54jphFow0fs0KxERBnruHAAA=",
+    "poster": {
+      "at": 58,
+      "widths": [
+        480,
+        960,
+        1080
+      ]
+    },
+    "files": {
+      "video": {
+        "file": "rayvo-captures0808-2026-10-11-leo-racing.mp4",
+        "width": 720,
+        "height": 1280,
+        "bytes": 16840928
+      },
+      "teaser": {
+        "file": "apercu.mp4",
+        "bytes": 603462
+      }
+    },
+    "storyboard": {
+      "file": "vignettes.webp",
+      "interval": 1,
+      "columns": 10,
+      "count": 75,
+      "width": 90,
+      "height": 160
+    }
+  },
+  "23-05-2026-daring-namur-h1": {
+    "source": "Daring - Namur H1 23:05:26.mp4",
+    "hash": "c041f2c88d6297f2",
+    "width": 1080,
+    "height": 1920,
+    "duration": 61.6,
+    "fps": 25,
+    "color": "#789858",
+    "blurDataURL": "data:image/webp;base64,UklGRt4AAABXRUJQVlA4INIAAAAwBACdASoQABwAPt1apkyopSOiMAgBEBuJbAC21BRKwAbHtBUcN8Y4AAAA/VM8UiWReJPzEuSVoYufhJQSEHi091lCcFES73gDbT9bmGkdoAQjShJw8kPCNsVLMPQASLXk0373lm1oBQlpgdPEogvTAXYqPafv+hr6UeDov761PGb6HyxRHn6DrSZX8e+7jKEA1gBZY45dDjWYDTejbr47sehD/gKfWSSHQ0ij1uqCV1G4i+xlHywc7r/hqJYbHYeWQr3YTvXJrhCr9kLwDqSAAAA=",
+    "poster": {
+      "at": 36,
+      "widths": [
+        480,
+        960,
+        1080
+      ]
+    },
+    "files": {
+      "video": {
+        "file": "rayvo-captures0808-2026-05-23-daring-namur-h1.mp4",
+        "width": 720,
+        "height": 1280,
+        "bytes": 14926886
+      },
+      "teaser": {
+        "file": "apercu.mp4",
+        "bytes": 650154
+      }
+    },
+    "storyboard": {
+      "file": "vignettes.webp",
+      "interval": 1,
+      "columns": 10,
+      "count": 62,
+      "width": 90,
+      "height": 160
+    }
+  },
+  "27-06-2026-australie-pays-bas-femmes": {
+    "source": "Australie - Pays Bas Femmes.mp4",
+    "hash": "415df8c6b2e2c05a",
+    "width": 1080,
+    "height": 1920,
+    "duration": 55.6,
+    "fps": 25,
+    "color": "#68c8f8",
+    "blurDataURL": "data:image/webp;base64,UklGRvYAAABXRUJQVlA4IOoAAAAwBACdASoQABwAPt1apkyopSOiMAgBEBuJbAB2AEmADz5ERTLHgcjBGDgA/ZUKWb4AC1eUCEczWt2ZnUCA71F/U68k2zYQtY+1RIqOoEKLNM8BwcM/YUAzffN7KRV9znZDH1v62vz940oInv8BRbChqXZbp+k5ppHx5zcGRUOQ0DXw3yAZZPTc7TrZRc/X3ZsOnjT7ukxta04U6bB4Nh8u8ij6yNVBJYAjKUSz4YOFEQbAi1e81NnbQvFcuSv91oMV4LmEd47W2gGnfL9udL66n/xAKgrr1+HbbFW7b5OJfcngl+X6r5R1AAA=",
+    "poster": {
+      "at": 14,
+      "widths": [
+        480,
+        960,
+        1080
+      ]
+    },
+    "files": {
+      "video": {
+        "file": "rayvo-captures0808-2026-06-27-australie-pays-bas-femmes.mp4",
+        "width": 720,
+        "height": 1280,
+        "bytes": 13518216
+      },
+      "teaser": {
+        "file": "apercu.mp4",
+        "bytes": 647709
+      }
+    },
+    "storyboard": {
+      "file": "vignettes.webp",
+      "interval": 1,
+      "columns": 10,
+      "count": 56,
+      "width": 90,
+      "height": 160
+    }
+  },
+  "27-06-2026-belgique-pays-bas": {
+    "source": "Belgique - Pays Bas 27:06:26.mp4",
+    "hash": "7e5423c16fee8105",
+    "width": 1920,
+    "height": 1080,
+    "duration": 113,
+    "fps": 25,
+    "color": "#181818",
+    "blurDataURL": "data:image/webp;base64,UklGRnYAAABXRUJQVlA4IGoAAAAQAgCdASoQAAkAAwBSJbACdAEYEhESyyO4AP2nJ7skQ2rd6K2NZqPjEBZhhVNjb5r1S2JSy5jNtlH5Sr8QE9nPSA5N3bVjRurZcXVkzln8NBpdUyBf8SZtMsXdvkRXA30Dmb1Q3lMtAAAA",
+    "poster": {
+      "at": 35,
+      "widths": [
+        480,
+        960,
+        1440,
+        1920
+      ]
+    },
+    "files": {
+      "video": {
+        "file": "rayvo-captures0808-2026-06-27-belgique-pays-bas.mp4",
+        "width": 1280,
+        "height": 720,
+        "bytes": 27134440
+      },
+      "teaser": {
+        "file": "apercu.mp4",
+        "bytes": 649884
+      }
+    },
+    "storyboard": {
+      "file": "vignettes.webp",
+      "interval": 2,
+      "columns": 10,
+      "count": 57,
+      "width": 160,
+      "height": 90
+    }
+  },
+  "30-05-2026-woluwe-langeveld": {
+    "source": "Woluwe - Langeveld 30-05-26.mp4",
+    "hash": "d937d779795b7190",
+    "width": 1920,
+    "height": 1080,
+    "duration": 66.92,
+    "fps": 25,
+    "color": "#080808",
+    "blurDataURL": "data:image/webp;base64,UklGRnIAAABXRUJQVlA4IGYAAAAwAgCdASoQAAkAAwBSJZgC7H8AFBm1dS0AAAD7mfxynh2K47bth7ljntTJmGRddiLwe6L9fe6Ig5kKXuWyvtr9SiULoTUZWU0xUuTS0UUP5WS1VzBFuayTXqfl56IoteiK4VwAAAA=",
+    "poster": {
+      "at": 16,
+      "widths": [
+        480,
+        960,
+        1440,
+        1920
+      ]
+    },
+    "files": {
+      "video": {
+        "file": "rayvo-captures0808-2026-05-30-woluwe-langeveld.mp4",
+        "width": 1280,
+        "height": 720,
+        "bytes": 16112669
+      },
+      "teaser": {
+        "file": "apercu.mp4",
+        "bytes": 648583
+      }
+    },
+    "storyboard": {
+      "file": "vignettes.webp",
+      "interval": 1,
+      "columns": 10,
+      "count": 67,
+      "width": 160,
+      "height": 90
+    }
+  }
+}

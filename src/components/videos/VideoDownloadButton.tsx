@@ -4,7 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import { Check, Download } from "@/components/ui/Icons";
 import { formatBytes } from "@/lib/utils";
 
-type Props = { src: string; filename: string; title: string; bytes?: number };
+type Props = {
+  src: string;
+  filename: string;
+  title: string;
+  bytes?: number;
+  /** `signal` : bouton orange (action principale de l'écran) ; `ghost` : voile discret. */
+  variant?: "signal" | "ghost";
+};
 
 type State =
   | { step: "idle" }
@@ -27,7 +34,7 @@ const mimeOf = (filename: string) => (filename.endsWith(".mov") ? "video/quickti
  *   il apparaît dans la galerie / Google Photos (album « Download »).
  * Si l'hébergeur refuse la lecture (CORS), la vidéo s'ouvre dans un onglet.
  */
-export function VideoDownloadButton({ src, filename, title, bytes }: Props) {
+export function VideoDownloadButton({ src, filename, title, bytes, variant = "signal" }: Props) {
   const [state, setState] = useState<State>({ step: "idle" });
   const abort = useRef<AbortController | null>(null);
   useEffect(() => () => abort.current?.abort(), []);
@@ -85,6 +92,7 @@ export function VideoDownloadButton({ src, filename, title, bytes }: Props) {
 
   const base =
     "inline-flex h-11 items-center gap-2.5 rounded-full px-5 text-[0.9375rem] font-medium transition-[background-color,color] duration-300 active:scale-[0.98]";
+  const tone = variant === "signal" ? "bg-flamingo text-ink hover:bg-tango" : "bg-wash-strong text-linen hover:bg-[rgb(231_231_216/0.16)]";
 
   if (state.step === "loading") {
     const percent = state.total ? Math.min(100, Math.round((state.received / state.total) * 100)) : null;
@@ -124,7 +132,7 @@ export function VideoDownloadButton({ src, filename, title, bytes }: Props) {
     <button
       type="button"
       onClick={start}
-      className={`${base} bg-flamingo text-ink hover:bg-tango`}
+      className={`${base} ${tone}`}
       aria-label={`Télécharger la vidéo « ${title} »${bytes ? ` (${formatBytes(bytes)})` : ""}`}
     >
       <Download size={18} />

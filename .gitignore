@@ -54,7 +54,7 @@ next-env.d.ts
 # logo du site décliné par npm run brand (source : assets/brand/)
 /public/brand/
 
-# vidéos : jamais dans Git (GitHub refuse les fichiers > 100 Mo)
+# vidéos d'origine : jamais dans Git (GitHub refuse les fichiers > 100 Mo)
 # motifs [xX] : insensibles à la casse aussi sur GitHub et Linux (.mp4 comme .MP4)
 *.[mM][pP]4
 *.[mM][oO][vV]
@@ -69,6 +69,8 @@ next-env.d.ts
 *.3[gG][pP]
 *.[mM][pP][gG]
 *.[mM][pP][eE][gG]
+# exception : versions web légères préparées par npm run videos (720p, ~15 Mo par vidéo), publiées avec le site
+!/public/_videos/**/*.mp4
 
 # macOS : icônes personnalisées de dossier (fichier « Icon » + retour chariot)
 Icon?
