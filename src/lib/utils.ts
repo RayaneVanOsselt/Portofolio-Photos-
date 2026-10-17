@@ -61,6 +61,22 @@ export function dateKeywords(iso: string | null) {
   ].join(" ");
 }
 
+/** Durée d'une vidéo : 74.9 → « 1:14 » (secondes entamées non comptées, comme un lecteur). */
+export function formatDuration(seconds: number) {
+  const s = Math.max(0, Math.floor(seconds));
+  const h = Math.floor(s / 3600);
+  const mm = Math.floor((s % 3600) / 60);
+  const ss = String(s % 60).padStart(2, "0");
+  return h ? `${h}:${String(mm).padStart(2, "0")}:${ss}` : `${mm}:${ss}`;
+}
+
+/** Durée en toutes lettres (lecteurs d'écran) : 74.9 → « 1 min 14 s ». */
+export function spokenDuration(seconds: number) {
+  const s = Math.max(0, Math.floor(seconds));
+  const m = Math.floor(s / 60);
+  return m ? `${m} min${s % 60 ? ` ${s % 60} s` : ""}` : `${s} s`;
+}
+
 /** Taille lisible : 512 000 → « 500 Ko », 1 800 000 000 → « 1,7 Go ». */
 export function formatBytes(bytes: number) {
   const units = ["octets", "Ko", "Mo", "Go"];

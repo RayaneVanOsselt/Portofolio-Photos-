@@ -3,7 +3,7 @@ import { getSocialLinks, siteConfig } from "@/config/site";
 import { services } from "@/data/services";
 import { categoryContext, SPORT_LABEL } from "@/lib/albums";
 import { fallbackPath, isLocalPhoto } from "@/lib/photo-sources";
-import type { Album, Category, Photo } from "@/lib/types";
+import type { Album, Category, Photo, Video } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
 /* --------------------------------------------------------------- textes */
@@ -50,7 +50,7 @@ export function pageMetadata({ title, description = siteConfig.description, path
   const desc = clampDescription(description);
   // Toujours une image de partage : sinon une page qui définit son `openGraph` perd celle du site.
   const shared = image ?? { url: "/opengraph-image.png", alt: `${siteConfig.name} — ${siteConfig.tagline}` };
-  const images = [{ url: absoluteUrl(shared.url), width: 1200, height: 630, alt: shared.alt, type: "image/png" }];
+  const images = [{ url: absoluteUrl(shared.url), width: 1200, height: 630, alt: shared.alt, type: shared.url.endsWith(".jpg") ? "image/jpeg" : "image/png" }];
   return {
     title: { absolute: fullTitle },
     description: desc,
@@ -81,9 +81,9 @@ export function absoluteUrl(path: string) {
   return `${siteConfig.url}${clean}${suffix}`;
 }
 
-/** Image de partage d'une page d'albums : « /albums/daring-h1 » → « /og/albums/daring-h1.png » (src/app/og/). */
+/** Image de partage d'une page d'albums : « /albums/daring-h1 » → « /og/albums/daring-h1.jpg » (src/app/og/). */
 export function ogImageHref(href: string) {
-  return `/og${href.replace(/\/$/, "")}.png`;
+  return `/og${href.replace(/\/$/, "")}.jpg`;
 }
 
 /* ---------------------------------------------- données structurées */
@@ -250,6 +250,73 @@ function sportsEventJsonLd(album: Album) {
           ],
         }
       : {}),
+  };
+}
+
+/* ---------------------------------------------------------------- vidéos */
+
+/** Fichier vidéo ou image d'aperçu en adresse complète (hébergement vidéo, sinon le site). */
+const mediaUrl = (src: string) => (/^https?:\/\//.test(src) ? src : absoluteUrl(src));
+
+/** Durée ISO 8601 : 74.9 → « PT1M14S ». */
+const isoDuration = (seconds: number) => {
+  const s = Math.floor(seconds);
+  return `PT${Math.floor(s / 60)}M${s % 60}S`;
+};
+
+/** Texte de présentation d'une vidéo (Google, partage) : sa description, sinon une phrase factuelle. */
+export function videoDescription(video: Video) {
+  return video.description ?? `${video.title} — la vidéo du match du ${formatDate(video.date)}${video.sport ? ` (${video.sport.toLowerCase()})` : ""}, par ${siteConfig.name}.`;
+}
+
+/** Une vidéo pour Google (résultats et onglet Vidéos) : titre, aperçu, durée, fichier. */
+export function videoObjectJsonLd(video: Video) {
+  return {
+    "@type": "VideoObject",
+    "@id": absoluteUrl(video.href),
+    name: video.title,
+    description: videoDescription(video),
+    thumbnailUrl: [mediaUrl(video.poster.src)],
+    uploadDate: video.date,
+    duration: isoDuration(video.duration),
+    contentUrl: mediaUrl(video.file.src),
+    width: video.file.width,
+    height: video.file.height,
+    inLanguage: siteConfig.language,
+    isFamilyFriendly: true,
+    creator: { "@id": BUSINESS_ID() },
+    publisher: { "@id": BUSINESS_ID() },
+    ...(video.album ? { about: { "@type": "SportsEvent", name: video.album.title, startDate: video.date } } : {}),
+  };
+}
+
+/** Page Vidéos : la liste des vidéos. */
+export function videosPageJsonLd(videos: Video[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `Vidéos — ${siteConfig.name}`,
+    url: absoluteUrl("/videos"),
+    inLanguage: siteConfig.language,
+    isPartOf: { "@id": WEBSITE_ID() },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: videos.length,
+      itemListElement: videos.map((video, i) => ({ "@type": "ListItem", position: i + 1, item: videoObjectJsonLd(video) })),
+    },
+  };
+}
+
+/** Entrée du plan du site pour Google Vidéos. */
+export function videoSitemapEntry(video: Video) {
+  return {
+    title: video.title,
+    thumbnail_loc: mediaUrl(video.poster.src),
+    description: videoDescription(video),
+    content_loc: mediaUrl(video.file.src),
+    duration: Math.floor(video.duration),
+    publication_date: video.date,
+    family_friendly: "yes" as const,
   };
 }
 

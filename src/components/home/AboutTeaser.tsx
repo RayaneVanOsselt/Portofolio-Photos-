@@ -5,10 +5,10 @@ import { SectionStamp } from "@/components/ui/SectionLabel";
 import type { Photo } from "@/lib/types";
 
 /** Le photographe, en bref : portrait, présentation, spécialités. */
-export function AboutTeaser({ portrait, intro, specialties }: { portrait: Photo | null; intro: string; specialties: string[] }) {
+export function AboutTeaser({ portrait, intro, specialties, index = "04" }: { portrait: Photo | null; intro: string; specialties: string[]; index?: string }) {
   return (
     <section aria-labelledby="about-teaser-title" className="container-site section">
-      <SectionStamp index="04" meta="À propos">
+      <SectionStamp index={index} meta="À propos">
         Le photographe
       </SectionStamp>
       <div className="mt-12 grid items-end gap-12 md:mt-16 md:grid-cols-12">

@@ -234,30 +234,61 @@ export type Service = {
 
 /** Une vidéo telle que déclarée dans src/data/videos.ts. */
 export type VideoInput = {
-  /** Fin de l'adresse (/videos#<slug>), commence par la date : « 18-10-2026-daring-h1-oree-h1-resume ». */
+  /** Fin de l'adresse (/videos/#<slug>), commence par la date : « 11-10-2026-leo-racing ». */
   slug: string;
+  /** Titre affiché, tel qu'écrit dans le nom du fichier : « Léo – Racing ». */
   title: string;
   /** AAAA-MM-JJ */
   date: string;
-  /** Adresse complète du fichier MP4 (H.264). */
-  src: string;
-  /** Image d'aperçu affichée avant la lecture. */
-  poster?: string;
+  /** Nom du fichier dans le dossier « Vidéo à rajouter » (lu par `npm run videos`). */
+  source: string;
+  /** Album photo du même match (son slug) : logos, sport et lien « Photos du match ». */
+  album?: string;
   description?: string;
+  /** Seconde de la vidéo utilisée comme image d'aperçu (par défaut : au premier tiers). */
+  posterAt?: number;
+  /** Début, en secondes, des 4 courts extraits de l'aperçu animé (par défaut : répartis sur la vidéo). */
+  teaser?: number[];
+  /** Vidéo « À la une » en tête de la page Vidéos (par défaut : la plus récente). */
+  featured?: boolean;
+  /** Sans album : club (logo) et sport de la vidéo. */
   club?: ClubId;
   sport?: Sport;
-  /** Durée affichée, ex. « 1:24 ». */
-  duration?: string;
-  /** Poids du fichier en octets (affiché sur le bouton « Télécharger »). */
-  bytes?: number;
-  /** Format vertical 9:16 (Reels, TikTok). */
-  vertical?: boolean;
   downloadEnabled?: boolean;
 };
 
-export type Video = Omit<VideoInput, "club" | "downloadEnabled"> & {
-  crest: Crest | null;
-  /** Nom du fichier enregistré : rayvo-captures0808-2026-10-18-daring-h1-oree-h1-resume.mp4 */
-  filename: string;
-  downloadEnabled: boolean;
+/** Un fichier vidéo publié. */
+export type VideoFile = { src: string; width: number; height: number; bytes: number };
+
+/** Une vidéo prête à afficher (fiche + fichiers préparés par `npm run videos`). */
+export type Video = {
+  slug: string;
+  title: string;
+  date: string;
+  description?: string;
+  /** /videos/#<slug> */
+  href: string;
+  /** Sport affiché : « Hockey ». */
+  sport: string | null;
+  /** Logos des équipes (ou du club, de la compétition). */
+  crests: Crest[];
+  /** Album photo du même match. */
+  album: { title: string; href: string; context: string; photoCount: number } | null;
+  width: number;
+  height: number;
+  vertical: boolean;
+  /** Durée en secondes. */
+  duration: number;
+  color: string;
+  blurDataURL: string;
+  poster: { avif: string; webp: string; src: string; width: number; height: number };
+  /** Le fichier vidéo (720p), lu sur place et téléchargé. */
+  file: VideoFile;
+  /** Aperçu muet de quelques secondes, joué au survol. */
+  teaser: string;
+  /** Planche de vignettes (survol de la barre de lecture). */
+  storyboard: { src: string; interval: number; columns: number; count: number; width: number; height: number };
+  /** Fichier à télécharger (le même, au nom propre), ou null si le téléchargement est désactivé. */
+  download: { src: string; filename: string; bytes: number } | null;
+  featured: boolean;
 };
