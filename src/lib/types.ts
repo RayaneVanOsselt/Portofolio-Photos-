@@ -257,6 +257,12 @@ export type VideoInput = {
   downloadEnabled?: boolean;
 };
 
+/**
+ * Vidéo annoncée : sa fiche existe, mais pas encore ses fichiers (vidéo pas encore
+ * déposée ou `npm run videos` pas encore lancé). Affichée « Vidéo à venir ».
+ */
+export type UpcomingVideo = Pick<Video, "slug" | "title" | "date" | "description" | "sport" | "crests" | "album">;
+
 /** Un fichier vidéo publié. */
 export type VideoFile = { src: string; width: number; height: number; bytes: number };
 

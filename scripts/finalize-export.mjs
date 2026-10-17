@@ -12,7 +12,7 @@
  * ajouté ici, sinon le favicon est introuvable sur GitHub Pages.
  */
 import { existsSync } from "node:fs";
-import { readdir, readFile, rename, rm, writeFile } from "node:fs/promises";
+import { readdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const OUT = join(process.cwd(), "out");
@@ -59,4 +59,10 @@ await rm(join(OUT, "_photos", ".pipeline.json"), { force: true });
 // Le site est déjà compilé : GitHub Pages ne doit pas le retraiter avec Jekyll.
 await writeFile(join(OUT, ".nojekyll"), "");
 
-console.log(`✓ Export finalisé : ${renamed} image(s) de partage en .png, ${updated} fichier(s) mis à jour.`);
+// Poids réellement publié : GitHub Pages limite un site à 1 Go (voir README, « Poids du site »).
+const LIMIT = 1024 * 1024 * 1024;
+const total = (await Promise.all((await walk(OUT)).map((file) => stat(file)))).reduce((sum, s) => sum + s.size, 0);
+const mb = (bytes) => `${(bytes / 1024 / 1024).toFixed(0)} Mo`;
+
+console.log(`✓ Export finalisé : ${renamed} image(s) de partage en .png, ${updated} fichier(s) mis à jour — site publié : ${mb(total)} sur 1 024 Mo.`);
+if (total > LIMIT) console.warn(`⚠ Le site dépasse la limite de 1 Go de GitHub Pages (${mb(total)}) : la publication risque d'échouer. Voir README, « Poids du site ».`);

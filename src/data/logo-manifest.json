@@ -29,6 +29,12 @@
     "width": 173,
     "height": 256
   },
+  "uccle-sport": {
+    "src": "/logos/uccle-sport.webp",
+    "png": "/logos/uccle-sport.png",
+    "width": 207,
+    "height": 256
+  },
   "white-star": {
     "src": "/logos/white-star.webp",
     "png": "/logos/white-star.png",
