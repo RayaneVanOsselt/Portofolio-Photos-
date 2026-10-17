@@ -369,7 +369,7 @@ for (const video of videos) {
       manifest[video.slug] = previous[video.slug];
       if (dir) warnings.push(`${video.slug} : « ${video.source} » introuvable dans le dossier source — version déjà préparée conservée.`);
     } else {
-      warnings.push(`${video.slug} : « ${video.source} » introuvable — la vidéo n'apparaîtra pas sur le site.`);
+      warnings.push(`${video.slug} : « ${video.source} » introuvable — affichée « Vidéo à venir » sur le site en attendant.`);
     }
     continue;
   }

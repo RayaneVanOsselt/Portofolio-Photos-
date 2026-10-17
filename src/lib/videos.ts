@@ -3,7 +3,7 @@
  * `npm run videos` (src/data/video-manifest.json), vérifiées au build comme les albums.
  *
  * Les fichiers sont dans public/_videos/ et publiés avec le site. Une vidéo dont les
- * fichiers manquent (`npm run videos` pas encore lancé) n'est pas affichée.
+ * fichiers manquent (`npm run videos` pas encore lancé) est annoncée « Vidéo à venir ».
  * `siteConfig.videoHost` permet de les servir depuis un autre hébergement (voir site.ts).
  * Réservé au serveur (lit le disque) : les composants reçoivent des objets `Video`.
  */
@@ -13,7 +13,7 @@ import { siteConfig } from "@/config/site";
 import manifestJson from "@/data/video-manifest.json";
 import { videos as videoInputs } from "@/data/videos";
 import { albumCrests, categoryContext, crestOf, getAllAlbums, SPORT_NAME } from "@/lib/albums";
-import type { Album, Crest, Video, VideoInput } from "@/lib/types";
+import type { Album, UpcomingVideo, Video, VideoInput } from "@/lib/types";
 import { publicPath } from "@/lib/utils";
 
 export const VIDEOS_HREF = "/videos";
@@ -55,31 +55,15 @@ function findAlbum(slug: string, where: string): Album {
   return matches[0];
 }
 
-function buildVideo(input: VideoInput): Video | null {
+/** Ce que la fiche suffit à dire d'une vidéo (titre, date, logos, sport, album), fichiers ou non. */
+function describeVideo(input: VideoInput): UpcomingVideo {
   const where = `vidéo « ${input.slug} »`;
   if (!SLUG.test(input.slug)) fail(`${where} : le slug ne doit contenir que des minuscules, des chiffres et des tirets`);
   const [, y, m, d] = input.date.match(ISO_DATE) ?? [];
   if (!y || Number.isNaN(Date.parse(input.date))) fail(`${where} : date « ${input.date} » invalide (format attendu : AAAA-MM-JJ)`);
   if (!input.slug.startsWith(`${d}-${m}-${y}-`)) fail(`${where} : le slug doit commencer par la date, « ${d}-${m}-${y}-… »`);
   const album = input.album ? findAlbum(input.album, where) : null;
-
-  const entry = manifest[input.slug];
-  if (!entry) {
-    if (process.env.NODE_ENV !== "production") console.warn(`[vidéos] ${where} pas encore préparée : lancez \`npm run videos\``);
-    return null;
-  }
-  const local = existsSync(join(LOCAL_DIR, input.slug, entry.files.video.file));
-  const host = isDev && local ? "" : configuredHost;
-  // Fichiers absents (vidéo pas encore préparée ou pas encore commitée) : la vidéo reste masquée.
-  if (!host && !local) return null;
-
-  const url = (file: string) => fileUrl(host, input.slug, file);
-  const { widths } = entry.poster;
-  const srcSet = (format: "avif" | "webp") => widths.map((w) => `${url(`affiche-${w}.${format}`)} ${w}w`).join(", ");
-  const fallback = widths.find((w) => w >= 960) ?? widths.at(-1)!;
-  const downloadEnabled = input.downloadEnabled ?? siteConfig.downloads.videos;
   const club = crestOf(input.club);
-  const crests: Crest[] = album ? albumCrests(album) : club ? [club] : [];
   const sport = album?.category.sport ?? input.sport;
 
   return {
@@ -87,10 +71,33 @@ function buildVideo(input: VideoInput): Video | null {
     title: input.title,
     date: input.date,
     description: input.description,
-    href: `${VIDEOS_HREF}/#${input.slug}`,
     sport: sport ? SPORT_NAME[sport] : null,
-    crests,
+    crests: album ? albumCrests(album) : club ? [club] : [],
     album: album && !album.private ? { title: album.title, href: album.href, context: categoryContext(album.category), photoCount: album.photos.length } : null,
+  };
+}
+
+/** La vidéo prête à lire, ou null si ses fichiers ne sont pas encore préparés (elle est alors « à venir »). */
+function buildVideo(input: VideoInput, base: UpcomingVideo): Video | null {
+  const entry = manifest[input.slug];
+  if (!entry) {
+    if (isDev) console.warn(`[vidéos] vidéo « ${input.slug} » pas encore préparée (affichée « à venir ») : déposez « ${input.source} » dans « Vidéo à rajouter » puis lancez \`npm run videos\``);
+    return null;
+  }
+  const local = existsSync(join(LOCAL_DIR, input.slug, entry.files.video.file));
+  const host = isDev && local ? "" : configuredHost;
+  // Fichiers absents (vidéo pas encore préparée ou pas encore commitée) : la vidéo reste « à venir ».
+  if (!host && !local) return null;
+
+  const url = (file: string) => fileUrl(host, input.slug, file);
+  const { widths } = entry.poster;
+  const srcSet = (format: "avif" | "webp") => widths.map((w) => `${url(`affiche-${w}.${format}`)} ${w}w`).join(", ");
+  const fallback = widths.find((w) => w >= 960) ?? widths.at(-1)!;
+  const downloadEnabled = input.downloadEnabled ?? siteConfig.downloads.videos;
+
+  return {
+    ...base,
+    href: `${VIDEOS_HREF}/#${input.slug}`,
     width: entry.width,
     height: entry.height,
     vertical: entry.height > entry.width,
@@ -117,15 +124,23 @@ function buildVideo(input: VideoInput): Video | null {
 }
 
 // Les plus récentes d'abord ; à date égale, l'ordre de src/data/videos.ts.
-const videos = videoInputs
-  .map((input, order) => ({ video: buildVideo(input), order }))
-  .filter((v): v is { video: Video; order: number } => v.video !== null)
-  .sort((a, b) => b.video.date.localeCompare(a.video.date) || a.order - b.order)
-  .map((v) => v.video);
+const entries = videoInputs
+  .map((input, order) => {
+    const base = describeVideo(input);
+    return { base, video: buildVideo(input, base), order };
+  })
+  .sort((a, b) => b.base.date.localeCompare(a.base.date) || a.order - b.order);
+const videos = entries.flatMap((e) => (e.video ? [e.video] : []));
+const upcoming = entries.flatMap((e) => (e.video ? [] : [e.base]));
 
 /** Vidéos publiées, les plus récentes d'abord. */
 export function getVideos(): Video[] {
   return videos;
+}
+
+/** Vidéos annoncées (fiche sans fichier préparé), affichées « Vidéo à venir », les plus récentes d'abord. */
+export function getUpcomingVideos(): UpcomingVideo[] {
+  return upcoming;
 }
 
 /** Vidéo « À la une » : celle marquée `featured`, sinon la plus récente. */

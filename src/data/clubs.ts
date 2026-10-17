@@ -18,6 +18,7 @@ export const clubs = {
   leopold: { name: "Léopold", aliases: ["Leopold", "Leo"] },
   "louvain-la-neuve": { name: "Louvain-la-Neuve" },
   rwdm: { name: "RWDM" },
+  "uccle-sport": { name: "Uccle Sport", aliases: ["Royal Uccle Sport"] },
   "white-star": { name: "White Star" },
   woluwe: { name: "Woluwe Hockey Club", aliases: ["Woluwe"] },
   wolvendael: { name: "Wolvendael" },

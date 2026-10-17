@@ -73,7 +73,7 @@ Les matchs sont **triés automatiquement par date**, du plus récent au plus anc
 
    Exportez-les en JPEG (2048 px sur le grand côté suffit : c'est la taille des fichiers à télécharger). Les sous-dossiers deviennent des **chapitres** (ex. `Belgique/`, `Pays Bas/`, ou `01-avant-match/`, `02-action/`…). Les vidéos ne sont jamais envoyées sur GitHub (voir « Vidéos » ci-dessous).
 
-2. **Une entrée** dans les `albums` de la bonne catégorie, dans `src/data/albums.ts`, avec le chemin de ce dossier copié tel quel (espaces compris) :
+2. **Une entrée** dans les `albums` de la bonne catégorie, dans `src/data/albums.ts`, avec le chemin de ce dossier copié tel quel (espaces compris). Pas besoin de l'écrire à la main : `npm run photos` repère le nouveau dossier et **affiche la fiche toute prête** (date lue dans le nom du dossier ou dans les photos, équipes lues dans le nom « Daring - Orée ») — copiez-la, puis complétez les équipes (« Daring H1 ») :
 
    ```ts
    {
@@ -97,10 +97,10 @@ Les matchs sont **triés automatiquement par date**, du plus récent au plus anc
 | Usage | Fichiers | Détail |
 | --- | --- | --- |
 | Affichage | AVIF 320 · 640 · 1080 · 1600 · 2048 px | qualité croissante avec la taille (50 → 58) ; ~30 % plus léger que le WebP |
-| Repli | WebP 320 · 640 · 1080 px | navigateurs anciens, vignettes de recherche, partage, Google |
-| Téléchargement | JPEG 2048 px, qualité 90, sRGB | nom propre : `rayvo-captures0808-2026-10-18-daring-h1-oree-h1-07.jpg` ; auteur et copyright inscrits |
+| Repli | WebP 320 · 640 px | navigateurs sans AVIF (~5 % des visiteurs) et vignettes ; en grand, ces navigateurs reçoivent le JPEG à télécharger (plus fin). WebP 1080 px en plus pour une galerie non téléchargeable |
+| Téléchargement | JPEG 2048 px, qualité 86 (mozjpeg), sRGB | nom propre : `rayvo-captures0808-2026-10-18-daring-h1-oree-h1-07.jpg` ; auteur et copyright inscrits ; sert aussi d'image pour Google |
 
-Aucune métadonnée privée n'est publiée (ni GPS, ni numéro de série du boîtier) ; les réglages de prise de vue (boîtier, objectif, focale, ouverture, vitesse, ISO) sont affichés dans la visionneuse. Le traitement est **incrémental** : une photo dont le contenu n'a pas changé n'est jamais réencodée (y compris sur GitHub, grâce au cache de la publication), et les fichiers générés d'une photo retirée sont supprimés. Le script signale aussi les fichiers illisibles, les formats non pris en charge (RAW, HEIC : exportez en JPEG) et les doublons.
+Aucune métadonnée privée n'est publiée (ni GPS, ni numéro de série du boîtier) ; les réglages de prise de vue (boîtier, objectif, focale, ouverture, vitesse, ISO) sont affichés dans la visionneuse. Le traitement est **incrémental** : une photo dont le contenu n'a pas changé n'est jamais réencodée (y compris sur GitHub, grâce au cache de la publication), et les fichiers générés d'une photo retirée sont supprimés. Le script signale aussi les fichiers illisibles, les formats non pris en charge (RAW, HEIC : exportez en JPEG) et les doublons, et affiche la **place restante** sur GitHub Pages, en nombre de photos (voir « Poids du site », §10).
 
 L'ordre d'affichage suit le nom de fichier. Le texte alternatif est déduit du nom de fichier (modifiable dans `src/data/photo-manifest.json`, conservé ensuite) et complété par le match : « Célébration du but — Daring H1 vs Leo H1 ». Pour un nom d'appareil (`IMG_1234.jpg`), il devient « Daring H1 vs Leo H1 — photo 12 (hockey sur gazon, 20 septembre 2026) ».
 
@@ -162,13 +162,15 @@ La page **Vidéos** (`/videos`) met en avant la dernière vidéo (aperçu animé
 
 **Rapide par construction** : rien n'est téléchargé avant « Lecture » (seulement l'image d'aperçu, en AVIF) ; les MP4 démarrent dès les premiers octets ; 720p à ~2 Mb/s, fluide même en 4G moyenne.
 
+**Vidéo à venir** : une fiche dont le fichier n'est pas encore préparé s'affiche déjà en haut de la page Vidéos, dans un cadre « Vidéo à venir » (titre, date, logos, lien vers l'album). Elle est remplacée toute seule par la vidéo après `npm run videos`.
+
 **Ajouter une vidéo** :
 1. déposez le fichier dans le dossier **`Vidéo à rajouter`** (à la racine du projet ; ces originaux ne partent jamais sur GitHub) ;
 2. ajoutez sa fiche dans **`src/data/videos.ts`** (titre, date, `source` = nom du fichier, `album` = slug de l'album du même match) — `npm run videos` propose la fiche toute prête, titre et date lus dans le nom du fichier ;
 3. lancez **`npm run videos`** : version web 720p (~14 Mo par minute), aperçu animé, images d'aperçu et vignettes, dans `public/_videos/` (≈ 15 s par vidéo ; seules les nouveautés sont traitées) ;
 4. commitez et publiez comme d'habitude : `public/_videos/` part avec le site.
 
-**Poids** : les vidéos sont publiées avec le site, que GitHub Pages limite à 1 Go (photos ≈ 840 Mo + vidéos ≈ 90 Mo en octobre 2026). `npm run videos` et `npm run photos` affichent le total : au-delà de ~900 Mo, il faudra héberger les vidéos ailleurs (Cloudflare R2, par exemple) — copier `public/_videos/` sur cet hébergement et indiquer son adresse dans `src/config/site.ts` → `videoHost` suffit. Éviter aussi de réencoder les vidéos déjà publiées (changer les réglages de `scripts/videos.mjs`) : chaque nouvelle version alourdit l'historique GitHub.
+**Poids** : les vidéos sont publiées avec le site, que GitHub Pages limite à 1 Go (site ≈ 853 Mo le 17/10/2026 : photos ≈ 725 Mo, vidéos ≈ 91 Mo, pages ≈ 37 Mo — place pour ≈ 190 photos de plus). `npm run photos` affiche la place restante : quand elle manque, on peut héberger les vidéos ailleurs (Cloudflare R2, par exemple) — copier `public/_videos/` sur cet hébergement et indiquer son adresse dans `src/config/site.ts` → `videoHost` suffit. Éviter aussi de réencoder les vidéos déjà publiées (changer les réglages de `scripts/videos.mjs`) : chaque nouvelle version alourdit l'historique GitHub.
 
 Les vidéos d'**origine** ne sont **jamais** envoyées sur GitHub (qui refuse les fichiers de plus de 100 Mo) : `.gitignore` les exclut (`.mp4`, `.mov`, `.webm`, `.avi`, `.mkv`…, majuscules comprises), sauf les versions web de `public/_videos/`. Un garde-fou local refuse en plus tout commit contenant une vidéo hors de `public/_videos/` ou un fichier de plus de 95 Mo, y compris depuis GitHub Desktop. Pour l'installer (ou le mettre à jour) sur un ordinateur :
 
@@ -244,7 +246,7 @@ npm run build      # → dossier out/, le site prêt à publier
 
 Ensuite, chaque mise à jour de la branche `main` publie automatiquement le site (onglet **Actions**, workflow « Publier le site »). Adresse : <https://rayvocaptures0808.be> (domaine personnalisé ; sans lui, `https://<utilisateur>.github.io/<nom-du-dépôt>/`). Les versions web des photos sont gardées en cache d'une publication à l'autre : seules les photos nouvelles sont encodées (quelques minutes) ; la toute première publication prend une quinzaine de minutes.
 
-**Hébergement — à surveiller.** GitHub Pages limite un site à **1 Go**. Avec les 795 photos actuelles, les versions web et les fichiers à télécharger pèsent environ 880 Mo : `npm run photos` affiche ce total et prévient au-delà de 850 Mo. Quand le site grandit, deux solutions sans changer le code : publier le même dossier `out/` sur **Cloudflare Pages** (gratuit, sans limite de taille totale), ou passer certaines galeries en `downloadEnabled: false` (environ −45 % de poids par photo).
+**Poids du site — à surveiller.** GitHub Pages limite un site à **1 Go** (au-delà, la publication n'est plus garantie). Chaque photo publiée pèse environ 885 Ko (toutes ses versions comprises) : un album de 100 photos ≈ 86 Mo. `npm run photos` affiche la place restante en nombre de photos, et `npm run build` le poids réel du site (avertissement au-delà de 1 Go). Quand la place vient à manquer, sans changer le code : publier le même dossier `out/` sur **Cloudflare Pages** (gratuit, sans limite de taille totale), ou passer d'anciennes galeries en `downloadEnabled: false` (environ −30 % de poids par photo, mais plus de téléchargement).
 
 **Domaine personnalisé** (actuellement `rayvocaptures0808.be`) : il se règle dans Settings → Pages → Custom domain ; l'Action adapte automatiquement les adresses du site.
 

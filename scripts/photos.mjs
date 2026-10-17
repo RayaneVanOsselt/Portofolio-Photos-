@@ -8,8 +8,9 @@
  *   - public/images/** : photos des pages (site/home, site/about…) et anciens albums.
  *
  * Pour chaque photo, dans public/_photos/ (généré, non commité) :
- *   - AFFICHAGE : AVIF en 5 largeurs (320 → 2048 px) + WebP en repli (320 → 1080 px),
- *     sans aucune métadonnée (ni boîtier, ni numéro de série, ni GPS) ;
+ *   - AFFICHAGE : AVIF en 5 largeurs (320 → 2048 px) + WebP en repli (320 → 640 px ;
+ *     1080 px si la galerie n'est pas téléchargeable, sinon c'est le JPEG à télécharger
+ *     qui sert de grand repli), sans aucune métadonnée (ni boîtier, ni GPS) ;
  *   - TÉLÉCHARGEMENT (galeries autorisées, voir src/lib/downloads.ts) : JPEG haute
  *     qualité, profil sRGB, auteur et copyright, nom propre
  *     (rayvo-captures0808-2026-05-23-daring-h1-namur-h1-07.jpg).
@@ -22,8 +23,9 @@
  * retraitée — y compris sur GitHub, où les dates de fichiers ne veulent rien dire.
  * Les fichiers générés qui ne correspondent plus à aucune photo sont supprimés.
  *
- * Signale : dossiers de « Dossier photos/ » reliés à aucun album, formats non pris
- * en charge (RAW, HEIC…), fichiers illisibles, doublons, poids total publié.
+ * Signale : dossiers de « Dossier photos/ » reliés à aucun album (avec la fiche
+ * prête à coller dans src/data/albums.ts), formats non pris en charge (RAW, HEIC…),
+ * fichiers illisibles, doublons, poids publié et place restante sur GitHub Pages.
  */
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
@@ -67,11 +69,21 @@ const WEBP = [
   { width: 640, quality: 78 },
   { width: 1080, quality: 80 },
 ];
+/**
+ * Galerie téléchargeable : WebP jusqu'à 640 px seulement. Au-delà, les navigateurs
+ * sans AVIF (~5 % des visiteurs) reçoivent le JPEG à télécharger, déjà publié et plus
+ * fin : ~110 Ko de moins par photo. Même règle côté site (src/lib/photo-sources.ts).
+ */
+const WEBP_MAX_WITH_DOWNLOAD = 640;
 /** JPEG à télécharger : qualité 86 (mozjpeg), sans différence visible à 2048 px, ~40 % plus léger que l'export d'origine. */
 const DOWNLOAD_QUALITY = 86;
 const SETTINGS = { avif: AVIF, webp: WEBP, download: { quality: DOWNLOAD_QUALITY } };
-/** Au-delà, GitHub Pages (limite : 1 Go par site) devient trop juste. */
-const PUBLISH_WARNING = 850 * 1024 * 1024;
+/** GitHub Pages : 1 Go par site publié (photos + vidéos + pages). */
+const SITE_LIMIT = 1024 * 1024 * 1024;
+/** Pages, scripts, images de partage, logos (mesuré : ~35 Mo en octobre 2026). */
+const SITE_OTHER = 40 * 1024 * 1024;
+/** Avertissement quand il reste moins que l'équivalent d'un gros album. */
+const ROOM_WARNING = 100 * 1024 * 1024;
 const LARGE_FILE = 6_000_000;
 
 const byName = (a, b) => a.localeCompare(b, "fr", { numeric: true });
@@ -168,6 +180,31 @@ async function unmappedFolders(sources) {
   return found;
 }
 
+/**
+ * Fiche prête à coller dans src/data/albums.ts pour un dossier pas encore relié :
+ * date lue dans le nom (« Daring - Orée 18:10:2026 », « RWDM 031026 ») ou, à défaut,
+ * dans la photo (EXIF) ; équipes lues dans le nom (« Daring - Orée », « Leo vs Racing »).
+ */
+async function suggestAlbum(folder) {
+  const name = basename(folder).normalize("NFC").trim();
+  const inName = name.match(/(\d{1,2})[:/._-](\d{1,2})[:/._-](\d{4}|\d{2})(?!\d)/) ?? name.match(/(?<!\d)(\d{2})(\d{2})(\d{2})(?!\d)/);
+  let date = inName ? `${inName[3].length === 2 ? `20${inName[3]}` : inName[3]}-${inName[2].padStart(2, "0")}-${inName[1].padStart(2, "0")}` : null;
+  if (!date || Number.isNaN(Date.parse(date))) {
+    const first = (await imagesIn(join(SOURCE_DIR, folder)))[0];
+    date = first ? await sharp(first).metadata().then((info) => readExif(info.exif)?.date ?? null, () => null) : null;
+  }
+  const label = name
+    .replace(inName?.[0] ?? "\0", "")
+    .replace(/\(.*?\)/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const [home, away] = label.split(/\s+(?:-|–|vs\.?|VS\.?|Vs\.?)\s+/);
+  const teams = home && away ? `match: { home: "${home}", away: "${away}" }` : `title: "${label || name}"`;
+  const [y, m, d] = (date ?? "AAAA-MM-JJ").split("-");
+  const slug = `${d}-${m}-${y}-${fileSlug(home && away ? `${home} ${away}` : label || name)}`;
+  return `{ slug: "${slug}", date: "${date ?? "AAAA-MM-JJ"}", ${teams}, source: "${folder.split(sep).join("/")}" },`;
+}
+
 /** Photos de public/images/** : un groupe par dossier (clé = chemin du dossier). */
 async function publicGroups() {
   const files = (await imagesIn(IMAGES_DIR)).filter((f) => relative(IMAGES_DIR, f).includes(sep));
@@ -251,7 +288,7 @@ async function processPhoto({ full, key, file, download }) {
       path: `${base}-${width}.avif`,
       make: (img) => img.resize({ width, withoutEnlargement: true }).avif({ quality, effort: 4 }),
     })),
-    ...widthsFor(WEBP, meta.width).map(({ width, quality }) => ({
+    ...widthsFor(download ? WEBP.filter((v) => v.width <= WEBP_MAX_WITH_DOWNLOAD) : WEBP, meta.width).map(({ width, quality }) => ({
       kind: "webp",
       path: `${base}-${width}.webp`,
       make: (img) => img.resize({ width, withoutEnlargement: true }).webp({ quality, effort: 4 }),
@@ -401,12 +438,21 @@ await writeFile(MANIFEST, `${JSON.stringify(sorted, null, 2)}\n`);
 
 // ---------------------------------------------------------------- rapport
 
-const published = (await Promise.all((await walkFiles(OUT_DIR)).map((f) => stat(f)))).reduce((n, s) => n + s.size, 0);
+const sizeOf = async (dir) => (await Promise.all((await walkFiles(dir)).map((f) => stat(f)))).reduce((n, s) => n + s.size, 0);
+const published = await sizeOf(OUT_DIR);
+const videoBytes = await sizeOf(join(ROOT, "public", "_videos"));
 const seconds = Math.round((Date.now() - started) / 1000);
 console.log(`✓ ${stats.photos} photo(s) dans ${Object.keys(manifest).length} dossier(s) — ${stats.generated} traitée(s), ${stats.files} fichier(s) écrit(s), ${removed} supprimé(s), ${seconds} s`);
 console.log(
-  `  AVIF ${AVIF.map((v) => v.width).join("/")} + WebP ${WEBP.map((v) => v.width).join("/")} · JPEG à télécharger pour ${sources.filter((s) => s.download).length}/${sources.length} album(s) · ${mb(published)} publiés`,
+  `  AVIF ${AVIF.map((v) => v.width).join("/")} + WebP ${WEBP.map((v) => v.width).join("/")} (${WEBP_MAX_WITH_DOWNLOAD} max. si téléchargeable) · JPEG à télécharger pour ${sources.filter((s) => s.download).length}/${sources.length} album(s) · ${mb(published)} publiés`,
 );
+// Place restante sur GitHub Pages, en photos : de quoi savoir combien d'albums ajouter encore.
+const perPhoto = stats.photos ? published / stats.photos : 1;
+const room = SITE_LIMIT - published - videoBytes - SITE_OTHER;
+const roomLine = `site ≈ ${mb(published + videoBytes + SITE_OTHER)} sur 1 024 Mo (photos ${mb(published)} + vidéos ${mb(videoBytes)} + pages ~${mb(SITE_OTHER)}) — ${
+  room > 0 ? `place pour ≈ ${Math.floor(room / perPhoto)} photos de plus (${Math.round(perPhoto / 1024)} Ko par photo)` : `limite dépassée de ${mb(-room)}`
+}`;
+console.log(`  ${roomLine}`);
 for (const source of sources) {
   const count = source.groups.reduce((n, g) => n + g.files.length, 0);
   const chapters = source.groups.length > 1 ? `, ${source.groups.length} chapitres` : "";
@@ -418,9 +464,12 @@ const report = (title, list) => {
   console.warn(`\n${title}`);
   for (const line of list) console.warn(`  · ${line}`);
 };
-if (published > PUBLISH_WARNING) console.warn(`\n⚠ ${mb(published)} de photos publiées : GitHub Pages limite un site à 1 Go (voir README, « Hébergement »).`);
+if (room < ROOM_WARNING) console.warn(`\n⚠ GitHub Pages limite un site à 1 Go : ${roomLine}. Voir README, « Poids du site ».`);
 const unmapped = await unmappedFolders(sources);
-report(`⚠ ${unmapped.length} dossier(s) de « Dossier photos/ » relié(s) à aucun album — ajoutez \`source\` dans src/data/albums.ts :`, unmapped);
+report(
+  `⚠ ${unmapped.length} dossier(s) de « Dossier photos/ » relié(s) à aucun album — fiche(s) à coller dans src/data/albums.ts (vérifiez équipes et date) :`,
+  await Promise.all(unmapped.map(suggestAlbum)),
+);
 report("⚠ Sources introuvables ou en double :", warnings.missing);
 report(`⚠ ${warnings.unreadable.length} fichier(s) illisible(s) ou corrompu(s), ignoré(s) :`, warnings.unreadable);
 report(`⚠ ${warnings.unsupported.length} fichier(s) dans un format non pris en charge (exportez-les en JPEG) :`, warnings.unsupported);

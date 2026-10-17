@@ -3,10 +3,11 @@ import { MetaList, PageIntro } from "@/components/layout/PageIntro";
 import { ClosingCta } from "@/components/sections/ClosingCta";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { ButtonLink } from "@/components/ui/Button";
+import { UpcomingVideos } from "@/components/videos/UpcomingVideos";
 import { VideoShowcase } from "@/components/videos/VideoShowcase";
 import { inArea, pageMetadata, videosPageJsonLd } from "@/lib/seo";
 import { formatDateMedium, formatDuration, pad } from "@/lib/utils";
-import { getFeaturedVideo, getVideos, VIDEOS_HREF } from "@/lib/videos";
+import { getFeaturedVideo, getUpcomingVideos, getVideos, VIDEOS_HREF } from "@/lib/videos";
 
 export const metadata: Metadata = pageMetadata({
   title: "Vidéos de match — hockey, football, rugby",
@@ -15,12 +16,13 @@ export const metadata: Metadata = pageMetadata({
 });
 
 /**
- * Vidéos (src/data/videos.ts, préparées par `npm run videos`) : la dernière à la une,
- * puis toutes les autres. Lecture plein écran, téléchargement
- * (iPhone : Enregistrer dans Photos ; Android : galerie).
+ * Vidéos (src/data/videos.ts, préparées par `npm run videos`) : celles annoncées
+ * (« Vidéo à venir »), la dernière à la une, puis toutes les autres. Lecture plein
+ * écran, téléchargement (iPhone : Enregistrer dans Photos ; Android : galerie).
  */
 export default function VideosPage() {
   const videos = getVideos();
+  const upcoming = getUpcomingVideos();
   const featured = getFeaturedVideo();
 
   return (
@@ -47,6 +49,8 @@ export default function VideosPage() {
           ) : null
         }
       />
+
+      {upcoming.length ? <UpcomingVideos videos={upcoming} /> : null}
 
       {videos.length && featured ? (
         <>

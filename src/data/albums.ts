@@ -10,7 +10,8 @@
  * ─── Ajouter un match ──────────────────────────────────────────────────────
  * 1. Déposez les photos dans « Dossier photos/ », rangées comme vous le souhaitez
  *    (un dossier par match, ex. « DARING /Messieurs 1 /Daring - Orée 18:10:2026 »).
- * 2. Une entrée dans `albums` de la bonne catégorie, avec le chemin de ce dossier :
+ * 2. Une entrée dans `albums` de la bonne catégorie, avec le chemin de ce dossier
+ *    (`npm run photos` l'affiche toute prête pour chaque nouveau dossier) :
  *      { slug: "18-10-2026-daring-h1-oree-h1", date: "2026-10-18",
  *        match: { home: "Daring H1", away: "Orée H1" },
  *        source: "DARING /Messieurs 1 /Daring - Orée 18:10:2026" },
@@ -258,6 +259,27 @@ export const albumTree: CategoryInput[] = [
         match: { home: "RWDM", away: "Flénu" },
         source: "RWDM 2026-2027/RWDM 290826",
         cover: "IMG_5093.jpg",
+      },
+    ],
+  },
+  {
+    // Club découpé en équipes : menu « Uccle Sport » → U19B1.
+    slug: "uccle-sport",
+    title: "Uccle Sport",
+    sport: "hockey",
+    club: "uccle-sport",
+    children: [
+      {
+        slug: "u19b1",
+        title: "U19B1",
+        albums: [
+          {
+            slug: "17-10-2026-uccle-sport-u19b1-pingouin-u19b1",
+            date: "2026-10-17",
+            match: { home: "Uccle Sport U19B1", away: "Pingouin U19B1" },
+            source: "Uccle Sport/U19B1/Uccle Sport - Pingouin 17:10:2026",
+          },
+        ],
       },
     ],
   },
