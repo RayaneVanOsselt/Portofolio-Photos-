@@ -108,7 +108,8 @@ function Featured({ video, onOpen }: { video: Video; onOpen: () => void }) {
               ))}
             </div>
           ) : null}
-          <h2 id="featured-title" className="t-h1 mt-6 text-linen" data-reveal style={delay(200)}>
+          {/* Noms d'équipes : jamais coupés par un trait d'union (« PIN-GOUIN ») ; un mot trop large passe quand même à la ligne. */}
+          <h2 id="featured-title" className="t-h1 mt-6 text-linen hyphens-manual" data-reveal style={delay(200)}>
             {video.title}
           </h2>
           {video.description ? (

@@ -24,12 +24,13 @@ import type { VideoInput } from "@/lib/types";
 
 export const videos: VideoInput[] = [
   {
-    // Affichée « Vidéo à venir » tant que le fichier n'est pas dans « Vidéo à rajouter ».
     slug: "17-10-2026-uccle-sport-pingouin-u19b1",
     title: "Uccle Sport U19B1 – Pingouin U19B1",
     date: "2026-10-17",
-    source: "Uccle Sport U19B1 - Pingouin U19B1 17:10:26.mp4",
+    source: "Uccle sport u19b1 - Pingouin u19b1 171026.mp4",
     album: "17-10-2026-uccle-sport-u19b1-pingouin-u19b1",
+    posterAt: 28.5,
+    teaser: [11, 25, 30, 38],
   },
   {
     slug: "11-10-2026-leo-racing",
