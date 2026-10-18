@@ -37,6 +37,45 @@
       "height": 160
     }
   },
+  "17-10-2026-uccle-sport-pingouin-u19b1": {
+    "source": "Uccle sport u19b1 - Pingouin u19b1 171026.mp4",
+    "hash": "2909c736f1bd4f64",
+    "width": 1920,
+    "height": 1080,
+    "duration": 82.77,
+    "fps": 30,
+    "color": "#789888",
+    "blurDataURL": "data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAABwAQCdASoQAAkAAwBSJYgCdADTAADybFfgbZVbifmB8dIDgcs3nVA/m7f7UsqAcbc46aHMpCTQB2J4/29kEh62aFpr79AA",
+    "poster": {
+      "at": 28.5,
+      "widths": [
+        480,
+        960,
+        1440,
+        1920
+      ]
+    },
+    "files": {
+      "video": {
+        "file": "rayvo-captures0808-2026-10-17-uccle-sport-pingouin-u19b1.mp4",
+        "width": 1280,
+        "height": 720,
+        "bytes": 19687802
+      },
+      "teaser": {
+        "file": "apercu.mp4",
+        "bytes": 656988
+      }
+    },
+    "storyboard": {
+      "file": "vignettes.webp",
+      "interval": 1,
+      "columns": 10,
+      "count": 83,
+      "width": 160,
+      "height": 90
+    }
+  },
   "23-05-2026-daring-namur-h1": {
     "source": "Daring - Namur H1 23:05:26.mp4",
     "hash": "c041f2c88d6297f2",
