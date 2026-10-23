@@ -96,9 +96,9 @@ Les matchs sont **triés automatiquement par date**, du plus récent au plus anc
 
 | Usage | Fichiers | Détail |
 | --- | --- | --- |
-| Affichage | AVIF 320 · 640 · 1080 · 1600 · 2048 px | qualité croissante avec la taille (50 → 58) ; ~30 % plus léger que le WebP |
+| Affichage | AVIF 320 · 640 · 1080 · 1600 · 2048 px | qualité croissante avec la taille (50 → 58), couleurs en 4:2:0 ; ~30 % plus léger que le WebP |
 | Repli | WebP 320 · 640 px | navigateurs sans AVIF (~5 % des visiteurs) et vignettes ; en grand, ces navigateurs reçoivent le JPEG à télécharger (plus fin). WebP 1080 px en plus pour une galerie non téléchargeable |
-| Téléchargement | JPEG 2048 px, qualité 86 (mozjpeg), sRGB | nom propre : `rayvo-captures0808-2026-10-18-daring-h1-oree-h1-07.jpg` ; auteur et copyright inscrits ; sert aussi d'image pour Google |
+| Téléchargement | JPEG 2048 px, qualité 82 (mozjpeg), sRGB | nom propre : `rayvo-captures0808-2026-10-18-daring-h1-oree-h1-07.jpg` ; auteur et copyright inscrits ; sert aussi d'image pour Google |
 
 Aucune métadonnée privée n'est publiée (ni GPS, ni numéro de série du boîtier) ; les réglages de prise de vue (boîtier, objectif, focale, ouverture, vitesse, ISO) sont affichés dans la visionneuse. Le traitement est **incrémental** : une photo dont le contenu n'a pas changé n'est jamais réencodée (y compris sur GitHub, grâce au cache de la publication), et les fichiers générés d'une photo retirée sont supprimés. Le script signale aussi les fichiers illisibles, les formats non pris en charge (RAW, HEIC : exportez en JPEG) et les doublons, et affiche la **place restante** sur GitHub Pages, en nombre de photos (voir « Poids du site », §10).
 
@@ -115,6 +115,15 @@ Un objet dans `albumTree` :
 ```
 
 Des sous-catégories (`children`) peuvent être imbriquées sur autant de niveaux que nécessaire — comme FIH Pro League → Hommes / Femmes, ou plus tard Club → Saison → Compétition → Match. L'ordre du fichier est celui du menu.
+
+**Un match sous deux clubs** — un album est rangé dans une seule catégorie (c'est son adresse). Pour le montrer aussi sous l'adversaire, sans doubler les photos ni le poids du site, la catégorie de l'adversaire liste son slug dans `include` :
+
+```ts
+{ slug: "waterloo-ducks", title: "Waterloo Ducks", sport: "hockey", club: "waterloo-ducks",
+  children: [{ slug: "h1", title: "H1", include: ["25-10-2026-daring-h1-waterloo-ducks-h1"] }] },
+```
+
+Le club apparaît alors dans le menu, avec son logo, et dans les filtres de « Retrouver mes photos » ; ses cartes mènent à l'album d'origine.
 
 ### Logos des clubs
 

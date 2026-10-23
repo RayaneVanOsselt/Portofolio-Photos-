@@ -64,6 +64,11 @@ const AVIF = [
   { width: 1600, quality: 57 },
   { width: 2048, quality: 58 },
 ];
+/**
+ * Couleurs en 4:2:0, comme le JPEG et presque toutes les photos du web : ~8 % de moins
+ * par AVIF, même netteté (testé le 23/10/2026 sur 41 photos, invisible même zoomé ×3).
+ */
+const AVIF_CHROMA = "4:2:0";
 const WEBP = [
   { width: 320, quality: 76 },
   { width: 640, quality: 78 },
@@ -75,9 +80,12 @@ const WEBP = [
  * fin : ~110 Ko de moins par photo. Même règle côté site (src/lib/photo-sources.ts).
  */
 const WEBP_MAX_WITH_DOWNLOAD = 640;
-/** JPEG à télécharger : qualité 86 (mozjpeg), sans différence visible à 2048 px, ~40 % plus léger que l'export d'origine. */
-const DOWNLOAD_QUALITY = 86;
-const SETTINGS = { avif: AVIF, webp: WEBP, download: { quality: DOWNLOAD_QUALITY } };
+/**
+ * JPEG à télécharger : qualité 82 (mozjpeg), sans différence visible à 2048 px et
+ * toujours plus fin que l'AVIF affiché ; ~18 % plus léger qu'en qualité 86 (23/10/2026).
+ */
+const DOWNLOAD_QUALITY = 82;
+const SETTINGS = { avif: { widths: AVIF, chroma: AVIF_CHROMA }, webp: WEBP, download: { quality: DOWNLOAD_QUALITY } };
 /** GitHub Pages : 1 Go par site publié (photos + vidéos + pages). */
 const SITE_LIMIT = 1024 * 1024 * 1024;
 /** Pages, scripts, images de partage, logos (mesuré : ~35 Mo en octobre 2026). */
@@ -286,7 +294,7 @@ async function processPhoto({ full, key, file, download }) {
     ...widthsFor(AVIF, meta.width).map(({ width, quality }) => ({
       kind: "avif",
       path: `${base}-${width}.avif`,
-      make: (img) => img.resize({ width, withoutEnlargement: true }).avif({ quality, effort: 4 }),
+      make: (img) => img.resize({ width, withoutEnlargement: true }).avif({ quality, effort: 4, chromaSubsampling: AVIF_CHROMA }),
     })),
     ...widthsFor(download ? WEBP.filter((v) => v.width <= WEBP_MAX_WITH_DOWNLOAD) : WEBP, meta.width).map(({ width, quality }) => ({
       kind: "webp",
