@@ -68,6 +68,11 @@ export type CategoryInput = {
   club?: ClubId;
   /** Les albums (matchs) de la catégorie, dans n'importe quel ordre : le site les trie par date. */
   albums?: AlbumInput[];
+  /**
+   * Albums rangés dans une autre catégorie, montrés aussi ici (leur slug) : le match
+   * « Daring H1 vs Waterloo Ducks H1 » apparaît aussi sous Waterloo Ducks, sans doubler les photos.
+   */
+  include?: string[];
   /** Sous-catégories (FIH Pro League → Hommes / Femmes ; plus tard : saisons, compétitions…). */
   children?: CategoryInput[];
   /** Téléchargement des photos pour toute la catégorie (et ses sous-catégories). Voir src/lib/downloads.ts. */

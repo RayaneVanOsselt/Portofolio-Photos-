@@ -24,10 +24,10 @@ export default function FootballPage() {
   const albums = getSportAlbums("football");
   const latest = albums[0];
   const footballRoots = new Set(getCategories().filter((c) => c.sport === "football").map((c) => c.slug));
-  const entries = getGalleryEntries().filter((e) => footballRoots.has(e.root));
+  const entries = getGalleryEntries().filter((e) => e.roots.some((root) => footballRoots.has(root)));
   const filters = getCategories()
     .filter((c) => footballRoots.has(c.slug))
-    .map((c) => ({ slug: c.slug, title: c.title, count: entries.filter((e) => e.root === c.slug).length }));
+    .map((c) => ({ slug: c.slug, title: c.title, count: entries.filter((e) => e.roots.includes(c.slug)).length }));
   const suggestions = [...new Set(albums.flatMap((a) => (a.match ? [teamShort(a, "home"), teamShort(a, "away")] : (a.teams ?? []))))].slice(0, 6);
 
   return (
