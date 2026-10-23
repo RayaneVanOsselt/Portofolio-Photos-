@@ -87,6 +87,12 @@ export const albumTree: CategoryInput[] = [
         title: "H1",
         albums: [
           {
+            slug: "25-10-2026-daring-h1-waterloo-ducks-h1",
+            date: "2026-10-25",
+            match: { home: "Daring H1", away: "Waterloo Ducks H1" },
+            source: "DARING /Messieurs 1 /Daring - Waterloo Ducks 25:10:2026",
+          },
+          {
             slug: "20-09-2026-daring-h1-leo-h1",
             date: "2026-09-20",
             match: { home: "Daring H1", away: "Leo H1" },
@@ -172,12 +178,24 @@ export const albumTree: CategoryInput[] = [
     ],
   },
   {
-    // Club découpé en équipes : menu « Léopold » → Messieurs 1.
+    // Club découpé en équipes : menu « Léopold » → Dames 1 / Messieurs 1.
     slug: "leopold",
     title: "Léopold",
     sport: "hockey",
     club: "leopold",
     children: [
+      {
+        slug: "dames-1",
+        title: "Dames 1",
+        albums: [
+          {
+            slug: "24-10-2026-leopold-d1-gantoise-d1",
+            date: "2026-10-24",
+            match: { home: "Léopold D1", away: "Gantoise D1" },
+            source: "Léopold/Dames 1/Léopold - Gantoise 24:10:2026",
+          },
+        ],
+      },
       {
         slug: "messieurs",
         title: "Messieurs 1",
@@ -219,6 +237,7 @@ export const albumTree: CategoryInput[] = [
     slug: "rugby",
     title: "Rugby",
     sport: "rugby",
+    club: "rugby",
     albums: [
       {
         slug: "16-05-2026-rugby-final-d1",
@@ -238,6 +257,12 @@ export const albumTree: CategoryInput[] = [
     sport: "football",
     club: "rwdm",
     albums: [
+      {
+        slug: "23-10-2026-rwdm-raec-mons",
+        date: "2026-10-23",
+        match: { home: "RWDM", away: "RAEC Mons" },
+        source: "RWDM 2026-2027/RWDM - RAEC Mons 23:10:2026",
+      },
       {
         slug: "03-10-2026-union-sg-b-rwdm",
         date: "2026-10-03",

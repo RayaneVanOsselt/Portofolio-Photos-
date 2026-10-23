@@ -15,14 +15,18 @@ import type { ClubInput } from "@/lib/types";
 
 export const clubs = {
   daring: { name: "Daring" },
+  gantoise: { name: "La Gantoise", aliases: ["Gantoise"] },
   leopold: { name: "Léopold", aliases: ["Leopold", "Leo"] },
   "louvain-la-neuve": { name: "Louvain-la-Neuve" },
   rwdm: { name: "RWDM" },
   "uccle-sport": { name: "Uccle Sport", aliases: ["Royal Uccle Sport"] },
+  "waterloo-ducks": { name: "Waterloo Ducks", aliases: ["Waterloo"] },
   "white-star": { name: "White Star" },
   woluwe: { name: "Woluwe Hockey Club", aliases: ["Woluwe"] },
   wolvendael: { name: "Wolvendael" },
   "fih-pro-league": { name: "FIH Pro League", kind: "competition" },
+  // Logo de la catégorie Rugby (menu, pages) : jamais reconnu dans un nom d'équipe.
+  rugby: { name: "Rugby", kind: "competition" },
 } satisfies Record<string, ClubInput>;
 
 export type ClubId = keyof typeof clubs;
