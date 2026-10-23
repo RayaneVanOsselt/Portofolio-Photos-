@@ -119,8 +119,8 @@ Des sous-catégories (`children`) peuvent être imbriquées sur autant de niveau
 **Un match sous deux clubs** — un album est rangé dans une seule catégorie (c'est son adresse). Pour le montrer aussi sous l'adversaire, sans doubler les photos ni le poids du site, la catégorie de l'adversaire liste son slug dans `include` :
 
 ```ts
-{ slug: "waterloo-ducks", title: "Waterloo Ducks", sport: "hockey", club: "waterloo-ducks",
-  children: [{ slug: "h1", title: "H1", include: ["25-10-2026-daring-h1-waterloo-ducks-h1"] }] },
+{ slug: "oree", title: "Orée", sport: "hockey", club: "oree",
+  children: [{ slug: "h1", title: "H1", include: ["18-10-2026-daring-h1-oree-h1"] }] },
 ```
 
 Le club apparaît alors dans le menu, avec son logo, et dans les filtres de « Retrouver mes photos » ; ses cartes mènent à l'album d'origine.
