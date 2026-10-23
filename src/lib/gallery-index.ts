@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { albumCrests, categoryContext, getAlbums, getAllAlbums, getCategories } from "@/lib/albums";
+import { albumCrests, albumRoots, categoryContext, getAlbums, getAllAlbums, getCategories } from "@/lib/albums";
 import { albumKeywords } from "@/lib/search-index";
 import type { Photo } from "@/lib/types";
 import { formatDate, formatDateShort } from "@/lib/utils";
@@ -9,8 +9,8 @@ export type GalleryEntry = {
   slug: string;
   title: string;
   href: string;
-  /** Slug de la catégorie racine (filtre). */
-  root: string;
+  /** Slugs des catégories racines où l'album apparaît (filtres) : la sienne, puis celles qui l'incluent. */
+  roots: string[];
   context: string;
   event?: string;
   date: string | null;
@@ -32,7 +32,7 @@ export function getGalleryEntries(): GalleryEntry[] {
     slug: a.slug,
     title: a.title,
     href: a.href,
-    root: a.category.path[0],
+    roots: albumRoots(a),
     context: categoryContext(a.category),
     event: a.event,
     date: a.date,
@@ -51,7 +51,7 @@ export function getGalleryEntries(): GalleryEntry[] {
 export function getGalleryFilters(): GalleryFilter[] {
   const entries = getGalleryEntries();
   return getCategories()
-    .map((c) => ({ slug: c.slug, title: c.title, count: entries.filter((e) => e.root === c.slug).length }))
+    .map((c) => ({ slug: c.slug, title: c.title, count: entries.filter((e) => e.roots.includes(c.slug)).length }))
     .filter((f) => f.count > 0);
 }
 

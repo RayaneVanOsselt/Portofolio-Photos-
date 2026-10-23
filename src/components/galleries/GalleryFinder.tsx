@@ -60,11 +60,11 @@ function FinderView({ entries, filters, suggestions, initialQuery }: Props & { i
       .sort((a, b) => b.score - a.score || a.order - b.order)
       .map((r) => r.entry);
   }, [entries, deferred, year]);
-  const results = category === "all" ? matched : matched.filter((e) => e.root === category);
+  const results = category === "all" ? matched : matched.filter((e) => e.roots.includes(category));
   // Les compteurs des filtres suivent la recherche en cours.
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: matched.length };
-    for (const e of matched) c[e.root] = (c[e.root] ?? 0) + 1;
+    for (const e of matched) for (const root of e.roots) c[root] = (c[root] ?? 0) + 1;
     return c;
   }, [matched]);
   const hasDates = useMemo(() => entries.some((e) => e.date), [entries]);

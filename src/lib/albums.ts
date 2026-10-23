@@ -79,6 +79,8 @@ function resolveMatch({ homeClub, awayClub, ...match }: MatchInput): MatchInfo {
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const allCategories: Category[] = [];
 const albumInputs: { input: AlbumInput; category: Category }[] = [];
+/** Albums montrés aussi dans une autre catégorie (`include`), résolus une fois les albums connus. */
+const inclusions: { slug: string; category: Category }[] = [];
 
 function resolveCategory(input: CategoryInput, parent?: Category): Category {
   if (!SLUG.test(input.slug)) fail(`catégorie « ${input.title} » : le slug « ${input.slug} » ne doit contenir que des minuscules, des chiffres et des tirets`);
@@ -106,6 +108,7 @@ function resolveCategory(input: CategoryInput, parent?: Category): Category {
   if (allCategories.some((c) => c.href === category.href)) fail(`la catégorie « ${category.href} » est déclarée deux fois`);
   allCategories.push(category);
   for (const album of input.albums ?? []) albumInputs.push({ input: album, category });
+  for (const slug of input.include ?? []) inclusions.push({ slug, category });
   category.children = (input.children ?? []).map((child) => resolveCategory(child, category));
   return category;
 }
@@ -247,6 +250,16 @@ const publicAlbums = albums.filter((a) => !a.private).sort(byDateDesc);
 const ownAlbums = new Map<Category, Album[]>();
 for (const album of publicAlbums) ownAlbums.set(album.category, [...(ownAlbums.get(album.category) ?? []), album]);
 
+/** Catégories où un album est montré en plus de la sienne (`include`). */
+const alsoIn = new Map<Album, Category[]>();
+for (const { slug, category } of inclusions) {
+  const where = `catégorie « ${category.fullTitle} », \`include\``;
+  const album = albums.find((a) => a.slug === slug) ?? fail(`${where} : aucun album « ${slug} »`);
+  if (album.private) fail(`${where} : l'album privé « ${slug} » ne peut pas être montré ailleurs`);
+  ownAlbums.set(category, [...(ownAlbums.get(category) ?? []), album]);
+  alsoIn.set(album, [...(alsoIn.get(album) ?? []), category]);
+}
+
 // Compteurs, date du dernier match et couverture, une fois les albums connus.
 for (const category of allCategories) {
   const list = getCategoryAlbums(category);
@@ -316,9 +329,14 @@ export function getAlbumByPath(path: string[]): Album | undefined {
   return albumByPath.get(path.join("/"));
 }
 
-/** Albums publics d'une catégorie, sous-catégories comprises, les plus récents d'abord. */
+/** Albums publics d'une catégorie, sous-catégories et albums `include` compris, les plus récents d'abord. */
 export function getCategoryAlbums(category: Category): Album[] {
-  return [...(ownAlbums.get(category) ?? []), ...category.children.flatMap(getCategoryAlbums)].sort(byDateDesc);
+  return [...new Set([...(ownAlbums.get(category) ?? []), ...category.children.flatMap(getCategoryAlbums)])].sort(byDateDesc);
+}
+
+/** Catégories principales où l'album apparaît : la sienne, puis celles qui le montrent aussi (`include`). */
+export function albumRoots(album: Album): string[] {
+  return [...new Set([album.category, ...(alsoIn.get(album) ?? [])].map((c) => c.path[0]))];
 }
 
 /** Albums mis en avant (`featured`) qui ont déjà des photos. */

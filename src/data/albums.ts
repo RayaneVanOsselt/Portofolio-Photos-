@@ -35,6 +35,11 @@
  * ex. Club → Saison → Compétition → Match. Menu, pages, recherche, plan du site
  * et images de partage sont générés automatiquement.
  *
+ * ─── Un match sous deux clubs ──────────────────────────────────────────────
+ * Un album est rangé dans une seule catégorie (son adresse). Pour le montrer aussi
+ * sous l'adversaire, sans doubler les photos : `include: ["<slug de l'album>"]`
+ * dans la catégorie de l'adversaire (voir Waterloo Ducks ci-dessous).
+ *
  * ─── Reportage en chapitres ────────────────────────────────────────────────
  * Les sous-dossiers du dossier d'un match deviennent des chapitres, dans l'ordre
  * de leur nom (ex. « Belgique » puis « Pays Bas », ou 01-avant-match/, 02-action/…).
@@ -178,6 +183,14 @@ export const albumTree: CategoryInput[] = [
     ],
   },
   {
+    // Adversaire : ses matchs sont rangés chez l'autre club et montrés aussi ici (`include`).
+    slug: "gantoise",
+    title: "La Gantoise",
+    sport: "hockey",
+    club: "gantoise",
+    children: [{ slug: "dames-1", title: "Dames 1", include: ["24-10-2026-leopold-d1-gantoise-d1"] }],
+  },
+  {
     // Club découpé en équipes : menu « Léopold » → Dames 1 / Messieurs 1.
     slug: "leopold",
     title: "Léopold",
@@ -308,6 +321,14 @@ export const albumTree: CategoryInput[] = [
         ],
       },
     ],
+  },
+  {
+    // Adversaire : ses matchs sont rangés chez l'autre club et montrés aussi ici (`include`).
+    slug: "waterloo-ducks",
+    title: "Waterloo Ducks",
+    sport: "hockey",
+    club: "waterloo-ducks",
+    children: [{ slug: "h1", title: "H1", include: ["25-10-2026-daring-h1-waterloo-ducks-h1"] }],
   },
   {
     slug: "white-star-h1",
