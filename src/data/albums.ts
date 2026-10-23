@@ -38,7 +38,8 @@
  * ─── Un match sous deux clubs ──────────────────────────────────────────────
  * Un album est rangé dans une seule catégorie (son adresse). Pour le montrer aussi
  * sous l'adversaire, sans doubler les photos : `include: ["<slug de l'album>"]`
- * dans la catégorie de l'adversaire (voir Waterloo Ducks ci-dessous).
+ * dans la catégorie de l'adversaire, ex. `{ slug: "h1", title: "H1", include: [
+ * "18-10-2026-daring-h1-oree-h1"] }` sous Orée.
  *
  * ─── Reportage en chapitres ────────────────────────────────────────────────
  * Les sous-dossiers du dossier d'un match deviennent des chapitres, dans l'ordre
@@ -91,12 +92,6 @@ export const albumTree: CategoryInput[] = [
         slug: "h1",
         title: "H1",
         albums: [
-          {
-            slug: "25-10-2026-daring-h1-waterloo-ducks-h1",
-            date: "2026-10-25",
-            match: { home: "Daring H1", away: "Waterloo Ducks H1" },
-            source: "DARING /Messieurs 1 /Daring - Waterloo Ducks 25:10:2026",
-          },
           {
             slug: "20-09-2026-daring-h1-leo-h1",
             date: "2026-09-20",
@@ -183,19 +178,11 @@ export const albumTree: CategoryInput[] = [
     ],
   },
   {
-    // Adversaire : ses matchs sont rangés chez l'autre club et montrés aussi ici (`include`).
+    // Club découpé en équipes : menu « La Gantoise » → Dames 1 (photos de La Gantoise seulement).
     slug: "gantoise",
     title: "La Gantoise",
     sport: "hockey",
     club: "gantoise",
-    children: [{ slug: "dames-1", title: "Dames 1", include: ["24-10-2026-leopold-d1-gantoise-d1"] }],
-  },
-  {
-    // Club découpé en équipes : menu « Léopold » → Dames 1 / Messieurs 1.
-    slug: "leopold",
-    title: "Léopold",
-    sport: "hockey",
-    club: "leopold",
     children: [
       {
         slug: "dames-1",
@@ -205,10 +192,19 @@ export const albumTree: CategoryInput[] = [
             slug: "24-10-2026-leopold-d1-gantoise-d1",
             date: "2026-10-24",
             match: { home: "Léopold D1", away: "Gantoise D1" },
-            source: "Léopold/Dames 1/Léopold - Gantoise 24:10:2026",
+            source: "La Gantoise/Dames 1/Léopold - Gantoise 24:10:2026",
           },
         ],
       },
+    ],
+  },
+  {
+    // Club découpé en équipes : menu « Léopold » → Messieurs 1.
+    slug: "leopold",
+    title: "Léopold",
+    sport: "hockey",
+    club: "leopold",
+    children: [
       {
         slug: "messieurs",
         title: "Messieurs 1",
@@ -323,12 +319,25 @@ export const albumTree: CategoryInput[] = [
     ],
   },
   {
-    // Adversaire : ses matchs sont rangés chez l'autre club et montrés aussi ici (`include`).
+    // Club découpé en équipes : menu « Waterloo Ducks » → H1 (photos de Waterloo seulement).
     slug: "waterloo-ducks",
     title: "Waterloo Ducks",
     sport: "hockey",
     club: "waterloo-ducks",
-    children: [{ slug: "h1", title: "H1", include: ["25-10-2026-daring-h1-waterloo-ducks-h1"] }],
+    children: [
+      {
+        slug: "h1",
+        title: "H1",
+        albums: [
+          {
+            slug: "25-10-2026-daring-h1-waterloo-ducks-h1",
+            date: "2026-10-25",
+            match: { home: "Daring H1", away: "Waterloo Ducks H1" },
+            source: "Waterloo Ducks/H1/Daring - Waterloo Ducks 25:10:2026",
+          },
+        ],
+      },
+    ],
   },
   {
     slug: "white-star-h1",
@@ -397,4 +406,7 @@ export const legacyPaths: Record<string, string> = {
   "leopold-h1": "leopold/messieurs",
   // Adversaire corrigé le 13/10/2026 : Langeveld (et non Sukel).
   "woluwe-hockey-club-h1/30-05-2026-woluwe-h1-sukel-h1": "woluwe-hockey-club-h1/30-05-2026-woluwe-h1-langeveld-h1",
+  // Déplacés le 23/10/2026 : photos de Waterloo et de La Gantoise seulement.
+  "daring/h1/25-10-2026-daring-h1-waterloo-ducks-h1": "waterloo-ducks/h1/25-10-2026-daring-h1-waterloo-ducks-h1",
+  "leopold/dames-1/24-10-2026-leopold-d1-gantoise-d1": "gantoise/dames-1/24-10-2026-leopold-d1-gantoise-d1",
 };
