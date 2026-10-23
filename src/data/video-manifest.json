@@ -76,6 +76,45 @@
       "height": 90
     }
   },
+  "18-10-2026-rasante-white-star-d1": {
+    "source": "Rasante D1 - White D1 181026.mp4",
+    "hash": "8f197d3fa76af636",
+    "width": 2160,
+    "height": 3840,
+    "duration": 89.77,
+    "fps": 30,
+    "color": "#d8e8e8",
+    "blurDataURL": "data:image/webp;base64,UklGRtIAAABXRUJQVlA4IMYAAADQBACdASoQABwAPt1cpkyopSOiMAgBEBuJQBOmUGbaaMuwyob2cvgia3zUV2an4AD+yg94Ycy4g/5uzOcTJn6k6Ros28S/8RdxBryiUDSfe4bHaCUVbYdbNo+Zu/4bjxZ8C4+5Ams+K1QpwZk4bvirUpLhPLhd0xP+Erg44IwUJEddAJ9hqDFkSfEUOe3/ZeXrjBVm+pNgrmpgwCPUC+jP8XDLDLOEuvw5TNmy9J/xEs1P5vHeAsKD8r2W4oEQcjuq3vAAAAA=",
+    "poster": {
+      "at": 17,
+      "widths": [
+        480,
+        960,
+        1440,
+        1920
+      ]
+    },
+    "files": {
+      "video": {
+        "file": "rayvo-captures0808-2026-10-18-rasante-white-star-d1.mp4",
+        "width": 720,
+        "height": 1280,
+        "bytes": 21220567
+      },
+      "teaser": {
+        "file": "apercu.mp4",
+        "bytes": 626055
+      }
+    },
+    "storyboard": {
+      "file": "vignettes.webp",
+      "interval": 1,
+      "columns": 10,
+      "count": 90,
+      "width": 90,
+      "height": 160
+    }
+  },
   "23-05-2026-daring-namur-h1": {
     "source": "Daring - Namur H1 23:05:26.mp4",
     "hash": "c041f2c88d6297f2",

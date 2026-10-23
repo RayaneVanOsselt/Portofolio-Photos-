@@ -24,6 +24,17 @@ import type { VideoInput } from "@/lib/types";
 
 export const videos: VideoInput[] = [
   {
+    // Pas d'album photo pour ce match : logo et sport indiqués directement.
+    slug: "18-10-2026-rasante-white-star-d1",
+    title: "Rasante D1 – White Star D1",
+    date: "2026-10-18",
+    source: "Rasante D1 - White D1 181026.mp4",
+    club: "white-star",
+    sport: "hockey",
+    posterAt: 17,
+    teaser: [16, 42, 49.5, 71],
+  },
+  {
     slug: "17-10-2026-uccle-sport-pingouin-u19b1",
     title: "Uccle Sport U19B1 – Pingouin U19B1",
     date: "2026-10-17",

@@ -11,6 +11,12 @@
     "width": 152,
     "height": 180
   },
+  "gantoise": {
+    "src": "/logos/gantoise.webp",
+    "png": "/logos/gantoise.png",
+    "width": 256,
+    "height": 256
+  },
   "leopold": {
     "src": "/logos/leopold.webp",
     "png": "/logos/leopold.png",
@@ -23,6 +29,12 @@
     "width": 256,
     "height": 256
   },
+  "rugby": {
+    "src": "/logos/rugby.webp",
+    "png": "/logos/rugby.png",
+    "width": 245,
+    "height": 251
+  },
   "rwdm": {
     "src": "/logos/rwdm.webp",
     "png": "/logos/rwdm.png",
@@ -34,6 +46,12 @@
     "png": "/logos/uccle-sport.png",
     "width": 207,
     "height": 256
+  },
+  "waterloo-ducks": {
+    "src": "/logos/waterloo-ducks.webp",
+    "png": "/logos/waterloo-ducks.png",
+    "width": 256,
+    "height": 163
   },
   "white-star": {
     "src": "/logos/white-star.webp",
