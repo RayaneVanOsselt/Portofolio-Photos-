@@ -189,10 +189,10 @@ export const albumTree: CategoryInput[] = [
         title: "Dames 1",
         albums: [
           {
-            slug: "24-10-2026-leopold-d1-gantoise-d1",
-            date: "2026-10-24",
+            slug: "25-10-2026-leopold-d1-gantoise-d1",
+            date: "2026-10-25",
             match: { home: "Léopold D1", away: "Gantoise D1" },
-            source: "La Gantoise/Dames 1/Léopold - Gantoise 24:10:2026",
+            source: "La Gantoise/Dames 1/Léopold - Gantoise 25:10:2026",
           },
         ],
       },
@@ -266,12 +266,6 @@ export const albumTree: CategoryInput[] = [
     sport: "football",
     club: "rwdm",
     albums: [
-      {
-        slug: "23-10-2026-rwdm-raec-mons",
-        date: "2026-10-23",
-        match: { home: "RWDM", away: "RAEC Mons" },
-        source: "RWDM 2026-2027/RWDM - RAEC Mons 23:10:2026",
-      },
       {
         slug: "03-10-2026-union-sg-b-rwdm",
         date: "2026-10-03",
@@ -408,5 +402,7 @@ export const legacyPaths: Record<string, string> = {
   "woluwe-hockey-club-h1/30-05-2026-woluwe-h1-sukel-h1": "woluwe-hockey-club-h1/30-05-2026-woluwe-h1-langeveld-h1",
   // Déplacés le 23/10/2026 : photos de Waterloo et de La Gantoise seulement.
   "daring/h1/25-10-2026-daring-h1-waterloo-ducks-h1": "waterloo-ducks/h1/25-10-2026-daring-h1-waterloo-ducks-h1",
-  "leopold/dames-1/24-10-2026-leopold-d1-gantoise-d1": "gantoise/dames-1/24-10-2026-leopold-d1-gantoise-d1",
+  "leopold/dames-1/24-10-2026-leopold-d1-gantoise-d1": "gantoise/dames-1/25-10-2026-leopold-d1-gantoise-d1",
+  // Date corrigée le 26/10/2026 : match joué le 25/10 (et non le 24).
+  "gantoise/dames-1/24-10-2026-leopold-d1-gantoise-d1": "gantoise/dames-1/25-10-2026-leopold-d1-gantoise-d1",
 };
