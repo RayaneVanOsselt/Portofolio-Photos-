@@ -328,6 +328,7 @@ export const albumTree: CategoryInput[] = [
             date: "2026-10-25",
             match: { home: "Daring H1", away: "Waterloo Ducks H1" },
             source: "Waterloo Ducks/H1/Daring - Waterloo Ducks 25:10:2026",
+            cover: "IMG_8679.jpg",
           },
         ],
       },
