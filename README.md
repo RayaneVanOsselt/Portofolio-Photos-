@@ -65,22 +65,24 @@ Les matchs sont **triés automatiquement par date**, du plus récent au plus anc
 
 ### Ajouter un match
 
-1. **Déposez les photos** dans `Dossier photos/`, rangées comme vous le souhaitez — un dossier par match :
+1. **Déposez les photos** dans `Dossier photos/`, rangées comme le site — `Club/Équipe/AAAA-MM-JJ Équipe A vs Équipe B/`, un dossier par match :
 
    ```
-   Dossier photos/DARING /Messieurs 1 /Daring - Orée 18:10:2026/
+   Dossier photos/Daring/Messieurs 1/2026-10-18 Daring H1 vs Orée H1/
    ```
 
-   Exportez-les en JPEG (2048 px sur le grand côté suffit : c'est la taille des fichiers à télécharger). Les sous-dossiers deviennent des **chapitres** (ex. `Belgique/`, `Pays Bas/`, ou `01-avant-match/`, `02-action/`…). Les vidéos ne sont jamais envoyées sur GitHub (voir « Vidéos » ci-dessous).
+   La date en tête (AAAA-MM-JJ) trie les matchs par date dans le Finder. Pas de `:` ni de `/` dans les noms (la date « 18:10:2026 » s'affiche « 18/10/2026 » dans le Finder mais bloque une copie sous Windows), pas d'espace en fin de nom. Les photos vont **directement** dans le dossier du match.
 
-2. **Une entrée** dans les `albums` de la bonne catégorie, dans `src/data/albums.ts`, avec le chemin de ce dossier copié tel quel (espaces compris). Pas besoin de l'écrire à la main : `npm run photos` repère le nouveau dossier et **affiche la fiche toute prête** (date lue dans le nom du dossier ou dans les photos, équipes lues dans le nom « Daring - Orée ») — copiez-la, puis complétez les équipes (« Daring H1 ») :
+   Exportez-les en JPEG (2048 px sur le grand côté suffit : c'est la taille des fichiers à télécharger). Les sous-dossiers deviennent des **chapitres** (ex. `Belgique/`, `Pays-Bas/`, ou `01-avant-match/`, `02-action/`…) : à réserver aux vrais chapitres, un sous-dossier « Daring - Orée 181026 » s'afficherait sous ce nom. Les vidéos ne sont jamais envoyées sur GitHub (voir « Vidéos » ci-dessous).
+
+2. **Une entrée** dans les `albums` de la bonne catégorie, dans `src/data/albums.ts`, avec le chemin de ce dossier. Pas besoin de l'écrire à la main : `npm run photos` repère le nouveau dossier et **affiche la fiche toute prête** (date lue dans le nom du dossier ou dans les photos, équipes lues dans le nom « Daring H1 vs Orée H1 ») — copiez-la, puis complétez les équipes (« Daring H1 ») :
 
    ```ts
    {
      slug: "18-10-2026-daring-h1-oree-h1",
      date: "2026-10-18",
      match: { home: "Daring H1", away: "Orée H1" },
-     source: "DARING /Messieurs 1 /Daring - Orée 18:10:2026",
+     source: "Daring/Messieurs 1/2026-10-18 Daring H1 vs Orée H1",
    },
    ```
 
@@ -253,9 +255,9 @@ npm run build      # → dossier out/, le site prêt à publier
 
 **Une seule fois** : sur GitHub, **Settings → Pages → Build and deployment → Source : « GitHub Actions »** (et non « Deploy from a branch »).
 
-Ensuite, chaque mise à jour de la branche `main` publie automatiquement le site (onglet **Actions**, workflow « Publier le site »). Adresse : <https://rayvocaptures0808.be> (domaine personnalisé ; sans lui, `https://<utilisateur>.github.io/<nom-du-dépôt>/`). Les versions web des photos sont gardées en cache d'une publication à l'autre : seules les photos nouvelles sont encodées (quelques minutes) ; la toute première publication prend une quinzaine de minutes.
+Ensuite, chaque mise à jour de la branche `main` publie automatiquement le site (onglet **Actions**, workflow « Publier le site »). Adresse : <https://rayvocaptures0808.be> (domaine personnalisé ; sans lui, `https://<utilisateur>.github.io/<nom-du-dépôt>/`). Les versions web des photos sont gardées en cache d'une publication à l'autre : seules les photos nouvelles sont encodées (quelques minutes), et une photo déplacée (dossier rangé, album renommé ou changé de catégorie) est recopiée sans réencodage. Un changement de réglages d'encodage réencode tout : compter alors 2 à 3 heures sur GitHub.
 
-**Poids du site — à surveiller.** GitHub Pages limite un site à **1 Go** (au-delà, la publication n'est plus garantie). Chaque photo publiée pèse environ 885 Ko (toutes ses versions comprises) : un album de 100 photos ≈ 86 Mo. `npm run photos` affiche la place restante en nombre de photos, et `npm run build` le poids réel du site (avertissement au-delà de 1 Go). Quand la place vient à manquer, sans changer le code : publier le même dossier `out/` sur **Cloudflare Pages** (gratuit, sans limite de taille totale), ou passer d'anciennes galeries en `downloadEnabled: false` (environ −30 % de poids par photo, mais plus de téléchargement).
+**Poids du site — à surveiller.** GitHub Pages limite un site à **1 Go** (au-delà, la publication n'est plus garantie). Chaque photo publiée pèse environ 765 Ko (toutes ses versions comprises) : un album de 100 photos ≈ 75 Mo. `npm run photos` affiche la place restante en nombre de photos, et `npm run build` le poids réel du site (avertissement au-delà de 1 Go). Quand la place vient à manquer, sans changer le code : publier le même dossier `out/` sur **Cloudflare Pages** (gratuit, sans limite de taille totale), ou passer d'anciennes galeries en `downloadEnabled: false` (environ −30 % de poids par photo, mais plus de téléchargement).
 
 **Domaine personnalisé** (actuellement `rayvocaptures0808.be`) : il se règle dans Settings → Pages → Custom domain ; l'Action adapte automatiquement les adresses du site.
 
@@ -308,7 +310,7 @@ src/
     ├── photo-sources.ts      Adresses des versions AVIF / WebP
     ├── zip.ts                Archive ZIP préparée dans le navigateur
     ├── seo.ts navigation.ts search-index.ts gallery-index.ts …
-Dossier photos/               ← vos photos de match, rangées à votre façon (reliées par `source`)
+Dossier photos/               ← vos photos de match : Club/Équipe/AAAA-MM-JJ Équipe A vs Équipe B (reliées par `source`)
 assets/brand/                 Logo du site (fichier source unique)
 assets/logos/                 Logos sources (un fichier par club : <identifiant>.png)
 public/images/site/           Photos des pages (facultatif)

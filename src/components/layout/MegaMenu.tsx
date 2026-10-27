@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useState, type CSSProperties } from "react";
 import { ClubCrest } from "@/components/clubs/ClubCrest";
 import { ArrowLink } from "@/components/ui/Button";
-import type { AlbumsNav, NavCategory } from "@/lib/navigation";
+import { Close, Search } from "@/components/ui/Icons";
+import type { AlbumsNav, NavCategory, NavGroup } from "@/lib/navigation";
+import { normalize } from "@/lib/search";
 import { formatDateMedium } from "@/lib/utils";
 
 type Props = {
@@ -19,14 +21,33 @@ type Props = {
  * avec son logo ; les sous-catégories (FIH Pro League → Hommes / Femmes)
  * juste dessous ; les derniers matchs à droite. Léger : aucune photo, et les
  * logos ne sont chargés qu'à la première ouverture.
+ *
+ * Fait pour grandir : au-delà de FILTER_FROM catégories, un champ filtre les clubs
+ * (accents et majuscules indifférents) ; la liste défile dans le panneau, qui ne
+ * dépasse jamais la hauteur de l'écran (le bas, « Tous les albums », reste visible).
  */
+const FILTER_FROM = 10;
+
+/** Clubs dont le nom (ou celui d'une équipe) contient la recherche ; les groupes vides disparaissent. */
+function filterGroups(groups: NavGroup[], query: string): NavGroup[] {
+  const q = normalize(query);
+  if (!q) return groups;
+  const hit = (text: string) => normalize(text).includes(q);
+  return groups
+    .map((group) => ({ ...group, categories: group.categories.filter((c) => hit(c.title) || c.children.some((child) => hit(child.title))) }))
+    .filter((group) => group.categories.length);
+}
 export function MegaMenu({ open, nav, onNavigate, onPointerEnter }: Props) {
   const [primed, setPrimed] = useState(false);
+  const [query, setQuery] = useState("");
   if (open && !primed) setPrimed(true);
+  // Recherche effacée à la fermeture : le panneau rouvre toujours complet.
+  if (!open && query) setQuery("");
 
+  const groups = filterGroups(nav.groups, query);
   // Les grands groupes (Hockey) occupent deux colonnes ; les petits (Football, Rugby) se partagent une colonne.
-  const large = nav.groups.filter((g) => g.categories.length > 3);
-  const small = nav.groups.filter((g) => g.categories.length <= 3);
+  const large = groups.filter((g) => g.categories.length > 3);
+  const small = groups.filter((g) => g.categories.length <= 3);
   const reveal = (i: number) =>
     ({
       transitionDelay: open ? `${60 + i * 50}ms` : "0ms",
@@ -45,43 +66,71 @@ export function MegaMenu({ open, nav, onNavigate, onPointerEnter }: Props) {
           : "invisible opacity-0 transition-[opacity,clip-path,visibility] [clip-path:inset(0_0_100%_0)]"
       }`}
     >
-      <div className="container-wide grid grid-cols-12 gap-x-10 pt-8 pb-8">
-        {large.map((group, i) => (
-          <div key={group.label} className={`col-span-6 ${revealClass}`} style={reveal(i)}>
-            <p className="t-mono text-ash">{group.label}</p>
-            <ul className="mt-3 columns-2 gap-x-8">
-              {group.categories.map((category) => (
-                <CategoryLink key={category.href} category={category} primed={primed} onNavigate={onNavigate} />
-              ))}
-            </ul>
-          </div>
-        ))}
-
-        <div className={`col-span-3 space-y-7 ${revealClass}`} style={reveal(large.length)}>
-          {small.map((group) => (
-            <div key={group.label}>
+      {nav.categoryCount >= FILTER_FROM ? (
+        <div className="container-wide pt-6">
+          <label className="flex h-11 max-w-sm items-center gap-3 rounded-full border border-line-strong px-4 text-ash transition-colors focus-within:border-linen">
+            <Search size={16} />
+            <span className="sr-only">Filtrer les clubs et les compétitions</span>
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={`Filtrer les ${nav.categoryCount} clubs et compétitions…`}
+              className="min-w-0 flex-1 bg-transparent text-[0.9375rem] text-linen outline-none placeholder:text-ash [&::-webkit-search-cancel-button]:hidden"
+            />
+            {query ? (
+              <button type="button" onClick={() => setQuery("")} aria-label="Effacer le filtre" className="text-ash transition-colors hover:text-linen">
+                <Close size={16} />
+              </button>
+            ) : null}
+          </label>
+        </div>
+      ) : null}
+      {/* Défile dans le panneau : la barre du bas (~4,25 rem) et le champ de filtre (~4,25 rem) restent à l'écran. */}
+      <div
+        className={`overflow-y-auto overscroll-contain [scrollbar-width:thin] ${
+          nav.categoryCount >= FILTER_FROM ? "max-h-[calc(100dvh-var(--header-height)-8.5rem)]" : "max-h-[calc(100dvh-var(--header-height)-4.25rem)]"
+        }`}
+      >
+        <div className="container-wide grid grid-cols-12 gap-x-10 pt-8 pb-8">
+          {groups.length ? null : <p className="col-span-6 t-small text-taupe">Aucun club ni aucune compétition ne correspond à « {query} ».</p>}
+          {large.map((group, i) => (
+            <div key={group.label} className={`col-span-6 ${revealClass}`} style={reveal(i)}>
               <p className="t-mono text-ash">{group.label}</p>
-              <ul className="mt-3">
+              <ul className="mt-3 columns-2 gap-x-8">
                 {group.categories.map((category) => (
                   <CategoryLink key={category.href} category={category} primed={primed} onNavigate={onNavigate} />
                 ))}
               </ul>
             </div>
           ))}
-        </div>
 
-        <div className={`col-span-3 ${revealClass}`} style={reveal(large.length + 1)}>
-          <p className="t-mono text-ash">Derniers matchs</p>
-          <ul className="mt-3 space-y-1">
-            {nav.latest.map((album) => (
-              <li key={album.href}>
-                <Link href={album.href} onClick={onNavigate} className="group -mx-3 block rounded-[var(--radius-sm)] px-3 py-2 transition-colors hover:bg-wash-strong">
-                  <span className="block t-mono text-taupe">{formatDateMedium(album.date)}</span>
-                  <span className="mt-0.5 block truncate text-[0.9375rem] text-linen">{album.title}</span>
-                </Link>
-              </li>
+          <div className={`col-span-3 space-y-7 ${revealClass}`} style={reveal(large.length)}>
+            {small.map((group) => (
+              <div key={group.label}>
+                <p className="t-mono text-ash">{group.label}</p>
+                <ul className="mt-3">
+                  {group.categories.map((category) => (
+                    <CategoryLink key={category.href} category={category} primed={primed} onNavigate={onNavigate} />
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </div>
+
+          <div className={`col-span-3 ${revealClass}`} style={reveal(large.length + 1)}>
+            <p className="t-mono text-ash">Derniers matchs</p>
+            <ul className="mt-3 space-y-1">
+              {nav.latest.map((album) => (
+                <li key={album.href}>
+                  <Link href={album.href} onClick={onNavigate} className="group -mx-3 block rounded-[var(--radius-sm)] px-3 py-2 transition-colors hover:bg-wash-strong">
+                    <span className="block t-mono text-taupe">{formatDateMedium(album.date)}</span>
+                    <span className="mt-0.5 block truncate text-[0.9375rem] text-linen">{album.title}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
       <div className="container-wide flex items-center justify-between border-t border-line py-4">
@@ -101,8 +150,12 @@ export function MegaMenu({ open, nav, onNavigate, onPointerEnter }: Props) {
   );
 }
 
-/** Une catégorie : logo, nom, nombre d'albums ; ses sous-catégories en pastilles. */
+/**
+ * Une catégorie : logo, nom, nombre d'albums ; ses sous-catégories en pastilles.
+ * Une seule équipe (« White Star → Messieurs 1 ») : nommée sur la même ligne, la liste reste compacte.
+ */
 function CategoryLink({ category, primed, onNavigate }: { category: NavCategory; primed: boolean; onNavigate: () => void }) {
+  const only = category.children.length === 1 ? category.children[0] : null;
   return (
     <li className="break-inside-avoid">
       <Link href={category.href} onClick={onNavigate} className="group -mx-2 flex items-center gap-3 rounded-[var(--radius-sm)] px-2 py-1.5 transition-colors hover:bg-wash-strong">
@@ -111,10 +164,13 @@ function CategoryLink({ category, primed, onNavigate }: { category: NavCategory;
         ) : (
           <span aria-hidden className={`size-[30px] shrink-0 rounded-full ${category.crest ? "bg-wash-strong" : "border border-line-strong"}`} />
         )}
-        <span className="min-w-0 flex-1 truncate text-[0.9375rem] text-linen">{category.title}</span>
+        <span className="min-w-0 flex-1 truncate text-[0.9375rem] text-linen">
+          {category.title}
+          {only ? <span className="ml-2 text-[0.8125rem] text-ash">· {only.title}</span> : null}
+        </span>
         <span className="font-mono text-[0.6875rem] text-ash">{category.count}</span>
       </Link>
-      {category.children.length ? (
+      {category.children.length > 1 ? (
         <ul className="mb-1 ml-[2.4rem] flex flex-wrap gap-1.5" aria-label={`${category.title} : catégories`}>
           {category.children.map((child) => (
             <li key={child.href}>

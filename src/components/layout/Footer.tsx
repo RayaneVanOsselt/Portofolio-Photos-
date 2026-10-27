@@ -109,19 +109,23 @@ export function Footer() {
           </FooterColumn>
 
           <FooterColumn title="Albums" className="col-span-2">
-            <div className="columns-2 gap-8">
-              {groups.map((group) => (
-                <div key={group.sport} className="mb-7 break-inside-avoid">
-                  <p className="t-mono text-taupe">{group.label}</p>
-                  <ul className="mt-3 space-y-2.5">
-                    {group.categories.map((c) => (
-                      <li key={c.href}>
-                        <FooterLink href={c.href}>{c.title}</FooterLink>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+            {/* Un sport aux nombreux clubs (Hockey) prend toute la largeur, en colonnes : la liste s'élargit au lieu de s'allonger. */}
+            <div className="grid grid-cols-2 gap-x-8 gap-y-7">
+              {groups.map((group) => {
+                const many = group.categories.length > 6;
+                return (
+                  <div key={group.sport} className={many ? "col-span-2" : undefined}>
+                    <p className="t-mono text-taupe">{group.label}</p>
+                    <ul className={`mt-3 ${many ? "columns-2 gap-8 sm:columns-3" : "space-y-2.5"}`}>
+                      {group.categories.map((c) => (
+                        <li key={c.href} className={many ? "mb-2.5 break-inside-avoid" : undefined}>
+                          <FooterLink href={c.href}>{c.title}</FooterLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
             </div>
           </FooterColumn>
 

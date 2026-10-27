@@ -5,6 +5,7 @@ import { MetaList, PageIntro } from "@/components/layout/PageIntro";
 import { ClosingCta } from "@/components/sections/ClosingCta";
 import { PhotoAccessBand } from "@/components/sections/PhotoAccessBand";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { ArrowLink } from "@/components/ui/Button";
 import { SectionStamp } from "@/components/ui/SectionLabel";
 import { siteConfig } from "@/config/site";
 import { ALBUMS_HREF, getAlbums, getCategories } from "@/lib/albums";
@@ -21,13 +22,18 @@ export const metadata: Metadata = pageMetadata({
 
 /**
  * Albums : Club / Compétition → Match → Photos.
- * Les catégories d'abord (un logo, un nom, le dernier match), puis tous les
- * matchs du plus récent au plus ancien, pour retrouver une date précise.
+ * Les catégories d'abord (un logo, un nom, le dernier match), puis les derniers
+ * matchs ; au-delà de RECENT, le reste est dans le calendrier (/matchs), classé
+ * par année et par mois : la page garde la même longueur, quel que soit le nombre d'albums.
  */
+const RECENT = 12;
+
 export default function AlbumsPage() {
   const categories = getCategories();
   const albums = getAlbums();
   const photos = albums.reduce((sum, a) => sum + a.photos.length, 0);
+  const recent = albums.slice(0, RECENT);
+  const more = albums.length > recent.length;
 
   return (
     <>
@@ -61,12 +67,17 @@ export default function AlbumsPage() {
       </section>
 
       <section aria-labelledby="matches-title" className="container-wide pb-[var(--section-space)]">
-        <SectionStamp id="matches-title" index="02" meta={`${albums.length} albums · du plus récent au plus ancien`}>
-          Tous les matchs
+        <SectionStamp id="matches-title" index="02" meta={more ? `${recent.length} sur ${albums.length} albums · du plus récent au plus ancien` : `${albums.length} albums · du plus récent au plus ancien`}>
+          {more ? "Derniers matchs" : "Tous les matchs"}
         </SectionStamp>
         <div className="mt-10 md:mt-14">
-          <AlbumTimeline albums={albums} />
+          <AlbumTimeline albums={recent} />
         </div>
+        {more ? (
+          <div className="mt-10 border-t border-line pt-6 md:mt-14">
+            <ArrowLink href="/matchs">Tous les {albums.length} matchs, par année et par mois</ArrowLink>
+          </div>
+        ) : null}
       </section>
 
       <PhotoAccessBand />

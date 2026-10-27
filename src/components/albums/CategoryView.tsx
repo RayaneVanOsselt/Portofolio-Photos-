@@ -16,14 +16,21 @@ import { categorySummary, collectionJsonLd } from "@/lib/seo";
 import type { Category } from "@/lib/types";
 import { formatDateShort, pad } from "@/lib/utils";
 import { AlbumCard } from "./AlbumCard";
+import { AlbumTimeline } from "./AlbumRow";
 
 const delay = (ms: number) => ({ "--delay": `${ms}ms` }) as CSSProperties;
+/** Page d'un club : les derniers matchs de chaque équipe (la suite sur la page de l'équipe). */
+const PER_TEAM = 4;
+/** Page d'une équipe : les plus récents en grand, les plus anciens en liste compacte. */
+const AS_CARDS = 6;
 
 /**
  * Page d'une catégorie (club, équipe, compétition) :
  * H1 = la catégorie, avec son logo ; puis chaque match (H2), du plus récent
  * au plus ancien. Une catégorie découpée (FIH Pro League) présente d'abord
- * ses sous-catégories (Hommes / Femmes), chacune avec ses matchs.
+ * ses sous-catégories (Hommes / Femmes), chacune avec ses derniers matchs.
+ * Reste lisible avec beaucoup d'albums : PER_TEAM matchs par équipe sur la page
+ * du club, AS_CARDS en grand sur celle d'une équipe, puis une liste compacte par mois.
  */
 export function CategoryView({ category }: { category: Category }) {
   const albums = getCategoryAlbums(category);
@@ -114,6 +121,7 @@ export function CategoryView({ category }: { category: Category }) {
       {category.children.length ? (
         category.children.map((child) => {
           const childAlbums = getCategoryAlbums(child);
+          const hidden = childAlbums.length - PER_TEAM;
           return (
             <section key={child.href} aria-labelledby={`categorie-${child.slug}`} className="container-wide pb-[var(--section-space-sm)] last-of-type:pb-[var(--section-space)]">
               <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-t border-line pt-5">
@@ -124,7 +132,14 @@ export function CategoryView({ category }: { category: Category }) {
                 </h2>
                 <ArrowLink href={child.href}>Tous les albums {child.title}</ArrowLink>
               </div>
-              <AlbumList albums={childAlbums} headingLevel="h3" />
+              <AlbumList albums={childAlbums.slice(0, PER_TEAM)} headingLevel="h3" />
+              {hidden > 0 ? (
+                <div className="mt-6 border-t border-line pt-5">
+                  <ArrowLink href={child.href}>
+                    {hidden} autre{hidden > 1 ? "s" : ""} match{hidden > 1 ? "s" : ""} {child.title}
+                  </ArrowLink>
+                </div>
+              ) : null}
             </section>
           );
         })
@@ -136,7 +151,15 @@ export function CategoryView({ category }: { category: Category }) {
             </span>
             <span>Du plus récent au plus ancien</span>
           </p>
-          <AlbumList albums={albums} headingLevel="h2" />
+          <AlbumList albums={albums.slice(0, AS_CARDS)} headingLevel="h2" />
+          {albums.length > AS_CARDS ? (
+            <div className="mt-[var(--section-space-sm)]">
+              <h2 className="border-t border-line pt-4 t-mono text-ash">Matchs précédents</h2>
+              <div className="mt-8">
+                <AlbumTimeline albums={albums.slice(AS_CARDS)} showCategory={false} />
+              </div>
+            </div>
+          ) : null}
         </section>
       )}
 
