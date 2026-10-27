@@ -91,10 +91,16 @@ export function MobileMenu({ open, onClose, nav, pathname }: Props) {
                                       ) : (
                                         <span aria-hidden className={`size-8 shrink-0 rounded-full ${category.crest ? "bg-wash-strong" : "border border-line-strong"}`} />
                                       )}
-                                      <span className="flex-1 text-lg font-medium tracking-[-0.015em] text-linen">{category.title}</span>
+                                      <span className="flex-1 text-lg font-medium tracking-[-0.015em] text-linen">
+                                        {category.title}
+                                        {/* Une seule équipe : nommée sur la même ligne (liste compacte, comme sur ordinateur). */}
+                                        {category.children.length === 1 ? (
+                                          <span className="ml-2 text-[0.875rem] font-normal tracking-normal text-ash">· {category.children[0].title}</span>
+                                        ) : null}
+                                      </span>
                                       <span className="font-mono text-[0.6875rem] text-ash">{category.count}</span>
                                     </Link>
-                                    {category.children.length ? (
+                                    {category.children.length > 1 ? (
                                       <ul className="mb-2 ml-11 flex flex-wrap gap-2">
                                         {category.children.map((child) => (
                                           <li key={child.href}>

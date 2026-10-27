@@ -21,15 +21,17 @@
  *
  * Incrémental : une photo dont l'empreinte (contenu) n'a pas changé n'est pas
  * retraitée — y compris sur GitHub, où les dates de fichiers ne veulent rien dire.
- * Les fichiers générés qui ne correspondent plus à aucune photo sont supprimés.
+ * Une photo déplacée (dossier rangé, album renommé ou changé de catégorie) est
+ * recopiée depuis son ancien emplacement, sans réencodage. Les fichiers générés qui
+ * ne correspondent plus à aucune photo sont supprimés.
  *
  * Signale : dossiers de « Dossier photos/ » reliés à aucun album (avec la fiche
  * prête à coller dans src/data/albums.ts), formats non pris en charge (RAW, HEIC…),
  * fichiers illisibles, doublons, poids publié et place restante sur GitHub Pages.
  */
 import { createHash } from "node:crypto";
-import { existsSync } from "node:fs";
-import { mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { constants, existsSync } from "node:fs";
+import { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { availableParallelism } from "node:os";
 import { basename, dirname, join, relative, sep } from "node:path";
 import exifReader from "exif-reader";
@@ -39,8 +41,8 @@ import { albumTree } from "../src/data/albums.ts";
 import { downloadFileName, fileSlug, isDownloadEnabled } from "../src/lib/downloads.ts";
 
 const ROOT = process.cwd();
-/** Dossier source des albums (nom choisi par le photographe, espace finale comprise). */
-const SOURCE_DIR = join(ROOT, "Dossier photos ");
+/** Dossier source des albums : « Dossier photos » (l'ancien nom, avec une espace finale, est encore accepté). */
+const SOURCE_DIR = ["Dossier photos", "Dossier photos "].map((name) => join(ROOT, name)).find((dir) => existsSync(dir)) ?? join(ROOT, "Dossier photos");
 const IMAGES_DIR = join(ROOT, "public", "images");
 const OUT_DIR = join(ROOT, "public", "_photos");
 const MANIFEST = join(ROOT, "src", "data", "photo-manifest.json");
@@ -195,8 +197,14 @@ async function unmappedFolders(sources) {
  */
 async function suggestAlbum(folder) {
   const name = basename(folder).normalize("NFC").trim();
-  const inName = name.match(/(\d{1,2})[:/._-](\d{1,2})[:/._-](\d{4}|\d{2})(?!\d)/) ?? name.match(/(?<!\d)(\d{2})(\d{2})(\d{2})(?!\d)/);
-  let date = inName ? `${inName[3].length === 2 ? `20${inName[3]}` : inName[3]}-${inName[2].padStart(2, "0")}-${inName[1].padStart(2, "0")}` : null;
+  // « 2026-10-18 Daring H1 vs Orée H1 » (rangement conseillé), puis les anciennes écritures (« 18:10:2026 », « 181026 »).
+  const iso = name.match(/(?<!\d)(\d{4})-(\d{2})-(\d{2})(?!\d)/);
+  const inName = iso ?? name.match(/(\d{1,2})[:/._-](\d{1,2})[:/._-](\d{4}|\d{2})(?!\d)/) ?? name.match(/(?<!\d)(\d{2})(\d{2})(\d{2})(?!\d)/);
+  let date = iso
+    ? `${iso[1]}-${iso[2]}-${iso[3]}`
+    : inName
+      ? `${inName[3].length === 2 ? `20${inName[3]}` : inName[3]}-${inName[2].padStart(2, "0")}-${inName[1].padStart(2, "0")}`
+      : null;
   if (!date || Number.isNaN(Date.parse(date))) {
     const first = (await imagesIn(join(SOURCE_DIR, folder)))[0];
     date = first ? await sharp(first).metadata().then((info) => readExif(info.exif)?.date ?? null, () => null) : null;
@@ -256,12 +264,26 @@ function altFromFilename(file) {
 }
 
 const previous = existsSync(MANIFEST) ? JSON.parse(await readFile(MANIFEST, "utf8")) : {};
-const previousBySrc = new Map(Object.values(previous).flat().map((p) => [p.src, p]));
+const previousEntries = Object.values(previous).flat();
+const previousBySrc = new Map(previousEntries.map((p) => [p.src, p]));
+/** Même contenu, autre adresse (album renommé, catégorie déplacée) : on retrouve la photo par son empreinte. */
+const previousByHash = new Map(previousEntries.map((p) => [p.hash, p]));
 const previousSettings = existsSync(SETTINGS_FILE) ? JSON.parse(await readFile(SETTINGS_FILE, "utf8")) : {};
 /** Réglage modifié depuis la dernière génération : ces fichiers sont refaits. */
 const stale = Object.fromEntries(Object.entries(SETTINGS).map(([kind, value]) => [kind, JSON.stringify(previousSettings[kind]) !== JSON.stringify(value)]));
+/**
+ * Fichiers déjà générés, par empreinte : { base, download }. Gardé dans .pipeline.json (donc aussi
+ * dans le cache de la publication GitHub) ; à défaut, déduit du manifest précédent. Une photo qui
+ * change d'adresse est recopiée depuis son ancien emplacement au lieu d'être réencodée.
+ */
+const generatedBefore =
+  previousSettings.photos ??
+  Object.fromEntries(previousEntries.map((p) => [p.hash, { base: p.src.replace(/^\/images\//, "").replace(IMAGE, ""), download: p.download?.path }]));
+const generatedNow = {};
+/** Emplacements occupés par les photos de cette génération (rempli avant le traitement). */
+const claimed = { bases: new Set(), downloads: new Set() };
 const expected = new Set();
-const stats = { photos: 0, generated: 0, files: 0 };
+const stats = { photos: 0, generated: 0, files: 0, reused: 0 };
 
 /** Traite une photo : métadonnées (réutilisées si elle n'a pas changé) + fichiers manquants. */
 async function processPhoto({ full, key, file, download }) {
@@ -269,8 +291,10 @@ async function processPhoto({ full, key, file, download }) {
   const base = `${key}/${file.replace(IMAGE, "")}`;
   const buffer = await readFile(full);
   const hash = createHash("sha1").update(buffer).digest("hex").slice(0, 16);
-  const prev = previousBySrc.get(src);
+  const atSrc = previousBySrc.get(src);
+  const prev = atSrc?.hash === hash ? atSrc : (previousByHash.get(hash) ?? atSrc);
   const same = prev?.hash === hash;
+  const moved = same && prev.src !== src;
 
   let meta;
   if (same && prev.width && prev.blurDataURL) {
@@ -314,17 +338,37 @@ async function processPhoto({ full, key, file, download }) {
     });
   }
 
+  // Ancien emplacement d'un fichier déjà préparé (même contenu, mêmes réglages), s'il est réutilisable :
+  // jamais un chemin qu'une autre photo occupe désormais (échange de noms).
+  const before = generatedBefore[hash];
+  const reusable = (job) => {
+    if (!before || stale[job.kind]) return null;
+    const isDownload = job.kind === "download";
+    const path = isDownload ? before.download : `${before.base}${job.path.slice(base.length)}`;
+    if (!path || path === job.path) return null;
+    if (isDownload ? claimed.downloads.has(path) : claimed.bases.has(before.base)) return null;
+    return existsSync(join(OUT_DIR, path)) ? join(OUT_DIR, path) : null;
+  };
+
   let wrote = false;
   for (const job of jobs) {
     expected.add(job.path);
     const target = join(OUT_DIR, job.path);
     if (same && !stale[job.kind] && existsSync(target)) continue;
     await mkdir(dirname(target), { recursive: true });
+    const from = reusable(job);
+    if (from) {
+      // Clone instantané sur APFS, copie ailleurs ; l'ancien fichier part au nettoyage final.
+      await copyFile(from, target, constants.COPYFILE_FICLONE);
+      stats.reused += 1;
+      continue;
+    }
     await job.make(sharp(buffer).rotate()).toFile(target);
     stats.files += 1;
     wrote = true;
   }
   if (wrote) stats.generated += 1;
+  generatedNow[hash] = { base, ...(download ? { download: download.path } : {}) };
 
   if (buffer.length > LARGE_FILE) warnings.large.push(`${relative(ROOT, full)} — ${meta.width}×${meta.height}, ${mb(buffer.length)}`);
 
@@ -333,7 +377,8 @@ async function processPhoto({ full, key, file, download }) {
     src,
     width: meta.width,
     height: meta.height,
-    alt: prev?.alt ?? altFromFilename(file),
+    // Photo déplacée : son texte alternatif personnalisé la suit ; celui déduit de l'ancien nom de fichier, non.
+    alt: moved && prev.alt === altFromFilename(prev.file) ? altFromFilename(file) : (prev?.alt ?? altFromFilename(file)),
     color: meta.color,
     blurDataURL: meta.blurDataURL,
     exif: meta.exif,
@@ -399,6 +444,10 @@ for (const group of await publicGroups()) {
   }
   for (const full of group.files) tasks.push({ key: group.key, album: group.key, full, file: basename(full), download: null });
 }
+for (const task of tasks) {
+  claimed.bases.add(`${task.key}/${task.file.replace(IMAGE, "")}`);
+  if (task.download) claimed.downloads.add(task.download.path);
+}
 
 const changed = Object.keys(stale).filter((kind) => stale[kind]);
 if (changed.length) console.log(`↻ Réglages nouveaux ou modifiés (${changed.join(", ")}) : ces fichiers sont (re)générés — la première fois, comptez quelques minutes.`);
@@ -439,7 +488,7 @@ for (const file of await walkFiles(OUT_DIR)) {
   removed += 1;
 }
 await mkdir(OUT_DIR, { recursive: true });
-await writeFile(SETTINGS_FILE, `${JSON.stringify(SETTINGS)}\n`);
+await writeFile(SETTINGS_FILE, `${JSON.stringify({ ...SETTINGS, photos: generatedNow })}\n`);
 
 const sorted = Object.fromEntries(Object.keys(manifest).sort(byName).map((k) => [k, manifest[k]]));
 await writeFile(MANIFEST, `${JSON.stringify(sorted, null, 2)}\n`);
@@ -450,7 +499,7 @@ const sizeOf = async (dir) => (await Promise.all((await walkFiles(dir)).map((f) 
 const published = await sizeOf(OUT_DIR);
 const videoBytes = await sizeOf(join(ROOT, "public", "_videos"));
 const seconds = Math.round((Date.now() - started) / 1000);
-console.log(`✓ ${stats.photos} photo(s) dans ${Object.keys(manifest).length} dossier(s) — ${stats.generated} traitée(s), ${stats.files} fichier(s) écrit(s), ${removed} supprimé(s), ${seconds} s`);
+console.log(`✓ ${stats.photos} photo(s) dans ${Object.keys(manifest).length} dossier(s) — ${stats.generated} traitée(s), ${stats.files} fichier(s) écrit(s), ${stats.reused} recopié(s) sans réencodage, ${removed} supprimé(s), ${seconds} s`);
 console.log(
   `  AVIF ${AVIF.map((v) => v.width).join("/")} + WebP ${WEBP.map((v) => v.width).join("/")} (${WEBP_MAX_WITH_DOWNLOAD} max. si téléchargeable) · JPEG à télécharger pour ${sources.filter((s) => s.download).length}/${sources.length} album(s) · ${mb(published)} publiés`,
 );
