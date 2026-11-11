@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="x-apple-disable-message-reformatting">
+<meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
+<title>{{title}}</title>
+<!-- Modèle EmailJS « Contactez-nous » — e-mail reçu à chaque demande du formulaire de contact.
+     À coller dans EmailJS : Email Templates → Contactez-nous → Contenu → Modifier le contenu → code source (< >).
+     Variables envoyées par le site (entre doubles accolades dans le modèle) : title, name, email, phone,
+     project_type, project_date, budget, message, time, site — voir src/lib/contact/submit.ts. -->
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,800&family=JetBrains+Mono:wght@400;500&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; padding: 0; background: #131412; -webkit-text-size-adjust: 100%; }
+  a { color: #eb642b; }
+  .btn a:hover { background: #ed762f !important; }
+  @media (max-width: 620px) {
+    .px { padding-left: 22px !important; padding-right: 22px !important; }
+    .h1 { font-size: 34px !important; line-height: 36px !important; }
+    .col { display: block !important; width: 100% !important; padding-left: 0 !important; padding-right: 0 !important; }
+    .col + .col { padding-top: 18px !important; }
+    .wordmark { font-size: 56px !important; }
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background:#131412;">
+
+<!-- Aperçu affiché dans la liste des e-mails (Gmail, Apple Mail…) -->
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#131412;">{{name}} · {{project_type}} — {{message}}</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#131412" style="background:#131412;">
+<tr><td align="center" style="padding:32px 12px 40px;">
+
+  <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">
+
+    <!-- En-tête : logo + date de réception -->
+    <tr><td style="padding:0 6px 22px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+        <td valign="middle"><a href="https://rayvocaptures0808.be" style="text-decoration:none;"><img src="https://rayvocaptures0808.be/brand/logo.png" width="140" alt="rayvo.captures0808" style="display:block;width:140px;height:auto;border:0;"></a></td>
+        <td valign="middle" align="right" style="font-family:'JetBrains Mono',Menlo,Consolas,monospace;font-size:11px;line-height:16px;letter-spacing:2px;text-transform:uppercase;color:#8f8d7b;">Reçu le<br><span style="color:#e7e7d8;">{{time}}</span></td>
+      </tr></table>
+    </td></tr>
+
+    <!-- Carte « billet » -->
+    <tr><td bgcolor="#1d1e1c" style="background:#1d1e1c;border:1px solid #33342f;border-radius:20px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+
+        <!-- Filet orange -->
+        <tr><td height="5" bgcolor="#eb642b" style="height:5px;font-size:0;line-height:0;background:#eb642b;background-image:linear-gradient(90deg,#eb642b,#f09235);border-radius:20px 20px 0 0;">&nbsp;</td></tr>
+
+        <!-- Qui écrit, et pourquoi -->
+        <tr><td class="px" style="padding:34px 40px 8px;">
+          <p style="margin:0;font-family:'JetBrains Mono',Menlo,Consolas,monospace;font-size:12px;line-height:18px;letter-spacing:3px;text-transform:uppercase;color:#eb642b;">+&nbsp; Nouvelle demande</p>
+          <h1 class="h1" style="margin:16px 0 0;font-family:'Archivo','Arial Black',Arial,sans-serif;font-stretch:125%;font-weight:800;font-size:44px;line-height:46px;letter-spacing:-0.5px;text-transform:uppercase;color:#e7e7d8;">{{name}}</h1>
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;"><tr>
+            <td style="border:1px solid #eb642b;border-radius:999px;padding:8px 16px;font-family:'Poppins',Helvetica,Arial,sans-serif;font-size:13px;line-height:18px;color:#e7e7d8;">{{project_type}}</td>
+          </tr></table>
+        </td></tr>
+
+        <!-- Action principale : répondre -->
+        <tr><td class="px" style="padding:26px 40px 30px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" class="btn"><tr>
+            <td bgcolor="#eb642b" style="border-radius:999px;background:#eb642b;">
+              <a href="mailto:{{email}}?subject=Votre%20demande%20%E2%80%94%20rayvo.captures0808" style="display:inline-block;padding:15px 28px;font-family:'Poppins',Helvetica,Arial,sans-serif;font-size:15px;line-height:18px;font-weight:500;color:#1d1e1c;text-decoration:none;border-radius:999px;">Répondre à {{name}} &nbsp;&#8599;</a>
+            </td>
+          </tr></table>
+          <p style="margin:14px 0 0;font-family:'Poppins',Helvetica,Arial,sans-serif;font-size:13px;line-height:20px;color:#8f8d7b;">Ou cliquez simplement sur « Répondre » : la réponse part à <a href="mailto:{{email}}" style="color:#afac96;">{{email}}</a>.</p>
+        </td></tr>
+
+        <!-- Perforation du billet -->
+        <tr><td class="px" style="padding:0 40px;"><div style="border-top:1px dashed #3d3e39;height:0;line-height:0;font-size:0;">&nbsp;</div></td></tr>
+
+        <!-- Coordonnées et projet -->
+        <tr><td class="px" style="padding:26px 40px 6px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td class="col" width="50%" valign="top" style="padding:0 12px 22px 0;">
+                <p style="margin:0;font-family:'JetBrains Mono',Menlo,Consolas,monospace;font-size:10px;line-height:14px;letter-spacing:2px;text-transform:uppercase;color:#8f8d7b;">E-mail</p>
+                <p style="margin:6px 0 0;font-family:'Poppins',Helvetica,Arial,sans-serif;font-size:15px;line-height:22px;color:#e7e7d8;word-break:break-all;"><a href="mailto:{{email}}" style="color:#e7e7d8;text-decoration:none;">{{email}}</a></p>
+              </td>
+              <td class="col" width="50%" valign="top" style="padding:0 0 22px 12px;">
+                <p style="margin:0;font-family:'JetBrains Mono',Menlo,Consolas,monospace;font-size:10px;line-height:14px;letter-spacing:2px;text-transform:uppercase;color:#8f8d7b;">Téléphone</p>
+                <p style="margin:6px 0 0;font-family:'Poppins',Helvetica,Arial,sans-serif;font-size:15px;line-height:22px;color:#e7e7d8;">{{phone}}</p>
+              </td>
+            </tr>
+            <tr>
+              <td class="col" width="50%" valign="top" style="padding:0 12px 22px 0;">
+                <p style="margin:0;font-family:'JetBrains Mono',Menlo,Consolas,monospace;font-size:10px;line-height:14px;letter-spacing:2px;text-transform:uppercase;color:#8f8d7b;">Date du projet</p>
+                <p style="margin:6px 0 0;font-family:'Poppins',Helvetica,Arial,sans-serif;font-size:15px;line-height:22px;color:#e7e7d8;">{{project_date}}</p>
+              </td>
+              <td class="col" width="50%" valign="top" style="padding:0 0 22px 12px;">
+                <p style="margin:0;font-family:'JetBrains Mono',Menlo,Consolas,monospace;font-size:10px;line-height:14px;letter-spacing:2px;text-transform:uppercase;color:#8f8d7b;">Budget</p>
+                <p style="margin:6px 0 0;font-family:'Poppins',Helvetica,Arial,sans-serif;font-size:15px;line-height:22px;color:#e7e7d8;">{{budget}}</p>
+              </td>
+            </tr>
+          </table>
+        </td></tr>
+
+        <!-- Le message -->
+        <tr><td class="px" style="padding:4px 40px 36px;">
+          <p style="margin:0 0 10px;font-family:'JetBrains Mono',Menlo,Consolas,monospace;font-size:10px;line-height:14px;letter-spacing:2px;text-transform:uppercase;color:#8f8d7b;">Message</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td bgcolor="#242522" style="background:#242522;border-left:3px solid #eb642b;border-radius:4px 12px 12px 4px;padding:20px 22px;font-family:'Poppins',Helvetica,Arial,sans-serif;font-size:16px;line-height:26px;font-weight:300;color:#e7e7d8;white-space:pre-line;">{{message}}</td>
+          </tr></table>
+        </td></tr>
+
+        <!-- Talon du billet -->
+        <tr><td bgcolor="#242522" class="px" style="background:#242522;border-top:1px solid #33342f;border-radius:0 0 20px 20px;padding:16px 40px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td style="font-family:'JetBrains Mono',Menlo,Consolas,monospace;font-size:10px;line-height:16px;letter-spacing:2px;text-transform:uppercase;color:#8f8d7b;">Formulaire de contact · {{site}}</td>
+            <td align="right" style="font-family:'JetBrains Mono',Menlo,Consolas,monospace;font-size:10px;line-height:16px;letter-spacing:2px;text-transform:uppercase;"><a href="https://rayvocaptures0808.be/contact/" style="color:#afac96;text-decoration:none;">Voir le site &#8599;</a></td>
+          </tr></table>
+        </td></tr>
+
+      </table>
+    </td></tr>
+
+    <!-- Signature : le grand nom, comme en bas du site -->
+    <tr><td style="padding:34px 6px 0;">
+      <p class="wordmark" style="margin:0;font-family:'Archivo','Arial Black',Arial,sans-serif;font-stretch:125%;font-weight:800;font-size:78px;line-height:70px;letter-spacing:-1px;text-transform:uppercase;color:#242522;">rayvo<span style="color:#eb642b;">.</span></p>
+      <p style="margin:14px 0 0;font-family:'JetBrains Mono',Menlo,Consolas,monospace;font-size:10px;line-height:18px;letter-spacing:2px;text-transform:uppercase;color:#8f8d7b;">Photographe sportif · Bruxelles &amp; Brabant wallon<br><a href="https://rayvocaptures0808.be" style="color:#afac96;text-decoration:none;">rayvocaptures0808.be</a> &nbsp;·&nbsp; <a href="https://www.instagram.com/rayvo.captures0808/" style="color:#afac96;text-decoration:none;">@rayvo.captures0808</a></p>
+    </td></tr>
+
+  </table>
+
+</td></tr>
+</table>
+</body>
+</html>
