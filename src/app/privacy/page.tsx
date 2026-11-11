@@ -83,7 +83,7 @@ export default function PrivacyPage() {
           body: (
             <p>
               Le site n&apos;utilise pas de cookies de suivi. Les polices de caractères sont servies depuis le site lui-même.
-              {siteConfig.instagramFeed ? " Les derniers posts Instagram affichés sur le site sont chargés depuis le service Behold (images hébergées par Instagram)." : ""} Pour toute question, rendez-vous sur la page <Link href="/contact">contact</Link>.
+              {siteConfig.instagramFeed ? " Les images des derniers posts Instagram sont chargées depuis le service Behold (behold.so), qui les héberge." : ""} Pour toute question, rendez-vous sur la page <Link href="/contact">contact</Link>.
             </p>
           ),
         },

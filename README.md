@@ -217,9 +217,12 @@ Toujours dans `src/config/site.ts` → `contact` (e-mail public, téléphone, zo
 `credit.handle` (« @rayvo.captures0808 ») est le crédit demandé aux visiteurs qui partagent une photo : visionneuse, téléchargement en ZIP, albums, Sélection, bloc orange, pied de page et mentions légales. `turnaround` (« 48 h ») est le délai de mise en ligne annoncé partout.
 
 **Derniers posts Instagram** (accueil et À propos) : le site étant statique, il lit un flux public préparé par **Behold** (gratuit, sans mot de passe dans le site) :
-1. Créez un compte sur <https://behold.so>, cliquez **Add feed → Instagram**, connectez le compte @rayvo.captures0808 (il doit être un compte **professionnel ou créateur** : Instagram → Paramètres → Type de compte).
-2. Choisissez le format **JSON**, copiez l'adresse du flux (`https://feeds.behold.so/…`).
-3. Collez-la dans `src/config/site.ts` → `instagramFeed`, puis publiez. Les 6 derniers posts s'affichent ; sans flux, le bloc garde son bouton « Suivre ».
+1. Instagram doit être un compte **professionnel** (Créateur ou Entreprise) : application Instagram → Profil → ☰ → Paramètres → **Type de compte et outils** → **Passer à un compte professionnel** → Créateur, catégorie « Photographe ».
+2. Sur <https://behold.so> : **Sign up free**, puis **Sources → + Add source → Basic source → Connect** (connexion Instagram, **Autoriser**).
+3. **Feeds → + Add feed** → flux d'un compte (user feed) → la source → **JSON** → **Create feed**. Réglages : **Number of Posts** 6 (maximum du plan gratuit), **Allowed post types** au choix, **Domain whitelist** vide (le flux est lu par GitHub pendant la publication, pas par le navigateur).
+4. Copiez l'adresse du flux (`https://feeds.behold.so/…`) dans `src/config/site.ts` → `instagramFeed`, puis publiez.
+
+Le flux est lu **une seule fois par publication** (jamais pendant les visites) et la GitHub Action republie le site **chaque matin** : les nouveaux posts apparaissent dans la journée, et le site reste loin du quota gratuit de Behold (1 200 lectures par mois, 6 posts, mise à jour quotidienne). Si le flux ne répond pas, la page se publie quand même avec le bouton « Suivre ».
 
 Une valeur vide masque l'élément en production ; en développement, une étiquette « À configurer » le signale. Même principe pour les chiffres clés et les références de la page À propos (`src/data/content.ts`) : rien n'est inventé, rien n'est affiché tant que ce n'est pas renseigné.
 

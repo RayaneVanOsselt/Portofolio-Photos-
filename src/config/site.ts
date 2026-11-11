@@ -58,12 +58,12 @@ export const siteConfig = {
   turnaround: "48 h",
 
   /**
-   * Derniers posts Instagram (accueil, À propos). Le site étant statique, il lit un flux
-   * JSON public préparé par un service gratuit comme Behold (https://behold.so) :
-   * collez ici l'adresse du flux (ex. "https://feeds.behold.so/AbCdEf123"). Vide = un
-   * simple bloc « Suivre sur Instagram » avec le lien du profil.
+   * Derniers posts Instagram (accueil, À propos) : adresse du flux JSON Behold
+   * (https://behold.so), ex. "https://feeds.behold.so/AbCdEf123". Lu une fois à chaque
+   * publication du site (et la GitHub Action republie chaque matin) : jamais pendant les
+   * visites, pour rester dans le quota gratuit. Vide = un simple bouton « Suivre ».
    */
-  instagramFeed: "" as string,
+  instagramFeed: "https://feeds.behold.so/1f59XhMifq6IRLE6OJEP" as string,
 
   /** Réseaux sociaux : URL complète. Laisser vide pour masquer. */
   socials: {
