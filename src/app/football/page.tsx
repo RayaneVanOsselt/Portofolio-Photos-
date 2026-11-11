@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
 import { AlbumTimeline } from "@/components/albums/AlbumRow";
+import { CategoryCard } from "@/components/albums/CategoryCard";
 import { LatestAlbum } from "@/components/albums/LatestAlbum";
 import { PitchLines } from "@/components/football/PitchLines";
 import { GalleryFinder } from "@/components/galleries/GalleryFinder";
@@ -22,6 +23,7 @@ const delay = (ms: number) => ({ "--delay": `${ms}ms` }) as CSSProperties;
 /** L'archive football : le dernier match, la recherche, puis tous les matchs par mois. */
 export default function FootballPage() {
   const albums = getSportAlbums("football");
+  const clubs = getCategories().filter((c) => c.sport === "football");
   const latest = albums[0];
   const footballRoots = new Set(getCategories().filter((c) => c.sport === "football").map((c) => c.slug));
   const entries = getGalleryEntries().filter((e) => e.roots.some((root) => footballRoots.has(root)));
@@ -45,7 +47,7 @@ export default function FootballPage() {
             </span>
           </h1>
           <p className="anim-rise mt-8 max-w-2xl t-lead text-taupe" style={delay(380)}>
-            Matchs, équipes, supporters et coulisses. Chaque rencontre racontée en images — de l&apos;avant-match au coup de sifflet final.
+            Matchs, équipes, supporters et coulisses, à Bruxelles et en Brabant wallon. Chaque rencontre racontée en images — de l&apos;avant-match au coup de sifflet final, en ligne sous 48 h.
           </p>
         </div>
       </header>
@@ -56,15 +58,31 @@ export default function FootballPage() {
         </section>
       ) : null}
 
+      {/* Les albums football, club par club (RWDM → saisons → matchs) */}
+      {clubs.length ? (
+        <section aria-labelledby="clubs-title" className="container-wide section-sm">
+          <SectionStamp id="clubs-title" meta={`${clubs.length} club${clubs.length > 1 ? "s" : ""} · ${albums.length} matchs`} className="mb-10 md:mb-14">
+            Albums football
+          </SectionStamp>
+          <ul className={`grid gap-4 ${clubs.length > 1 ? "md:grid-cols-2" : ""}`}>
+            {clubs.map((club) => (
+              <li key={club.href}>
+                <CategoryCard category={club} layout="full" headingLevel="h3" />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       <section aria-labelledby="find-title" className="container-wide section-sm">
-        <SectionStamp id="find-title" index="01" meta={`${entries.length} album${entries.length > 1 ? "s" : ""}`} className="mb-10 md:mb-14">
+        <SectionStamp id="find-title" meta={`${entries.length} album${entries.length > 1 ? "s" : ""}`} className="mb-10 md:mb-14">
           Votre match
         </SectionStamp>
         <GalleryFinder entries={entries} filters={filters} suggestions={suggestions} />
       </section>
 
       <section aria-labelledby="archive-title" className="container-wide pb-[var(--section-space)]">
-        <SectionStamp id="archive-title" index="02" meta="Du plus récent au plus ancien">
+        <SectionStamp id="archive-title" meta="Du plus récent au plus ancien">
           Archive
         </SectionStamp>
         <div className="mt-10 md:mt-14">

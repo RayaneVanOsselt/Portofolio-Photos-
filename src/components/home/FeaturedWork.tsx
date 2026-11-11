@@ -4,7 +4,7 @@ import { SectionStamp } from "@/components/ui/SectionLabel";
 import type { Album, Photo } from "@/lib/types";
 
 /**
- * Sélection : composition éditoriale asymétrique (12 colonnes).
+ * Albums à la une : composition éditoriale asymétrique (12 colonnes).
  * Chaque emplacement a sa place, sa taille et son ratio — pas de grille uniforme.
  */
 const SLOTS = [
@@ -15,21 +15,24 @@ const SLOTS = [
   { frame: "aspect-[21/9]", col: "md:col-start-3 md:col-span-10", sizes: "(min-width: 768px) 83vw, 100vw" },
 ];
 
-export function FeaturedWork({ albums, index = "01" }: { albums: Album[]; index?: string }) {
+export function FeaturedWork({ albums }: { albums: Album[] }) {
   // Seuls les albums qui ont une couverture sont mis en avant (voir getFeaturedAlbums).
   const selection = albums.filter((a): a is Album & { cover: Photo } => Boolean(a.cover)).slice(0, SLOTS.length);
   if (!selection.length) return null;
 
   return (
     <section aria-labelledby="featured-title" className="container-wide section">
-      <SectionStamp id="featured-title" index={index} meta={`${selection.length} album${selection.length > 1 ? "s" : ""}`}>
-        Sélection
+      <SectionStamp id="featured-title" meta={`${selection.length} album${selection.length > 1 ? "s" : ""}`}>
+        Albums à la une
       </SectionStamp>
       <div className="mt-8 mb-14 flex flex-col gap-6 md:mt-10 md:mb-20 md:flex-row md:items-end md:justify-between">
         <p className="max-w-lg t-lead text-taupe" data-reveal>
           Des matchs, des équipes, des instants. Les albums que je préfère, à parcourir en plein écran.
         </p>
-        <ArrowLink href="/albums">Tous les albums</ArrowLink>
+        <div className="flex flex-wrap gap-x-8 gap-y-3">
+          <ArrowLink href="/selection">Voir ma sélection</ArrowLink>
+          <ArrowLink href="/albums">Tous les albums</ArrowLink>
+        </div>
       </div>
 
       <ul className="grid grid-cols-1 gap-y-14 md:grid-cols-12 md:gap-x-[clamp(1rem,2vw,2rem)] md:gap-y-[clamp(3rem,7vw,7rem)]">

@@ -26,6 +26,13 @@ type ManifestEntry = Omit<Photo, "id" | "credit" | "download"> & {
 };
 const realPhotos = manifest as Record<string, ManifestEntry[]>;
 
+function withoutGear(exif: NonNullable<Photo["exif"]>): Photo["exif"] {
+  const settings = { ...exif };
+  delete settings.camera;
+  delete settings.lens;
+  return settings;
+}
+
 export function getFolderPhotos(folder: string): Photo[] {
   const real = realPhotos[folder];
   if (real?.length) {
@@ -38,7 +45,8 @@ export function getFolderPhotos(folder: string): Photo[] {
       alt,
       color,
       blurDataURL,
-      exif,
+      // Boîtier et objectif ne sont jamais publiés (ni affichés, ni dans le code des pages).
+      exif: exif ? withoutGear(exif) : undefined,
       ...(download ? { download: { url: `/_photos/${download.path}`, filename: download.path.split("/").at(-1)!, bytes: download.bytes } } : {}),
     }));
   }

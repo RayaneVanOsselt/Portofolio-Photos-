@@ -83,7 +83,7 @@ export default function ServicesPage() {
       </section>
 
       <section aria-labelledby="process-title" className="container-wide pb-[var(--section-space)]">
-        <SectionStamp id="process-title" index="01" meta="Une collaboration" className="mb-12 md:mb-16">
+        <SectionStamp id="process-title" meta="Une collaboration" className="mb-12 md:mb-16">
           Déroulé
         </SectionStamp>
         <RouteSteps steps={STEPS} />

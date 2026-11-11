@@ -9,9 +9,10 @@ import { formatDate } from "@/lib/utils";
 /* --------------------------------------------------------------- textes */
 
 const area = siteConfig.seo.area.trim();
+const areaPhrase = siteConfig.seo.areaPhrase.trim() || (area ? `à ${area}` : "");
 
-/** « à Bruxelles » si une zone est configurée, sinon rien. */
-export const inArea = area ? ` à ${area}` : "";
+/** « à Bruxelles et en Brabant wallon » si une zone est configurée, sinon rien. */
+export const inArea = areaPhrase ? ` ${areaPhrase}` : "";
 
 /** Titre principal du site (page d'accueil). */
 export const homeTitle = `Photographe sportif${inArea} — hockey, rugby & football`;
@@ -118,10 +119,15 @@ export function businessJsonLd() {
     logo: absoluteUrl("/apple-icon.png"),
     image: absoluteUrl("/opengraph-image.png"),
     slogan: siteConfig.tagline,
+    founder: { "@type": "Person", name: `${siteConfig.owner.firstName} ${siteConfig.owner.lastName}`, jobTitle: "Photographe sportif" },
     knowsAbout: ["Photographie sportive", "Hockey sur gazon", "Rugby", "Football", "Photographie de match", "Portrait d'équipe"],
     ...(email ? { email } : {}),
     ...(phone ? { telephone: phone } : {}),
-    ...(area ? { areaServed: { "@type": "Place", name: area } } : {}),
+    ...(siteConfig.seo.areaServed.length
+      ? { areaServed: siteConfig.seo.areaServed.map((name) => ({ "@type": "Place", name })) }
+      : area
+        ? { areaServed: { "@type": "Place", name: area } }
+        : {}),
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: "Prestations photo",

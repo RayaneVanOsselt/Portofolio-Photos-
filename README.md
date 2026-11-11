@@ -42,9 +42,12 @@ En ligne, tout est fourni automatiquement par la GitHub Action. En local, dans `
 | ---------------------------------- | --------------------------------------------------------------------------------- |
 | `NEXT_PUBLIC_SITE_URL`             | URL publique, sans `/` final — canonical, sitemap, partages                       |
 | `NEXT_PUBLIC_BASE_PATH`            | Sous-dossier de publication (ex. `/Portofolio-Photos-`) — vide en local           |
-| `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` | Clé Web3Forms du formulaire de contact (voir §8)                                  |
+| `NEXT_PUBLIC_EMAILJS_SERVICE_ID`   | EmailJS — identifiant du service e-mail (voir §8)                                 |
+| `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID`  | EmailJS — identifiant du modèle d'e-mail (voir §8)                                |
+| `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY`   | EmailJS — clé publique du compte (voir §8)                                        |
+| `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` | Ancien réglage (Web3Forms), utilisé seulement si EmailJS n'est pas renseigné      |
 
-Sans clé Web3Forms **en local**, le formulaire fonctionne mais le message est affiché dans la console du navigateur. **En ligne**, le visiteur voit un message l'invitant à vous écrire directement.
+Sans clés EmailJS **en local**, le formulaire fonctionne mais le message est affiché dans la console du navigateur. **En ligne**, le visiteur voit un message l'invitant à vous écrire directement.
 
 ## 4. Albums : Club / Compétition → Match → Photos
 
@@ -197,16 +200,27 @@ La page **Matchs** (`/matchs`) présente tous les matchs par année puis par moi
 
 Chaque photo de page est désignée par son identifiant dans `src/data/content.ts` (hero, À propos) et `src/data/services.ts` (une par prestation) : une photo de match (`albums/fih-pro-league/hommes/27-06-2026-belgique-pays-bas-men/belgique/IMG_3563.jpg` — dossier de l'adresse + nom du fichier) ou une image déposée dans `public/images/site/home/`, `site/about/` ou `site/services/` (`site/about/portrait.jpg`).
 
+### Page Sélection
+
+La page **Sélection** (`/selection`, dans le menu) présente les meilleures photos du site, dans l'ordre de **`src/data/selection.ts`** : une ligne par photo, son identifiant (dossier de l'adresse de l'album + nom du fichier, ex. `albums/rwdm/2026-2027/12-09-2026-rwdm-charleroi-b/IMG_5970.jpg`). Restez entre 20 et 30 photos ; une photo introuvable est ignorée (signalée pendant le build).
+
 ## 6. Modifier le nom du site
 
 Dans **`src/config/site.ts`** : `name`, `logo.primary`, `logo.secondary`, `tagline`, `description`.
 Le logo, les titres, les metadata, le footer, les e-mails et les images de partage se mettent à jour.
 Le logo (image) se trouve dans **`assets/brand/logo-rayvo-captures0808.png`** : c'est le seul fichier à remplacer pour changer de logo (même nom, PNG transparent, logo clair pour fond sombre). `npm run brand` — lancé automatiquement par `npm run dev` et `npm run build` — en tire le logo complet, l'emblème seul et le nom seul (`public/brand/`, fichiers générés), utilisés par l'en-tête, le menu mobile, le pied de page, le rideau d'intro, le favicon, l'icône iOS et les images de partage.
-Le pied de page se met à jour tout seul : les 4 derniers matchs publiés, le nombre de matchs et de photos, les albums groupés par sport, vos coordonnées et réseaux dès qu'ils sont renseignés (§7), l'heure locale en direct (`timeZone`) et votre zone (`seo.area` ou `contact.location`).
+Le pied de page se met à jour tout seul : les 4 derniers matchs publiés, le nombre de matchs et de photos, les albums groupés par sport, vos coordonnées et réseaux dès qu'ils sont renseignés (§7), votre zone (`seo.area` ou `contact.location`) et le rappel « Merci de créditer » (`credit.handle`).
 
-## 7. Réseaux sociaux et coordonnées
+## 7. Réseaux sociaux, coordonnées, crédit photo, Instagram
 
 Toujours dans `src/config/site.ts` → `contact` (e-mail public, téléphone, zone) et `socials` (URL complètes).
+`credit.handle` (« @rayvo.captures0808 ») est le crédit demandé aux visiteurs qui partagent une photo : visionneuse, téléchargement en ZIP, albums, Sélection, bloc orange, pied de page et mentions légales. `turnaround` (« 48 h ») est le délai de mise en ligne annoncé partout.
+
+**Derniers posts Instagram** (accueil et À propos) : le site étant statique, il lit un flux public préparé par **Behold** (gratuit, sans mot de passe dans le site) :
+1. Créez un compte sur <https://behold.so>, cliquez **Add feed → Instagram**, connectez le compte @rayvo.captures0808 (il doit être un compte **professionnel ou créateur** : Instagram → Paramètres → Type de compte).
+2. Choisissez le format **JSON**, copiez l'adresse du flux (`https://feeds.behold.so/…`).
+3. Collez-la dans `src/config/site.ts` → `instagramFeed`, puis publiez. Les 6 derniers posts s'affichent ; sans flux, le bloc garde son bouton « Suivre ».
+
 Une valeur vide masque l'élément en production ; en développement, une étiquette « À configurer » le signale. Même principe pour les chiffres clés et les références de la page À propos (`src/data/content.ts`) : rien n'est inventé, rien n'est affiché tant que ce n'est pas renseigné.
 
 ## 7 bis. Référencement (SEO)
@@ -222,27 +236,35 @@ Déjà en place automatiquement :
 - texte alternatif des photos complété automatiquement avec l'équipe et la compétition.
 
 À faire de votre côté (dans `src/config/site.ts` → `seo`) :
-1. **`area`** : votre ville ou région (ex. `"Bruxelles"`). Elle est ajoutée aux titres et descriptions — c'est ce qui vous fait remonter sur « photographe sportif Bruxelles ».
+1. **`area`** / **`areaPhrase`** / **`areaServed`** : votre zone (déjà réglée sur Bruxelles et le Brabant wallon). Elle est ajoutée aux titres et descriptions — c'est ce qui vous fait remonter sur « photographe sportif Bruxelles ».
 2. **Google Search Console** (<https://search.google.com/search-console>) : ajoutez la propriété « Préfixe d'URL » avec l'adresse du site, choisissez la méthode « Balise HTML », copiez uniquement le code du `content="…"` dans `googleSiteVerification`, publiez, puis validez. Soumettez ensuite `sitemap.xml`.
 3. Idem pour **Bing Webmaster Tools** avec `bingSiteVerification` (optionnel).
 4. Donnez à vos photos des **noms de fichiers et textes alternatifs descriptifs** (« red-lions-but-van-aubel.jpg » plutôt que « IMG_1234.jpg »).
 5. Renseignez les lieux et compétitions de vos matchs dans `src/data/albums.ts`, et écrivez de vraies descriptions : plus il y a de texte utile, mieux c'est.
 6. Ajoutez vos réseaux (Instagram…) : ils sont reliés au site dans les données Google.
 
-## 8. Configuration du formulaire de contact (Web3Forms)
+## 8. Configuration du formulaire de contact (EmailJS)
 
-Le site étant statique (sans serveur), les messages sont transmis par **Web3Forms**, un service gratuit conçu pour ce cas.
+Le site étant statique (sans serveur), les messages sont envoyés par **EmailJS**, un service gratuit (200 e-mails par mois) qui envoie l'e-mail depuis votre propre boîte Gmail.
 
-1. Allez sur <https://web3forms.com>, saisissez l'adresse qui doit recevoir les demandes : vous recevez une **clé d'accès** par e-mail.
-2. Sur GitHub : **Settings → Secrets and variables → Actions → onglet Variables → New repository variable**
-   - Nom : `WEB3FORMS_ACCESS_KEY`
-   - Valeur : votre clé
-3. Relancez la publication (**Actions → Publier le site → Run workflow**) ou poussez un commit.
-4. Envoyez un message de test depuis la page Contact.
+1. Créez un compte sur <https://www.emailjs.com> (bouton **Sign Up Free**).
+2. **Email Services → Add New Service → Gmail** → **Connect Account** (votre adresse Gmail), puis **Create Service**. Notez le **Service ID** (ex. `service_ab12cd3`).
+3. **Email Templates → Create New Template** :
+   - **Subject** : `{{title}}`
+   - **Content** : par exemple
+     `Nom : {{name}}` · `E-mail : {{email}}` · `Téléphone : {{phone}}` · `Sujet : {{project_type}}` · `Date : {{project_date}}` · `Budget : {{budget}}` · `Message : {{message}}` · `Envoyé le {{time}}`
+   - **To Email** : votre adresse · **Reply To** : `{{email}}` (pour répondre directement au visiteur)
+   - **Save**, puis notez le **Template ID** (ex. `template_xy98zw7`).
+4. **Account → General** : copiez la **Public Key**. Dans **Account → Security**, cochez la restriction aux domaines autorisés et ajoutez l'adresse du site (ex. `rayanevanosselt.github.io`).
+5. Sur GitHub : **Settings → Secrets and variables → Actions → onglet Variables → New repository variable**, trois fois :
+   - `EMAILJS_SERVICE_ID` = le Service ID
+   - `EMAILJS_TEMPLATE_ID` = le Template ID
+   - `EMAILJS_PUBLIC_KEY` = la Public Key
+6. Relancez la publication (**Actions → Publier le site → Run workflow**) ou poussez un commit, puis envoyez un message de test depuis la page Contact.
 
-Cette clé est publique par conception : elle permet uniquement d'envoyer des messages vers **votre** adresse. L'adresse du visiteur est placée en réponse (`Reply-To`) : il suffit de répondre à l'e-mail reçu.
+Ces trois valeurs sont publiques par conception : elles permettent uniquement d'envoyer des messages vers **votre** adresse. En local, mettez les mêmes valeurs dans `.env.local` (`NEXT_PUBLIC_EMAILJS_…`, voir `.env.example`).
 
-Protections : validation des champs dans le navigateur (`src/lib/contact/schema.ts`), nettoyage des saisies, champ piège (honeypot), délai minimal de remplissage, et filtrage anti-spam côté Web3Forms. Pour changer de service (Formspree…), seule `src/lib/contact/submit.ts` est à adapter.
+Protections : validation des champs dans le navigateur (`src/lib/contact/schema.ts`), nettoyage des saisies, champ piège (honeypot), délai minimal de remplissage, limite de domaines côté EmailJS. L'ancien réglage Web3Forms (`WEB3FORMS_ACCESS_KEY`) reste accepté si EmailJS n'est pas renseigné. Tout l'envoi est dans `src/lib/contact/submit.ts`.
 
 ## 9. Build
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import { AlbumTimeline } from "@/components/albums/AlbumRow";
-import { CategoryCard } from "@/components/albums/CategoryCard";
+import { CategoryCard, mosaicLayouts, tileSpan } from "@/components/albums/CategoryCard";
 import { MetaList, PageIntro } from "@/components/layout/PageIntro";
 import { ClosingCta } from "@/components/sections/ClosingCta";
 import { PhotoAccessBand } from "@/components/sections/PhotoAccessBand";
@@ -34,14 +35,15 @@ export default function AlbumsPage() {
   const photos = albums.reduce((sum, a) => sum + a.photos.length, 0);
   const recent = albums.slice(0, RECENT);
   const more = albums.length > recent.length;
+  const layouts = mosaicLayouts(categories.length);
 
   return (
     <>
       <PageIntro
         crumbs={[{ name: "Albums", path: ALBUMS_HREF }]}
-        kicker="Hockey · Football · Rugby"
+        kicker="Hockey · Football · Rugby — Bruxelles & Brabant wallon"
         title="Albums"
-        intro={<p>Choisissez un club ou une compétition, puis un match : toutes les photos de la rencontre vous attendent.</p>}
+        intro={<p>Choisissez un club ou une compétition, puis un match : toutes les photos de la rencontre vous attendent, en ligne sous {siteConfig.turnaround} après le coup de sifflet final.</p>}
         aside={
           <MetaList
             items={[
@@ -54,20 +56,21 @@ export default function AlbumsPage() {
       />
 
       <section aria-labelledby="categories-title" className="container-wide pb-[var(--section-space)]">
-        <SectionStamp id="categories-title" index="01" meta={`${categories.length} catégories`} className="mb-10 md:mb-14">
+        <SectionStamp id="categories-title" meta={`${categories.length} catégories`} className="mb-10 md:mb-14">
           Clubs & compétitions
         </SectionStamp>
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
-          {categories.map((category) => (
-            <li key={category.href}>
-              <CategoryCard category={category} headingLevel="h3" />
+        {/* Mosaïque : grands formats horizontaux et verticaux mêlés, la FIH Pro League en vedette. */}
+        <ul className="grid grid-flow-row-dense gap-4 sm:grid-cols-2 lg:auto-rows-[clamp(15rem,21vw,22rem)] lg:grid-cols-3 lg:gap-5">
+          {categories.map((category, i) => (
+            <li key={category.href} className={tileSpan(layouts[i])} data-reveal style={{ "--reveal-delay": `${(i % 3) * 70}ms` } as CSSProperties}>
+              <CategoryCard category={category} layout={layouts[i]} headingLevel="h3" priority={i === 0} className="lg:aspect-auto lg:h-full" />
             </li>
           ))}
         </ul>
       </section>
 
       <section aria-labelledby="matches-title" className="container-wide pb-[var(--section-space)]">
-        <SectionStamp id="matches-title" index="02" meta={more ? `${recent.length} sur ${albums.length} albums · du plus récent au plus ancien` : `${albums.length} albums · du plus récent au plus ancien`}>
+        <SectionStamp id="matches-title" meta={more ? `${recent.length} sur ${albums.length} albums · du plus récent au plus ancien` : `${albums.length} albums · du plus récent au plus ancien`}>
           {more ? "Derniers matchs" : "Tous les matchs"}
         </SectionStamp>
         <div className="mt-10 md:mt-14">

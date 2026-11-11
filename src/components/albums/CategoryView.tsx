@@ -11,7 +11,7 @@ import { ArrowLink } from "@/components/ui/Button";
 import { ArrowUpRight } from "@/components/ui/Icons";
 import { PhotoImage } from "@/components/ui/PhotoImage";
 import { SectionLabel } from "@/components/ui/SectionLabel";
-import { ALBUMS_HREF, getCategoryAlbums, getCategoryTrail, getNextCategory } from "@/lib/albums";
+import { ALBUMS_HREF, getCategoryAlbums, getCategoryTrail, getNextCategory, SPORT_NAME, SPORT_PAGES } from "@/lib/albums";
 import { categorySummary, collectionJsonLd } from "@/lib/seo";
 import type { Category } from "@/lib/types";
 import { formatDateShort, pad } from "@/lib/utils";
@@ -66,6 +66,11 @@ export function CategoryView({ category }: { category: Category }) {
         <div className="mt-10 grid gap-10 border-t border-line pt-8 md:mt-14 lg:grid-cols-12">
           <div className="anim-rise t-lead text-taupe lg:col-span-6" style={delay(380)}>
             <p>{category.intro ?? categorySummary(category)}</p>
+            {SPORT_PAGES[category.sport] ? (
+              <div className="mt-6">
+                <ArrowLink href={SPORT_PAGES[category.sport]!}>Toute la page {SPORT_NAME[category.sport]}</ArrowLink>
+              </div>
+            ) : null}
           </div>
           <div className="anim-rise lg:col-span-5 lg:col-start-8" style={delay(480)}>
             <MetaList

@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useDeferredValue, useEffect, useId, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Highlight } from "@/components/search/SearchParts";
 import { ArrowUpRight, Close, Search } from "@/components/ui/Icons";
+import { siteConfig } from "@/config/site";
 import type { GalleryEntry, GalleryFilter } from "@/lib/gallery-index";
 import { scoreText, tokenize } from "@/lib/search";
 import { pad, publicPath } from "@/lib/utils";
@@ -257,7 +258,7 @@ function ResultRow({ entry, query, hasDates }: { entry: GalleryEntry; query: str
       </span>
       <span className="hidden t-mono text-taupe md:block">
         {entry.event ? <span className="block">{entry.event}</span> : null}
-        <span className="block text-ash">{entry.count ? `${entry.count} photos` : "Photos à venir"}</span>
+        <span className="block text-ash">{entry.count ? `${entry.count} photos` : `Photos sous ${siteConfig.turnaround}`}</span>
       </span>
       <span className="flex items-center gap-3">
         <span className="hidden text-[0.875rem] text-linen lg:inline">Voir l&apos;album</span>

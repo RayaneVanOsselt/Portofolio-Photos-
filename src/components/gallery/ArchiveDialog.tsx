@@ -111,6 +111,9 @@ export function ArchiveDialog({ open, onClose, title, archiveName, photos, date 
           </div>
         </dl>
         <p className="mt-4 t-small text-taupe">JPEG haute qualité, réunis dans une archive ZIP « {archiveName}.zip ».</p>
+        <p className="mt-3 rounded-[var(--radius-sm)] border border-flamingo/40 bg-flamingo/[0.06] px-4 py-3 t-small text-linen">
+          Vous partagez ces photos ? Merci de créditer <strong className="font-medium text-flamingo">{siteConfig.credit.handle}</strong> dans votre publication.
+        </p>
 
         <div className="mt-6" aria-live="polite">
           {phase === "confirm" && tooLarge ? (
