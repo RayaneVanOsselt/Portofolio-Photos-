@@ -255,7 +255,8 @@ Le site étant statique (sans serveur), les messages sont envoyés par **EmailJS
      `Nom : {{name}}` · `E-mail : {{email}}` · `Téléphone : {{phone}}` · `Sujet : {{project_type}}` · `Date : {{project_date}}` · `Budget : {{budget}}` · `Message : {{message}}` · `Envoyé le {{time}}`
    - **To Email** : votre adresse · **Reply To** : `{{email}}` (pour répondre directement au visiteur)
    - **Save**, puis notez le **Template ID** (ex. `template_xy98zw7`).
-4. **Account → General** : copiez la **Public Key**. Dans **Account → Security** : laissez **Use Private Key** décoché (le site n'envoie que la clé publique) et, dans **Domains**, ajoutez `https://rayanevanosselt.github.io` (et `http://localhost:3808` pour tester en local) : seuls ces sites pourront envoyer avec vos clés.
+   - Version mise en page à la charte du site (logo, couleurs, polices, bouton « Répondre ») : **`assets/email/demande-contact.html`** — dans le modèle, **Modifier le contenu** → bouton code source (`< >`), tout remplacer par ce fichier, enregistrer.
+4. **Account → General** : copiez la **Public Key**. Dans **Account → Security** : laissez **Use Private Key** décoché (le site n'envoie que la clé publique) et, dans **Domains**, ajoutez `https://rayvocaptures0808.be` — l'adresse du site — (et `http://localhost:3808` pour tester en local) : seuls ces sites pourront envoyer avec vos clés.
 5. Sur GitHub : **Settings → Secrets and variables → Actions → onglet Variables → New repository variable**, trois fois :
    - `EMAILJS_SERVICE_ID` = le Service ID
    - `EMAILJS_TEMPLATE_ID` = le Template ID
