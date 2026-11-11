@@ -108,7 +108,13 @@ export function MegaMenu({ open, nav, onNavigate, onPointerEnter }: Props) {
           <div className={`col-span-3 space-y-7 ${revealClass}`} style={reveal(large.length)}>
             {small.map((group) => (
               <div key={group.label}>
-                <p className="t-mono text-ash">{group.label}</p>
+                {group.href ? (
+                  <Link href={group.href} onClick={onNavigate} className="link-underline t-mono text-ash hover:text-linen">
+                    {group.label} →
+                  </Link>
+                ) : (
+                  <p className="t-mono text-ash">{group.label}</p>
+                )}
                 <ul className="mt-3">
                   {group.categories.map((category) => (
                     <CategoryLink key={category.href} category={category} primed={primed} onNavigate={onNavigate} />

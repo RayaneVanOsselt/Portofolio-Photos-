@@ -1,11 +1,13 @@
 import { ButtonLink } from "@/components/ui/Button";
+import { CreditNote } from "@/components/ui/CreditNote";
+import { siteConfig } from "@/config/site";
 import { QuickSearchForm } from "./QuickSearchForm";
 import { RouteSteps } from "./RouteSteps";
 
 const STEPS = [
   { title: "Trouvez votre galerie", body: "Tapez une équipe, un adversaire ou une date." },
   { title: "Ouvrez vos photos", body: "Plein écran, navigation au clavier ou au doigt." },
-  { title: "Récupérez-les", body: "Demandez la haute définition en un clic." },
+  { title: "Récupérez-les", body: "Téléchargez-les en haute qualité, ou demandez la haute définition." },
 ];
 
 /**
@@ -23,8 +25,8 @@ export function PhotoAccessBand({ context, withSearch = true }: { context?: stri
               Vous êtes sur les photos ?
             </h2>
             <p className="mt-5 max-w-xl text-lg font-normal text-ink">
-              {context ? `Une image de ${context} vous plaît ? ` : "Retrouvez votre match en quelques secondes. "}
-              Chaque photo peut être demandée en haute définition, pour vous ou pour votre club.
+              {context ? `Une image de ${context} vous plaît ? ` : `Les photos sont en ligne sous ${siteConfig.turnaround} après chaque match : retrouvez le vôtre en quelques secondes. `}
+              Chaque photo peut être téléchargée ou demandée en haute définition, pour vous ou pour votre club.
             </p>
           </div>
           <div className="lg:col-span-4">
@@ -45,6 +47,7 @@ export function PhotoAccessBand({ context, withSearch = true }: { context?: stri
         <div className="mt-12 border-t border-ink/20 pt-10 md:mt-16">
           <RouteSteps steps={STEPS} tone="ink" />
         </div>
+        <CreditNote tone="ink" className="mt-10 border-t border-ink/20 pt-6" />
       </div>
     </section>
   );

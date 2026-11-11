@@ -13,19 +13,17 @@ export function SectionLabel({ children, className = "" }: { children: ReactNode
 }
 
 /**
- * Tampon de section : la signature du système. Un filet, une ligne de repères
- * (numéro, contexte), puis le titre en monospace très espacé, comme imprimé
- * sur un billet. Remplace les H2 classiques des grandes sections.
+ * Tampon de section : la signature du système. Un filet, une ligne de contexte,
+ * puis le titre en monospace très espacé, comme imprimé sur un billet.
+ * Remplace les H2 classiques des grandes sections.
  */
 export function SectionStamp({
-  index,
   meta,
   id,
   children,
   as: Tag = "h2",
   className = "",
 }: {
-  index?: string;
   meta?: ReactNode;
   id?: string;
   children: ReactNode;
@@ -34,10 +32,7 @@ export function SectionStamp({
 }) {
   return (
     <div className={`border-t border-line pt-4 ${className}`}>
-      <div className="flex items-center justify-between gap-6 t-mono text-ash">
-        <span>{index ? `(${index})` : null}</span>
-        {meta ? <span className="text-right">{meta}</span> : null}
-      </div>
+      {meta ? <p className="t-mono text-ash">{meta}</p> : null}
       <Tag id={id} className="t-stamp mt-6 break-words md:mt-8" data-reveal>
         {children}
       </Tag>

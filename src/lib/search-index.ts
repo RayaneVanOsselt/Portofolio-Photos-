@@ -16,7 +16,7 @@ export function albumKeywords(album: Album) {
     album.event,
     ...(album.teams ?? []),
     ...(album.match
-      ? [album.match.home, album.match.away, album.match.homeShort, album.match.awayShort, album.match.competition, album.match.round, "match", album.match.score?.join("-")]
+      ? [album.match.home, album.match.away, album.match.homeShort, album.match.awayShort, album.match.level, ...album.match.original, album.match.competition, album.match.round, "match", album.match.score?.join("-")]
       : []),
     album.location,
     dateKeywords(album.date),
@@ -74,7 +74,8 @@ export function buildSearchIndex(): SearchItem[] {
     { type: "Page", title: "Albums", href: "/albums", context: "Tous les clubs, compétitions et matchs", keywords: "albums galeries photos matchs clubs compétitions portfolio" },
     { type: "Page", title: "Retrouver mes photos", href: "/galeries", context: "Recherche par équipe, match ou date", keywords: "mes photos match récupérer télécharger code accès client galeries" },
     { type: "Page", title: "Football — archive des matchs", href: "/football", context: "Matchs, clubs, saisons", keywords: "football foot soccer matchday archive matchs rwdm" },
-    { type: "Page", title: "À propos", href: "/about", context: "Le photographe", keywords: "about biographie approche valeurs matériel" },
+    { type: "Page", title: "Sélection", href: "/selection", context: "Les meilleures photos", keywords: "sélection best of meilleures photos portfolio coups de cœur" },
+    { type: "Page", title: "À propos", href: "/about", context: "Rayane, le photographe", keywords: "about biographie rayane van osselt photographe approche valeurs" },
     { type: "Page", title: "Services", href: "/services", context: "Prestations", keywords: "offres prestations devis" },
     { type: "Page", title: "Contact", href: "/contact", context: "Demande de devis", keywords: "email message devis réserver disponibilité" },
   );

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPage } from "@/components/layout/LegalPage";
 import { siteConfig } from "@/config/site";
+import { CONTACT_PROVIDER } from "@/lib/contact/submit";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
@@ -12,22 +13,22 @@ export const metadata: Metadata = pageMetadata({
 
 /**
  * Base de politique de confidentialité (RGPD) décrivant le fonctionnement
- * réel du site. Les éléments entre crochets sont à compléter.
- * À faire relire si votre activité collecte d'autres données.
+ * réel du site. À faire relire si votre activité collecte d'autres données.
  */
 export default function PrivacyPage() {
   const email = siteConfig.contact.email || "[ADRESSE E-MAIL DE CONTACT]";
+  const owner = `${siteConfig.owner.firstName} ${siteConfig.owner.lastName}`;
   return (
     <LegalPage
       title="Politique de confidentialité"
       path="/privacy"
-      updated="[DATE DE MISE À JOUR]"
+      updated="11 novembre 2026"
       sections={[
         {
           title: "Responsable du traitement",
           body: (
             <p>
-              Le responsable du traitement des données est <strong>[NOM ET PRÉNOM / RAISON SOCIALE]</strong>, exerçant sous le nom {siteConfig.name}, [ADRESSE]. Contact : {email}.
+              Le responsable du traitement des données est <strong>{owner}</strong>, photographe exerçant sous le nom {siteConfig.name}. Contact : <a href={`mailto:${email}`}>{email}</a>.
             </p>
           ),
         },
@@ -57,13 +58,13 @@ export default function PrivacyPage() {
           title: "Destinataires",
           body: (
             <p>
-              Votre message est transmis par e-mail au photographe via le service de formulaires <strong>Web3Forms</strong>. Vos données ne sont ni vendues, ni louées, ni cédées à des tiers.
+              Votre message est transmis par e-mail au photographe via le service d&apos;envoi de formulaires <strong>{CONTACT_PROVIDER}</strong>. Vos données ne sont ni vendues, ni louées, ni cédées à des tiers.
             </p>
           ),
         },
         {
           title: "Durée de conservation",
-          body: <p>Les échanges sont conservés [DURÉE — ex. 3 ans après le dernier contact], puis supprimés.</p>,
+          body: <p>Les échanges sont conservés au maximum 3 ans après le dernier contact, puis supprimés.</p>,
         },
         {
           title: "Vos droits",
@@ -81,7 +82,8 @@ export default function PrivacyPage() {
           title: "Cookies et ressources",
           body: (
             <p>
-              Le site n&apos;utilise pas de cookies de suivi. Les polices de caractères sont servies depuis le site lui-même. Pour toute question, rendez-vous sur la page <Link href="/contact">contact</Link>.
+              Le site n&apos;utilise pas de cookies de suivi. Les polices de caractères sont servies depuis le site lui-même.
+              {siteConfig.instagramFeed ? " Les derniers posts Instagram affichés sur le site sont chargés depuis le service Behold (images hébergées par Instagram)." : ""} Pour toute question, rendez-vous sur la page <Link href="/contact">contact</Link>.
             </p>
           ),
         },

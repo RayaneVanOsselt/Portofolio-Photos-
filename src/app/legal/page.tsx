@@ -10,24 +10,42 @@ export const metadata: Metadata = pageMetadata({
   path: "/legal",
 });
 
-/** Mentions légales — les éléments entre crochets sont à compléter. */
+/** Mentions légales : éditeur, hébergement, droits sur les photos, crédit demandé. */
 export default function LegalNoticePage() {
+  const { email, phone } = siteConfig.contact;
+  const instagram = siteConfig.socials.instagram;
   return (
     <LegalPage
       title="Mentions légales"
       path="/legal"
-      updated="[DATE DE MISE À JOUR]"
+      updated="11 novembre 2026"
       sections={[
         {
           title: "Éditeur du site",
           body: (
             <ul>
               <li>
-                <strong>{siteConfig.name}</strong> — [NOM ET PRÉNOM / RAISON SOCIALE]
+                <strong>
+                  {siteConfig.owner.lastName} {siteConfig.owner.firstName}
+                </strong>{" "}
+                — photographe sportif, exerçant sous le nom {siteConfig.name}
               </li>
-              <li>Adresse : [ADRESSE]</li>
-              <li>Numéro d&apos;entreprise (BCE) / TVA : [NUMÉRO]</li>
-              <li>Contact : {siteConfig.contact.email || "[ADRESSE E-MAIL]"}</li>
+              <li>
+                E-mail : <a href={`mailto:${email}`}>{email}</a>
+              </li>
+              {phone ? (
+                <li>
+                  Téléphone : <a href={`tel:${phone.replace(/\s/g, "")}`}>{phone}</a>
+                </li>
+              ) : null}
+              {instagram ? (
+                <li>
+                  Instagram :{" "}
+                  <a href={instagram} target="_blank" rel="noopener noreferrer">
+                    {siteConfig.credit.handle}
+                  </a>
+                </li>
+              ) : null}
             </ul>
           ),
         },
@@ -40,12 +58,23 @@ export default function LegalNoticePage() {
           body: (
             <>
               <p>
-                L&apos;ensemble des photographies, textes, logos et éléments graphiques présents sur ce site sont protégés par le droit d&apos;auteur. Sauf mention contraire, les photographies sont la propriété exclusive de {siteConfig.name}.
+                L&apos;ensemble des photographies, vidéos, textes, logos et éléments graphiques présents sur ce site sont protégés par le droit d&apos;auteur. Sauf mention contraire, les photographies sont la propriété exclusive de {siteConfig.owner.firstName} {siteConfig.owner.lastName} ({siteConfig.name}).
               </p>
-              <p>Toute reproduction, représentation, modification ou diffusion, totale ou partielle, sans autorisation écrite préalable est interdite.</p>
+              <p>Toute reproduction, représentation, modification ou diffusion à des fins commerciales, totale ou partielle, sans autorisation écrite préalable est interdite.</p>
               <p>
                 Pour une demande d&apos;utilisation d&apos;image ou de licence, <Link href="/contact">contactez-moi</Link>.
               </p>
+            </>
+          ),
+        },
+        {
+          title: "Crédit photo",
+          body: (
+            <>
+              <p>
+                Joueurs, clubs et supporters peuvent télécharger leurs photos et les partager librement sur leurs réseaux, à une condition : <strong>merci de créditer {siteConfig.credit.handle}</strong> (mention dans la publication ou identification du compte Instagram).
+              </p>
+              <p>Ne pas recadrer la photo pour en retirer une signature, ni la retoucher au point d&apos;en changer le sens.</p>
             </>
           ),
         },

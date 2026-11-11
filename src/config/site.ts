@@ -17,11 +17,16 @@ export const siteConfig = {
     primary: "rayvo.",
     secondary: "captures0808",
   },
+  /** Le photographe (mentions légales, À propos, données structurées). */
+  owner: {
+    firstName: "Rayane",
+    lastName: "Van Osselt",
+  },
   /** Signature affichée sous le nom. */
-  tagline: "Photographe sportif — Hockey · Rugby · Football",
+  tagline: "Photographe sportif à Bruxelles et en Brabant wallon — Hockey · Rugby · Football",
   /** Description par défaut (SEO, partage). */
   description:
-    "Photographe sportif — hockey, rugby et football. Reportages de match, portraits d'équipe et contenus pour clubs, au plus près du jeu.",
+    "Photographe sportif à Bruxelles et en Brabant wallon — hockey, rugby et football. Reportages de match, portraits d'équipe et contenus pour clubs, photos en ligne sous 48 h.",
   /** Langue du contenu (attribut html lang + Open Graph). */
   locale: "fr_BE",
   language: "fr-BE",
@@ -31,16 +36,38 @@ export const siteConfig = {
 
   contact: {
     /** Adresse affichée publiquement sur le site (pas forcément EMAIL_TO). */
-    email: "" as string,
+    email: "vanosselt.rayane@gmail.com" as string,
     /** Format international conseillé, ex. "+32 470 00 00 00". */
-    phone: "" as string,
+    phone: "+32 483 73 07 15" as string,
     /** Ville / zone d'intervention, ex. "Bruxelles, Belgique". */
-    location: "" as string,
+    location: "Bruxelles & Brabant wallon" as string,
   },
+
+  /**
+   * Crédit demandé quand une photo est partagée (réseaux, presse, site d'un club) :
+   * affiché près des boutons de téléchargement, dans la visionneuse et les mentions légales.
+   */
+  credit: {
+    handle: "@rayvo.captures0808",
+  },
+
+  /**
+   * Délai de mise en ligne des photos après un match, annoncé sur le site
+   * (accueil, albums « Photos à venir », page Retrouver mes photos).
+   */
+  turnaround: "48 h",
+
+  /**
+   * Derniers posts Instagram (accueil, À propos). Le site étant statique, il lit un flux
+   * JSON public préparé par un service gratuit comme Behold (https://behold.so) :
+   * collez ici l'adresse du flux (ex. "https://feeds.behold.so/AbCdEf123"). Vide = un
+   * simple bloc « Suivre sur Instagram » avec le lien du profil.
+   */
+  instagramFeed: "" as string,
 
   /** Réseaux sociaux : URL complète. Laisser vide pour masquer. */
   socials: {
-    instagram: "" as string,
+    instagram: "https://www.instagram.com/rayvo.captures0808/" as string,
     tiktok: "" as string,
     linkedin: "" as string,
     facebook: "" as string,
@@ -54,14 +81,15 @@ export const siteConfig = {
      * Ajoutée aux titres, descriptions et données structurées : c'est ce qui vous fait
      * apparaître sur « photographe sportif <ville> ». Laisser vide si non souhaité.
      */
-    area: "" as string,
+    area: "Bruxelles et Brabant wallon" as string,
+    /** La même zone dans une phrase : « Photographe sportif à Bruxelles et en Brabant wallon ». */
+    areaPhrase: "à Bruxelles et en Brabant wallon" as string,
+    /** Lieux servis, pour Google (données structurées). */
+    areaServed: ["Bruxelles", "Brabant wallon"] as string[],
     /** Codes de vérification (Google Search Console, Bing Webmaster Tools). */
     googleSiteVerification: "" as string,
     bingSiteVerification: "" as string,
   },
-
-  /** Fuseau de l'heure affichée en direct dans le pied de page. */
-  timeZone: "Europe/Brussels",
 
   /** Vidéo d'arrière-plan du hero (fichier dans /public), sinon null. */
   heroVideo: null as null | { src: string; type: string },
@@ -115,6 +143,7 @@ export function getSocialLinks() {
 export const mainNav = [
   { label: "Accueil", href: "/" },
   { label: "Albums", href: "/albums", hasMegaMenu: true },
+  { label: "Sélection", href: "/selection" },
   { label: "Matchs", href: "/matchs" },
   { label: "Vidéos", href: "/videos" },
   { label: "À propos", href: "/about" },

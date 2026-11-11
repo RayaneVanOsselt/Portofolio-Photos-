@@ -6,6 +6,7 @@ import { ShareGalleryButton } from "@/components/galleries/ShareGalleryButton";
 import { Gallery, type GallerySection } from "@/components/gallery/Gallery";
 import { Breadcrumbs, type Crumb } from "@/components/layout/Breadcrumbs";
 import { ArrowLink } from "@/components/ui/Button";
+import { CreditNote } from "@/components/ui/CreditNote";
 import { PhotoImage } from "@/components/ui/PhotoImage";
 import { SectionStamp } from "@/components/ui/SectionLabel";
 import { AlbumVideo } from "@/components/videos/AlbumVideo";
@@ -115,7 +116,7 @@ export function AlbumView({ album, crumbs, video }: { album: Album; crumbs: Crum
 
           {/* ----------------------------------------------------------- Galerie */}
           <section id="photos" aria-labelledby="photos-title" className="container-wide scroll-mt-20 pb-[var(--section-space)]">
-            <SectionStamp id="photos-title" index="01" meta={`${chapters.length > 1 ? `${chapters.length} chapitres · ` : ""}${photoCountLabel(count)}`}>
+            <SectionStamp id="photos-title" meta={`${chapters.length > 1 ? `${chapters.length} chapitres · ` : ""}${photoCountLabel(count)}`}>
               Galerie
             </SectionStamp>
 
@@ -138,6 +139,7 @@ export function AlbumView({ album, crumbs, video }: { album: Album; crumbs: Crum
               </nav>
             ) : null}
 
+            <CreditNote className="mt-6" />
             <div className="mt-10 md:mt-14">
               <Gallery
                 id={album.slug}
@@ -157,11 +159,11 @@ export function AlbumView({ album, crumbs, video }: { album: Album; crumbs: Crum
         <section aria-labelledby="photos-title" className="container-wide pb-[var(--section-space)]">
           <div className="anim-rise grid gap-8 rounded-[var(--radius-card)] border border-dashed border-line-strong px-6 py-10 md:grid-cols-12 md:items-end md:px-12 md:py-14" style={delay(620)}>
             <div className="md:col-span-7">
-              <p className="t-mono text-flamingo">Galerie · Photos à venir</p>
+              <p className="t-mono text-flamingo">Galerie · Photos en ligne sous {siteConfig.turnaround}</p>
               <h2 id="photos-title" className="mt-4 text-[clamp(1.5rem,1.1rem+1.4vw,2.5rem)] leading-[1.1] font-light tracking-[-0.03em] text-linen">
-                Les photos de ce match arrivent bientôt.
+                Les photos de ce match seront en ligne sous {siteConfig.turnaround} après le coup de sifflet final.
               </h2>
-              <p className="mt-3 max-w-lg t-small text-taupe">L&apos;album s&apos;affichera ici dès sa mise en ligne.</p>
+              <p className="mt-3 max-w-lg t-small text-taupe">L&apos;album s&apos;affichera ici : gardez la page en favori ou suivez {siteConfig.credit.handle} sur Instagram pour être prévenu.</p>
             </div>
             <div className="flex flex-col items-start gap-4 md:col-span-5 md:items-end">
               <ArrowLink href={category.href}>Tous les albums {category.fullTitle}</ArrowLink>
@@ -177,7 +179,8 @@ export function AlbumView({ album, crumbs, video }: { album: Album; crumbs: Crum
 
 /**
  * L'affiche du match : chaque équipe sur sa ligne, avec son logo et son score s'il est connu.
- * Le texte du titre reste exactement « Daring H1 vs Leo H1 » (lecteurs d'écran, Google).
+ * Le texte du titre reste exactement le titre de l'album (lecteurs d'écran, Google) :
+ * l'équipe commune (« Messieurs 1 ») est ajoutée sous l'affiche.
  */
 function MatchHeadline({ album }: { album: Album }) {
   const match = album.match!;
@@ -201,6 +204,12 @@ function MatchHeadline({ album }: { album: Album }) {
         <span aria-hidden className="anim-fade h-px flex-1 bg-line" style={delay(360)} />
       </span>{" "}
       <TeamLine name={away} crest={match.awayCrest} goals={match.score?.[1]} wait={300} size={size} />
+      {match.level ? (
+        <span className="anim-fade col-span-3 mt-2 t-mono text-taupe md:mt-3" style={delay(420)}>
+          <span className="sr-only"> — </span>
+          {match.level}
+        </span>
+      ) : null}
       {match.score ? <span className="sr-only">{`, score final ${match.score[0]} à ${match.score[1]}`}</span> : null}
     </span>
   );

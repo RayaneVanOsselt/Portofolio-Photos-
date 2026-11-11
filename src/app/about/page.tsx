@@ -1,42 +1,42 @@
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
+import { TrustedClubs } from "@/components/clubs/TrustedClubs";
 import { Parallax } from "@/components/effects/Parallax";
+import { InstagramSection } from "@/components/instagram/InstagramSection";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { ClosingCta } from "@/components/sections/ClosingCta";
-import { socialIcons } from "@/components/ui/Icons";
+import { ArrowLink } from "@/components/ui/Button";
 import { PhotoImage } from "@/components/ui/PhotoImage";
 import { SectionLabel, SectionStamp } from "@/components/ui/SectionLabel";
 import { Todo } from "@/components/ui/Todo";
-import { getSocialLinks, isDev, siteConfig } from "@/config/site";
+import { isDev, siteConfig } from "@/config/site";
 import { aboutContent } from "@/data/content";
 import { getPhotoById } from "@/lib/albums";
 import { inArea, pageMetadata } from "@/lib/seo";
 import { isPlaceholder, pad } from "@/lib/utils";
 
+const { firstName, lastName } = siteConfig.owner;
+
 export const metadata: Metadata = pageMetadata({
-  title: `À propos — photographe sportif${inArea}`,
-  description: `Le photographe derrière ${siteConfig.name} : approche, vision et valeurs. Photographie de hockey, rugby et football${inArea}.`,
+  title: `${firstName} ${lastName} — photographe sportif${inArea}`,
+  description: `${firstName}, le photographe derrière ${siteConfig.name} : passionné de photographie de sport, il couvre le hockey, le football et le rugby${inArea}. Photos en ligne sous ${siteConfig.turnaround}.`,
   path: "/about",
 });
 
 const delay = (ms: number) => ({ "--delay": `${ms}ms` }) as CSSProperties;
 
+/**
+ * À propos : le portrait et la mini-bio, l'approche (principes rédigés seulement),
+ * les valeurs, les clubs qui m'ont fait confiance, Instagram.
+ */
 export default function AboutPage() {
   const portrait = getPhotoById(aboutContent.portraitId, "site/about");
   const wide = getPhotoById(aboutContent.wideId, "site/about");
   const stats = aboutContent.stats.filter((s) => s.value);
   const showStats = stats.length > 0 || isDev;
-  const socials = getSocialLinks();
-  const { equipment } = aboutContent;
   // Textes encore entre crochets : visibles en développement, jamais publiés.
   const intro = isDev || !isPlaceholder(aboutContent.intro) ? aboutContent.intro : siteConfig.description;
   const approach = aboutContent.approach.filter((item) => isDev || !isPlaceholder(item.body));
-  const showEquipment = equipment.length > 0 || isDev;
-  const showSocials = socials.length > 0 || isDev;
-  const showClients = aboutContent.clients.length > 0 || isDev;
-  // Numéros des tampons de section, selon les sections réellement affichées.
-  const stamps = [approach.length ? "approach" : null, "values", showClients ? "clients" : null].filter(Boolean);
-  const stampIndex = (id: string) => pad(stamps.indexOf(id) + 1);
 
   return (
     <>
@@ -46,14 +46,21 @@ export default function AboutPage() {
         <div className="mt-10 grid gap-12 md:mt-14 md:grid-cols-12 md:items-end">
           <div className="md:col-span-7">
             <div className="anim-rise" style={delay(120)}>
-              <SectionLabel>Le photographe</SectionLabel>
+              <SectionLabel>À propos · Photographe sportif</SectionLabel>
             </div>
             <h1 className="t-display mt-6 text-linen">
               <span className="line-mask">
-                <span style={delay(180)}>À propos</span>
+                <span style={delay(180)}>{firstName}</span>
+              </span>
+              <span className="sr-only">
+                {" "}
+                {lastName} — photographe sportif{inArea}
               </span>
             </h1>
-            <p className="anim-rise mt-10 max-w-xl t-lead text-linen/85" style={delay(420)}>
+            <p className="anim-rise mt-5 t-mono text-taupe" style={delay(320)}>
+              {firstName} {lastName} · {siteConfig.name} · {siteConfig.contact.location}
+            </p>
+            <p className="anim-rise mt-8 max-w-xl t-lead text-linen/85" style={delay(420)}>
               {intro}
             </p>
             <ul className="anim-rise mt-8 flex flex-wrap gap-2" style={delay(520)} aria-label="Spécialités">
@@ -63,9 +70,21 @@ export default function AboutPage() {
                 </li>
               ))}
             </ul>
+            <div className="anim-rise mt-10 flex flex-wrap gap-x-8 gap-y-4" style={delay(600)}>
+              <ArrowLink href="/selection">Voir ma sélection</ArrowLink>
+              <ArrowLink href="/contact">Travailler ensemble</ArrowLink>
+            </div>
           </div>
           <div className="anim-fade md:col-span-5" style={delay(300)}>
-            {portrait ? <PhotoImage photo={portrait} fill priority sizes="(min-width: 768px) 40vw, 100vw" className="aspect-[4/5] rounded-[var(--radius-card)]" /> : null}
+            {portrait ? (
+              <figure>
+                <PhotoImage photo={portrait} fill priority sizes="(min-width: 768px) 40vw, 100vw" position="50% 30%" className="aspect-[4/5] rounded-[var(--radius-card)]" />
+                <figcaption className="mt-3 flex justify-between gap-4 t-mono text-ash">
+                  <span>{firstName}, au bord du terrain</span>
+                  <span>{siteConfig.credit.handle}</span>
+                </figcaption>
+              </figure>
+            ) : null}
           </div>
         </div>
       </header>
@@ -73,15 +92,12 @@ export default function AboutPage() {
       {/* Approche — uniquement les principes rédigés */}
       {approach.length ? (
         <section aria-labelledby="approach-title" className="container-wide section">
-          <SectionStamp id="approach-title" index={stampIndex("approach")} meta={`${approach.length} principe${approach.length > 1 ? "s" : ""}`} className="mb-12 md:mb-16">
+          <SectionStamp id="approach-title" meta={`${approach.length} principe${approach.length > 1 ? "s" : ""}`} className="mb-12 md:mb-16">
             Approche
           </SectionStamp>
           <ol className="grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {approach.map((item, i) => (
               <li key={item.title} className="relative border-t border-line pt-6" data-reveal style={{ "--reveal-delay": `${(i % 3) * 80}ms` } as CSSProperties}>
-                <span aria-hidden className="pointer-events-none absolute top-5 right-0 font-display text-[4rem] leading-none font-extrabold text-linen/[0.05] [font-stretch:125%]">
-                  {pad(i + 1)}
-                </span>
                 <span className="t-mono text-flamingo">{pad(i + 1)}</span>
                 <h3 className="relative mt-4 t-h3 text-linen">{item.title}</h3>
                 <p className="relative mt-3 t-small text-taupe">{item.body}</p>
@@ -107,7 +123,7 @@ export default function AboutPage() {
 
       {/* Valeurs */}
       <section aria-labelledby="values-title" className="container-wide section-sm">
-        <SectionStamp id="values-title" index={stampIndex("values")} meta="Ce qui guide chaque image">
+        <SectionStamp id="values-title" meta="Ce qui guide chaque image">
           Valeurs
         </SectionStamp>
         <ul className="mt-10">
@@ -118,8 +134,7 @@ export default function AboutPage() {
               data-reveal
               style={{ "--reveal-delay": `${i * 70}ms` } as CSSProperties}
             >
-              <span className="t-mono text-ash md:col-span-1">({pad(i + 1)})</span>
-              <p className="t-h1 text-linen md:col-span-7">{value.title}</p>
+              <p className="t-h1 text-linen md:col-span-8">{value.title}</p>
               <p className="t-small text-taupe md:col-span-4">{value.body}</p>
             </li>
           ))}
@@ -135,81 +150,12 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Matériel et réseaux — uniquement ce qui est renseigné */}
-      {showEquipment || showSocials ? (
-        <section aria-label="Matériel et réseaux" className="container-wide section-sm">
-          <div className="grid gap-10 md:grid-cols-2">
-            {showEquipment ? (
-              <div className="rounded-[var(--radius-card)] border border-line p-6 md:p-8">
-                <h2 id="kit-title" className="t-mono text-ash">
-                  + Matériel
-                </h2>
-                {equipment.length ? (
-                  <ul className="mt-6 divide-y divide-line">
-                    {equipment.map((item) => (
-                      <li key={item} className="py-3 font-mono text-[0.875rem] tracking-[0.04em] text-linen">
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="mt-6">
-                    <Todo>Boîtiers, objectifs (data/content.ts)</Todo>
-                  </p>
-                )}
-              </div>
-            ) : null}
-            {showSocials ? (
-              <div className="rounded-[var(--radius-card)] border border-line p-6 md:p-8">
-                <h2 className="t-mono text-ash">+ Me suivre</h2>
-                {socials.length ? (
-                  <ul className="mt-6 flex flex-wrap gap-2">
-                    {socials.map((s) => {
-                      const Icon = socialIcons[s.key];
-                      return (
-                        <li key={s.key}>
-                          <a href={s.href} target="_blank" rel="noopener noreferrer" className="flex h-11 items-center gap-2.5 rounded-full bg-wash-strong px-5 text-[0.9375rem] text-linen transition-colors hover:bg-[rgb(231_231_216/0.16)]">
-                            <Icon size={17} />
-                            {s.label}
-                          </a>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                ) : (
-                  <p className="mt-6">
-                    <Todo>Réseaux sociaux (config/site.ts)</Todo>
-                  </p>
-                )}
-              </div>
-          ) : null}
-          </div>
-        </section>
-      ) : null}
+      {/* Les clubs qui m'ont fait confiance (générés depuis les albums) */}
+      <TrustedClubs className="mt-[var(--section-space-sm)] mb-[var(--section-space)]" />
 
-      {/* Références : seulement de vraies références */}
-      {showClients ? (
-        <section aria-labelledby="clients-title" className="container-wide section-sm">
-          <SectionStamp id="clients-title" index={stampIndex("clients")} meta="Références">
-            Confiance
-          </SectionStamp>
-          {aboutContent.clients.length ? (
-            <ul className="mt-10 flex flex-wrap gap-x-12 gap-y-6">
-              {aboutContent.clients.map((client) => (
-                <li key={client} className="text-2xl font-light tracking-[-0.03em] text-taupe">
-                  {client}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="mt-8">
-              <Todo>Clubs, médias, partenaires (data/content.ts)</Todo>
-            </p>
-          )}
-        </section>
-      ) : null}
+      <InstagramSection />
 
-      <ClosingCta title="Travaillons *ensemble.*" body="Une idée, un match, une saison à raconter ? Écrivez-moi." />
+      <ClosingCta title="Travaillons *ensemble.*" body="Une idée, un match, une saison à raconter ? Écrivez-moi." />
     </>
   );
 }

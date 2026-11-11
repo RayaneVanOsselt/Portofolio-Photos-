@@ -1,3 +1,4 @@
+import { siteConfig } from "@/config/site";
 import type { Album } from "@/lib/types";
 
 /** « 2 — 1 » ou null si le score n'est pas renseigné. */
@@ -11,7 +12,7 @@ export function matchContext(album: Album) {
   return [album.location, album.match?.competition, album.match?.round].filter(Boolean).join("  ·  ");
 }
 
-/** « 24 photos », « 1 photo » ou « Photos à venir ». */
+/** « 24 photos », « 1 photo » ou « Photos sous 48 h » (match pas encore publié). */
 export function photoCountLabel(count: number) {
-  return count ? `${count} photo${count > 1 ? "s" : ""}` : "Photos à venir";
+  return count ? `${count} photo${count > 1 ? "s" : ""}` : `Photos sous ${siteConfig.turnaround}`;
 }

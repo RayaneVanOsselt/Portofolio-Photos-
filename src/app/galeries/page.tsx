@@ -8,6 +8,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { SectionLabel, SectionStamp } from "@/components/ui/SectionLabel";
 import { getAccessCodeIndex, getGalleryEntries, getGalleryFilters } from "@/lib/gallery-index";
 import { getAlbums, getCategories } from "@/lib/albums";
+import { siteConfig } from "@/config/site";
 import { inArea, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
@@ -22,7 +23,7 @@ const STEPS = [
   { title: "Cherchez", body: "Le nom de votre équipe, de l'adversaire, une date ou une compétition." },
   { title: "Ouvrez l'album", body: "Toutes les photos du match, en vue éditoriale ou en planche." },
   { title: "Choisissez", body: "Agrandissez une photo, partagez son lien permanent." },
-  { title: "Récupérez-la", body: "« Demander cette photo » : je vous envoie la haute définition." },
+  { title: "Récupérez-la", body: `Téléchargez-la en haute qualité — et merci de créditer ${siteConfig.credit.handle} si vous la partagez.` },
 ];
 
 /** Accès aux photos : le parcours de celles et ceux qui cherchent leurs images. */
@@ -50,7 +51,7 @@ export default function GalleriesPage() {
             </span>
           </h1>
           <p className="anim-rise t-lead text-taupe lg:col-span-4" style={delay(420)}>
-            Un match, une équipe, une date : tapez ce que vous cherchez, les albums s&apos;affichent pendant la saisie.
+            Un match, une équipe, une date : tapez ce que vous cherchez, les albums s&apos;affichent pendant la saisie. Les photos sont en ligne sous {siteConfig.turnaround} après chaque match.
           </p>
         </div>
       </header>
@@ -60,7 +61,7 @@ export default function GalleriesPage() {
       </section>
 
       <section aria-labelledby="how-title" className="container-wide section-sm">
-        <SectionStamp id="how-title" index="01" meta="4 étapes" className="mb-12 md:mb-16">
+        <SectionStamp id="how-title" meta="4 étapes" className="mb-12 md:mb-16">
           Mode d&apos;emploi
         </SectionStamp>
         <RouteSteps steps={STEPS} />
@@ -70,7 +71,7 @@ export default function GalleriesPage() {
             <div>
               <p className="text-lg font-medium tracking-[-0.015em] text-linen">Votre match n&apos;est pas en ligne ?</p>
               <p className="mt-1 t-small text-taupe">
-                Toutes les rencontres ne sont pas publiées. Indiquez l&apos;équipe et la date : je vérifie si j&apos;ai des images pour vous.
+                Les albums sont publiés sous {siteConfig.turnaround} après le match. Passé ce délai, indiquez l&apos;équipe et la date : je vérifie si j&apos;ai des images pour vous.
               </p>
             </div>
             <div>

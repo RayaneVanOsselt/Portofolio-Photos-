@@ -26,7 +26,7 @@ export const videos: VideoInput[] = [
   {
     // Pas d'album photo pour ce match : logo et sport indiqués directement.
     slug: "18-10-2026-rasante-white-star-d1",
-    title: "Rasante D1 – White Star D1",
+    title: "Rasante – White Star · Dames 1",
     date: "2026-10-18",
     source: "Rasante D1 - White D1 181026.mp4",
     club: "white-star",
@@ -81,7 +81,7 @@ export const videos: VideoInput[] = [
   },
   {
     slug: "23-05-2026-daring-namur-h1",
-    title: "Daring – Namur H1",
+    title: "Daring – Namur · Messieurs 1",
     date: "2026-05-23",
     source: "Daring - Namur H1 23:05:26.mp4",
     album: "23-05-2026-daring-h1-namur-h1",
