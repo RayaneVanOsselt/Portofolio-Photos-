@@ -62,6 +62,55 @@ const NATIONS = { belgique: { title: "Belgique" }, "pays-bas": { title: "Pays-Ba
 
 export const albumTree: CategoryInput[] = [
   {
+    // En tête du menu, des pages et de la grille des albums : l'album le plus prestigieux.
+    slug: "fih-pro-league",
+    title: "FIH Pro League",
+    kicker: "Hockey · International",
+    sport: "hockey",
+    club: "fih-pro-league",
+    children: [
+      {
+        slug: "hommes",
+        title: "Hommes",
+        albums: [
+          {
+            slug: "27-06-2026-belgique-pays-bas-men",
+            date: "2026-06-27",
+            match: { home: "Belgique", away: "Pays-Bas" },
+            source: "FIH Pro League/Hommes/2026-06-27 Belgique vs Pays-Bas",
+            cover: "belgique/IMG_3563.jpg",
+            featured: true,
+            chapters: NATIONS,
+          },
+        ],
+      },
+      {
+        slug: "femmes",
+        title: "Femmes",
+        albums: [
+          {
+            slug: "28-06-2026-belgique-pays-bas-women",
+            date: "2026-06-28",
+            match: { home: "Belgique", away: "Pays-Bas" },
+            source: "FIH Pro League/Femmes/2026-06-28 Belgique vs Pays-Bas",
+            cover: "belgique/IMG_3851.jpg",
+            featured: true,
+            chapters: NATIONS,
+          },
+          {
+            slug: "27-06-2026-pays-bas-australie-women",
+            date: "2026-06-27",
+            match: { home: "Pays-Bas", away: "Australie" },
+            source: "FIH Pro League/Femmes/2026-06-27 Pays-Bas vs Australie",
+            cover: "pays-bas/IMG_3202.jpg",
+            featured: true,
+            chapters: NATIONS,
+          },
+        ],
+      },
+    ],
+  },
+  {
     // Menu « Daring » → Dames 1 / Messieurs 1 / U19B1.
     // Anciennes adresses (/albums/daring-h1/…, /albums/daring/h1/…) redirigées : voir `legacyPaths` plus bas.
     slug: "daring",
@@ -128,52 +177,6 @@ export const albumTree: CategoryInput[] = [
             match: { home: "Daring U19B1", away: "Taxandria H1" },
             source: "Daring/U19B1/2026-09-19 Daring U19B1 vs Taxandria H1",
             cover: "IMG_6074.jpg",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    slug: "fih-pro-league",
-    title: "FIH Pro League",
-    kicker: "Hockey · International",
-    sport: "hockey",
-    club: "fih-pro-league",
-    children: [
-      {
-        slug: "hommes",
-        title: "Hommes",
-        albums: [
-          {
-            slug: "27-06-2026-belgique-pays-bas-men",
-            date: "2026-06-27",
-            match: { home: "Belgique", away: "Pays-Bas" },
-            source: "FIH Pro League/Hommes/2026-06-27 Belgique vs Pays-Bas",
-            cover: "belgique/IMG_3563.jpg",
-            featured: true,
-            chapters: NATIONS,
-          },
-        ],
-      },
-      {
-        slug: "femmes",
-        title: "Femmes",
-        albums: [
-          {
-            slug: "28-06-2026-belgique-pays-bas-women",
-            date: "2026-06-28",
-            match: { home: "Belgique", away: "Pays-Bas" },
-            source: "FIH Pro League/Femmes/2026-06-28 Belgique vs Pays-Bas",
-            cover: "belgique/IMG_3851.jpg",
-            chapters: NATIONS,
-          },
-          {
-            slug: "27-06-2026-pays-bas-australie-women",
-            date: "2026-06-27",
-            match: { home: "Pays-Bas", away: "Australie" },
-            source: "FIH Pro League/Femmes/2026-06-27 Pays-Bas vs Australie",
-            cover: "pays-bas/IMG_3202.jpg",
-            chapters: NATIONS,
           },
         ],
       },

@@ -18,7 +18,6 @@ export function LegalPage({ title, path, updated, sections }: { title: string; p
             {sections.map((s, i) => (
               <li key={s.title}>
                 <a href={`#section-${i + 1}`} className="link-underline hover:text-linen">
-                  <span className="mr-2 font-mono text-xs text-ash">{pad(i + 1)}</span>
                   {s.title}
                 </a>
               </li>

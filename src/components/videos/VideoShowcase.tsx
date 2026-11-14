@@ -30,7 +30,7 @@ export function VideoShowcase({ videos, featured }: { videos: Video[]; featured:
 
       {others.length ? (
         <section aria-labelledby="videos-title" className="container-wide pb-[var(--section-space)]">
-          <SectionStamp id="videos-title" index="01" meta={`${pad(others.length)} vidéo${others.length > 1 ? "s" : ""}`}>
+          <SectionStamp id="videos-title" meta={`${pad(others.length)} vidéo${others.length > 1 ? "s" : ""}`}>
             Plus de vidéos
           </SectionStamp>
           <ul className="mt-10 grid gap-x-5 gap-y-12 sm:grid-cols-2 md:mt-14 xl:grid-cols-4">

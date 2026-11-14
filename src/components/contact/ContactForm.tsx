@@ -94,7 +94,7 @@ export function ContactForm({ initialProjectType = "", initialMessage = "" }: { 
         <p className="mt-6 max-w-md t-lead text-taupe">Je reviens vers vous dès que possible.</p>
         {status.simulated ? (
           <p className="mt-6 rounded-[var(--radius-sm)] border border-dashed border-flamingo/60 p-4 t-small text-flamingo">
-            Mode développement : le message a été affiché dans la console du navigateur au lieu d&apos;être envoyé. Renseignez NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY pour l&apos;envoi réel.
+            Mode développement : le message a été affiché dans la console du navigateur au lieu d&apos;être envoyé. Renseignez les clés EmailJS (NEXT_PUBLIC_EMAILJS_…) pour l&apos;envoi réel.
           </p>
         ) : null}
         <div className="mt-10 flex flex-wrap gap-3">

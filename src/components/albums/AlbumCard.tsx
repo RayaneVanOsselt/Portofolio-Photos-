@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CrestPair } from "@/components/clubs/ClubCrest";
 import { ArrowUpRight } from "@/components/ui/Icons";
 import { PhotoImage } from "@/components/ui/PhotoImage";
+import { siteConfig } from "@/config/site";
 import { albumCrests, categoryContext } from "@/lib/albums";
 import type { Album, Photo } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
@@ -98,7 +99,7 @@ function FixtureCard({ album, headingLevel: Heading, context }: CardProps & { al
         </Heading>
         <span className="mt-1.5 block t-small text-taupe">
           {context ? `${context}  ·  ` : ""}
-          <span className="text-ash">Photos à venir</span>
+          <span className="text-ash">Photos en ligne sous {siteConfig.turnaround}</span>
         </span>
       </span>
       <ArrowBadge />

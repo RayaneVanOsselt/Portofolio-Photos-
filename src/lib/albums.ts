@@ -15,6 +15,7 @@ import { albumTree, legacyPaths } from "@/data/albums";
 import { clubs, type ClubId } from "@/data/clubs";
 import logoManifest from "@/data/logo-manifest.json";
 import { getFolderChapters, getFolderPhotos } from "@/data/photos";
+import { selection } from "@/data/selection";
 import { isDownloadEnabled } from "@/lib/downloads";
 import type { Album, AlbumInput, Category, CategoryInput, Chapter, ClubInput, Crest, MatchInfo, MatchInput, Photo, Sport } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
@@ -66,9 +67,38 @@ function clubOfTeam(team: string): ClubId | null {
   return clubAliases.find(({ alias }) => name === alias || name.startsWith(`${alias} `))?.id ?? null;
 }
 
+// ------------------------------------------------------- noms d'équipe
+
+const LEVEL = /\s+([HD])(\d+)$/i;
+
+/** « Daring H1 » → { club: "Daring", level: "Messieurs 1" } ; « Leo D2 » → Dames 2. */
+function splitLevel(team: string): { club: string; level: string | null } {
+  const found = team.match(LEVEL);
+  if (!found || found.index === undefined) return { club: team, level: null };
+  return { club: team.slice(0, found.index).trim(), level: `${found[1].toUpperCase() === "H" ? "Messieurs" : "Dames"} ${found[2]}` };
+}
+
+/** Nom d'équipe en toutes lettres : « Daring H1 » → « Daring Messieurs 1 » (les autres noms sont gardés tels quels). */
+export function teamLabel(team: string) {
+  const { club, level } = splitLevel(team);
+  return level ? `${club} ${level}` : team;
+}
+
+/**
+ * Noms uniformisés : « Daring H1 vs Leo H1 » s'affiche « Daring vs Leo · Messieurs 1 »
+ * (l'équipe commune est dite une fois, en toutes lettres) ; deux équipes différentes
+ * gardent chacune la leur (« Daring U19B1 vs Taxandria Messieurs 1 »).
+ */
 function resolveMatch({ homeClub, awayClub, ...match }: MatchInput): MatchInfo {
+  const home = splitLevel(match.home);
+  const away = splitLevel(match.away);
+  const level = home.level && home.level === away.level ? home.level : undefined;
   return {
     ...match,
+    home: level ? home.club : teamLabel(match.home),
+    away: level ? away.club : teamLabel(match.away),
+    level,
+    original: [match.home, match.away],
     homeCrest: crestOf(homeClub === undefined ? clubOfTeam(match.home) : homeClub),
     awayCrest: crestOf(awayClub === undefined ? clubOfTeam(match.away) : awayClub),
   };
@@ -204,7 +234,7 @@ function buildAlbum({ input, category }: { input: AlbumInput; category: Category
   const match = matchInput ? resolveMatch(matchInput) : undefined;
   const album: Album = {
     ...rest,
-    title: title ?? `${match!.home} vs ${match!.away}`,
+    title: title ?? `${match!.home} vs ${match!.away}${match!.level ? ` · ${match!.level}` : ""}`,
     href: `${ALBUMS_HREF}/${path.join("/")}`,
     path,
     folder,
@@ -285,10 +315,13 @@ export function getCategoryByPath(path: string[]): Category | undefined {
   return categoryByPath.get(path.join("/"));
 }
 
+/** Pages dédiées à un sport (archive, recherche, tous les matchs), reliées depuis le menu et les albums. */
+export const SPORT_PAGES: Partial<Record<Sport, string>> = { football: "/football" };
+
 /** Catégories principales regroupées par sport (menu, page Albums). */
-export function getCategoryGroups(): { sport: Sport; label: string; categories: Category[] }[] {
+export function getCategoryGroups(): { sport: Sport; label: string; href?: string; categories: Category[] }[] {
   const sports = [...new Set(categories.map((c) => c.sport))];
-  return sports.map((sport) => ({ sport, label: SPORT_NAME[sport], categories: categories.filter((c) => c.sport === sport) }));
+  return sports.map((sport) => ({ sport, label: SPORT_NAME[sport], href: SPORT_PAGES[sport], categories: categories.filter((c) => c.sport === sport) }));
 }
 
 /**
@@ -339,9 +372,13 @@ export function albumRoots(album: Album): string[] {
   return [...new Set([album.category, ...(alsoIn.get(album) ?? [])].map((c) => c.path[0]))];
 }
 
-/** Albums mis en avant (`featured`) qui ont déjà des photos. */
+/**
+ * Albums mis en avant (`featured`) qui ont déjà des photos, dans l'ordre des
+ * catégories de src/data/albums.ts (la FIH Pro League d'abord), puis par date.
+ */
 export function getFeaturedAlbums(): Album[] {
-  return publicAlbums.filter((a) => a.featured && a.cover);
+  const rank = (album: Album) => categories.findIndex((c) => c.slug === album.path[0]);
+  return publicAlbums.filter((a) => a.featured && a.cover).sort((a, b) => rank(a) - rank(b) || byDateDesc(a, b));
 }
 
 /** Albums d'un sport, les plus récents d'abord. */
@@ -356,6 +393,16 @@ export function getSportAlbums(sport: Sport): Album[] {
 export function getPhotoById(id: string, folder?: string): Photo | null {
   const pool = [...SITE_FOLDERS.flatMap(getFolderPhotos), ...publicAlbums.flatMap((a) => a.photos)];
   return pool.find((p) => p.id === id) ?? (folder ? getFolderPhotos(folder)[0] : undefined) ?? publicAlbums.find((a) => a.cover)?.cover ?? null;
+}
+
+/** Les meilleures photos (src/data/selection.ts), chacune avec l'album d'où elle vient. */
+export function getSelection(): { photo: Photo; album: Album }[] {
+  const byId = new Map(publicAlbums.flatMap((album) => album.photos.map((photo) => [photo.id, { photo, album }] as const)));
+  return selection.flatMap((id) => {
+    const found = byId.get(id);
+    if (!found) console.warn(`[sélection] photo introuvable, ignorée : ${id} — voir src/data/selection.ts`);
+    return found ? [found] : [];
+  });
 }
 
 /**

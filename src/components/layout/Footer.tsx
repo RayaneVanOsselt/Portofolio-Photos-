@@ -7,7 +7,6 @@ import { Todo } from "@/components/ui/Todo";
 import { getSocialLinks, isDev, mainNav, photoAccess, secondaryNav, siteConfig } from "@/config/site";
 import { getAlbums, getCategoryGroups } from "@/lib/albums";
 import { formatDateShort } from "@/lib/utils";
-import { LiveClock } from "./LiveClock";
 
 /** Derniers matchs listés dans le pied de page. */
 const LATEST_COUNT = 4;
@@ -17,8 +16,8 @@ const number = new Intl.NumberFormat("fr-BE");
 /**
  * Pied de page : la signature et les derniers matchs mis en ligne (mis à jour
  * tout seuls à chaque album ajouté), puis le plan du site — albums groupés par
- * sport —, un grand nom et une ligne « tampon » (lieu, heure locale en direct),
- * comme au dos d'un billet.
+ * sport —, un grand nom et une ligne « tampon » (lieu, crédit photo), comme au
+ * dos d'un billet.
  */
 export function Footer() {
   const socials = getSocialLinks();
@@ -82,6 +81,7 @@ export function Footer() {
                             {album.match.home}
                             <span className="mx-1.5 font-mono text-[0.6875rem] tracking-[0.18em] text-flamingo uppercase">vs</span>
                             {album.match.away}
+                            {album.match.level ? <span className="text-taupe"> · {album.match.level}</span> : null}
                           </>
                         ) : (
                           album.title
@@ -115,7 +115,13 @@ export function Footer() {
                 const many = group.categories.length > 6;
                 return (
                   <div key={group.sport} className={many ? "col-span-2" : undefined}>
-                    <p className="t-mono text-taupe">{group.label}</p>
+                    {group.href ? (
+                      <Link href={group.href} className="link-underline t-mono text-taupe hover:text-linen">
+                        {group.label} →
+                      </Link>
+                    ) : (
+                      <p className="t-mono text-taupe">{group.label}</p>
+                    )}
                     <ul className={`mt-3 ${many ? "columns-2 gap-8 sm:columns-3" : "space-y-2.5"}`}>
                       {group.categories.map((c) => (
                         <li key={c.href} className={many ? "mb-2.5 break-inside-avoid" : undefined}>
@@ -200,7 +206,7 @@ export function Footer() {
             <span aria-hidden className="text-sm leading-none text-flamingo">
               +
             </span>
-            © {year} {siteConfig.name} — Tous droits réservés
+            © {year} {siteConfig.name} — Tous droits réservés · Merci de créditer {siteConfig.credit.handle}
           </p>
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
             <li>
@@ -215,8 +221,8 @@ export function Footer() {
             </li>
           </ul>
           <p className="flex items-center gap-2.5">
-            <span aria-hidden className="live-dot size-1.5 rounded-full bg-flamingo" />
-            {place} — <LiveClock timeZone={siteConfig.timeZone} />
+            <span aria-hidden className="size-1.5 rounded-full bg-flamingo" />
+            {place}
           </p>
         </div>
       </div>

@@ -10,7 +10,8 @@ export type NavCategory = {
   children: { title: string; href: string; count: number }[];
 };
 
-export type NavGroup = { label: string; categories: NavCategory[] };
+/** `href` : page dédiée au sport, si elle existe (Football → /football). */
+export type NavGroup = { label: string; href?: string; categories: NavCategory[] };
 export type NavAlbum = { title: string; href: string; date: string; context: string };
 
 export type AlbumsNav = {
@@ -32,7 +33,7 @@ const toNav = (c: Category): NavCategory => ({
 export function getAlbumsNav(): AlbumsNav {
   const albums = getAlbums();
   return {
-    groups: getCategoryGroups().map((group) => ({ label: group.label, categories: group.categories.map(toNav) })),
+    groups: getCategoryGroups().map((group) => ({ label: group.label, ...(group.href ? { href: group.href } : {}), categories: group.categories.map(toNav) })),
     latest: albums.slice(0, 4).map((a) => ({ title: a.title, href: a.href, date: a.date, context: categoryContext(a.category) })),
     categoryCount: getCategories().length,
     albumCount: albums.length,

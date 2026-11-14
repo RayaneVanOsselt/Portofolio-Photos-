@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { AlbumRow } from "@/components/albums/AlbumRow";
 import { LatestAlbum } from "@/components/albums/LatestAlbum";
+import { TrustedClubs } from "@/components/clubs/TrustedClubs";
 import { AboutTeaser } from "@/components/home/AboutTeaser";
 import { CategoryIndex } from "@/components/home/CategoryIndex";
 import { FeaturedWork } from "@/components/home/FeaturedWork";
 import { Hero } from "@/components/home/Hero";
+import { Spotlight } from "@/components/home/Spotlight";
+import { InstagramSection } from "@/components/instagram/InstagramSection";
 import { ClosingCta } from "@/components/sections/ClosingCta";
 import { PhotoAccessBand } from "@/components/sections/PhotoAccessBand";
 import { ArrowLink } from "@/components/ui/Button";
@@ -26,8 +29,9 @@ export const metadata: Metadata = pageMetadata({
 
 /**
  * Accueil — quatre parcours évidents :
- * les derniers matchs → les albums par club / compétition, retrouver ses photos
- * (bloc orange), connaître le photographe, le contacter.
+ * les clubs qui m'ont fait confiance et l'album phare (FIH Pro League), les derniers
+ * matchs → les albums par club / compétition, retrouver ses photos (bloc orange),
+ * connaître le photographe, le suivre sur Instagram, le contacter.
  */
 export default function HomePage() {
   const albums = getAlbums();
@@ -42,9 +46,7 @@ export default function HomePage() {
   // Présentation encore entre crochets : jamais publiée, la description du site la remplace.
   const aboutIntro = isDev || !isPlaceholder(aboutContent.intro) ? aboutContent.intro : siteConfig.description;
   const videos = getVideos();
-  // Numéros des sections, selon celles qui sont affichées.
-  const order = ["latest", ...(videos.length ? ["videos"] : []), ...(featured.length ? ["featured"] : []), "categories", "about"];
-  const number = (key: string) => pad(order.indexOf(key) + 1);
+  const star = categories.find((c) => c.slug === homeContent.spotlight.category);
 
   return (
     <>
@@ -55,13 +57,17 @@ export default function HomePage() {
         caption={heroSource ? { label: `${heroSource.title} — ${categoryContext(heroSource.category)}`, href: heroSource.href } : undefined}
       />
 
+      <TrustedClubs />
+
+      {star ? <Spotlight category={star} photo={getPhotoById(homeContent.spotlight.photoId)} kicker={homeContent.spotlight.kicker} text={homeContent.spotlight.text} /> : null}
+
       <section aria-labelledby="latest-title" className="container-wide section">
-        <SectionStamp id="latest-title" index="01" meta="Du plus récent au plus ancien">
+        <SectionStamp id="latest-title" meta="Du plus récent au plus ancien">
           Derniers matchs
         </SectionStamp>
         <div className="mt-8 mb-10 flex flex-col gap-6 md:mt-10 md:mb-14 md:flex-row md:items-end md:justify-between">
           <p className="max-w-lg t-lead text-taupe" data-reveal>
-            Chaque match a son album : choisissez une rencontre, retrouvez toutes ses photos.
+            Chaque match a son album, en ligne sous {siteConfig.turnaround} : choisissez une rencontre, retrouvez toutes ses photos.
           </p>
           <ArrowLink href="/albums">Tous les albums</ArrowLink>
         </div>
@@ -81,7 +87,7 @@ export default function HomePage() {
 
       {videos.length ? (
         <section aria-labelledby="videos-title" className="container-wide pb-[var(--section-space)]">
-          <SectionStamp id="videos-title" index={number("videos")} meta={`${pad(videos.length)} vidéo${videos.length > 1 ? "s" : ""} · Le match en mouvement`}>
+          <SectionStamp id="videos-title" meta={`${pad(videos.length)} vidéo${videos.length > 1 ? "s" : ""} · Le match en mouvement`}>
             Vidéos
           </SectionStamp>
           <div className="mt-8 mb-10 flex flex-col gap-6 md:mt-10 md:mb-14 md:flex-row md:items-end md:justify-between">
@@ -94,10 +100,10 @@ export default function HomePage() {
         </section>
       ) : null}
 
-      {featured.length ? <FeaturedWork albums={featured} index={number("featured")} /> : null}
+      {featured.length ? <FeaturedWork albums={featured} /> : null}
 
       <section aria-labelledby="categories-title" className="container-wide pb-[var(--section-space)]">
-        <SectionStamp id="categories-title" index={number("categories")} meta={`${categories.length} catégories`}>
+        <SectionStamp id="categories-title" meta={`${categories.length} catégories`}>
           Albums
         </SectionStamp>
         <div className="mt-8 mb-12 flex flex-col gap-6 md:mt-10 md:mb-16 md:flex-row md:items-end md:justify-between">
@@ -111,7 +117,9 @@ export default function HomePage() {
 
       <PhotoAccessBand />
 
-      <AboutTeaser portrait={getPhotoById(aboutContent.portraitId, "site/about")} intro={aboutIntro} specialties={aboutContent.specialties} index={number("about")} />
+      <AboutTeaser portrait={getPhotoById(aboutContent.portraitId, "site/about")} intro={aboutIntro} specialties={aboutContent.specialties} name={siteConfig.owner.firstName} />
+
+      <InstagramSection />
 
       <ClosingCta />
     </>

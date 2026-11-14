@@ -14,23 +14,33 @@
 export const homeContent = {
   hero: {
     photoId: "albums/fih-pro-league/hommes/27-06-2026-belgique-pays-bas-men/belgique/IMG_3563.jpg",
-    eyebrow: "Photographe sportif — Hockey · Rugby · Football",
+    eyebrow: "Photographe sportif · Bruxelles & Brabant wallon",
     /** Deux lignes, affichées en très grand (capitales étendues). */
     title: ["Au cœur", "du jeu."] as [string, string],
-    lead: "Matchs, équipes et clubs photographiés au bord du terrain — l'effort, le geste, l'émotion, au moment exact où tout bascule.",
+    lead: "Hockey, football et rugby à Bruxelles et en Brabant wallon : matchs, équipes et clubs photographiés au bord du terrain. Vos photos en ligne sous 48 h après le match.",
     primaryCta: { label: "Voir les albums", href: "/albums" },
     secondaryCta: { label: "Trouver mes photos", href: "/galeries" },
+  },
+  /**
+   * « À la une » sous le hero : la catégorie la plus prestigieuse, en très grand.
+   * `category` = slug d'une catégorie principale de src/data/albums.ts.
+   */
+  spotlight: {
+    category: "fih-pro-league",
+    photoId: "albums/fih-pro-league/hommes/27-06-2026-belgique-pays-bas-men/belgique/IMG_3620.jpg",
+    kicker: "À la une · Hockey international",
+    text: "Belgique – Pays-Bas chez les hommes et chez les femmes, Pays-Bas – Australie : trois matchs de FIH Pro League, le plus haut niveau du hockey mondial, vécus au bord du terrain.",
   },
 };
 
 export const aboutContent = {
-  portraitId: "ph-1777304012262-594db955dce9",
+  portraitId: "site/about/rayane-photographe-sportif-au-bord-du-terrain.jpg",
   /** Spécialités (puces de la page À propos et de l'accueil). */
   specialties: ["Hockey sur gazon", "Rugby", "Football", "Portraits d'équipe", "Contenus pour clubs"],
-  /** Matériel : laisser vide pour masquer la section (rien n'est inventé). Ex. "Sony A1", "70-200 mm f/2.8". */
-  equipment: [] as string[],
   wideId: "albums/rwdm/2026-2027/03-10-2026-union-sg-b-rwdm/IMG_6956.jpg",
-  intro: "[VOTRE PRÉSENTATION — deux ou trois phrases authentiques : qui vous êtes, d'où vous venez, ce qui vous a amené à la photo de sport.]",
+  /** Mini-bio (4-5 phrases) : page À propos et accueil. */
+  intro:
+    "Je m'appelle Rayane, photographe sportif à Bruxelles et en Brabant wallon. J'adore la photographie de sport : l'intensité d'un duel, la tension avant un corner, la joie d'une équipe qui célèbre ensemble. Hockey, football ou rugby, du championnat de Belgique jusqu'à la FIH Pro League, je photographie chaque match au bord du terrain, au plus près des joueurs. Mon objectif : saisir l'instant qui ne se rejoue pas et le rendre aussi fort que sur le terrain. Chaque rencontre devient un album en ligne sous 48 h, pour que joueurs, clubs et supporters retrouvent leurs plus beaux moments.",
   approach: [
     { title: "Ma manière de travailler", body: "[COMMENT VOUS TRAVAILLEZ — préparation, placement au bord du terrain, échanges avec le club.]" },
     { title: "Ma vision", body: "[VOTRE VISION — ce que vous cherchez à montrer dans une image de sport.]" },
@@ -54,8 +64,6 @@ export const aboutContent = {
     { label: "Matchs couverts", value: null as string | null },
     { label: "Clubs & partenaires", value: null as string | null },
   ],
-  /** Clubs, médias, partenaires : à compléter avec de vraies références uniquement. */
-  clients: [] as string[],
 };
 
 export const contactContent = {

@@ -81,7 +81,13 @@ export function MobileMenu({ open, onClose, nav, pathname }: Props) {
                         <div className="space-y-6 pt-1 pb-6 sm:pl-10">
                           {nav.groups.map((group) => (
                             <div key={group.label}>
-                              <p className="t-mono text-ash">{group.label}</p>
+                              {group.href ? (
+                                <Link href={group.href} onClick={onClose} className="link-underline t-mono text-ash">
+                                  {group.label} →
+                                </Link>
+                              ) : (
+                                <p className="t-mono text-ash">{group.label}</p>
+                              )}
                               <ul className="mt-2 grid gap-x-6 sm:grid-cols-2">
                                 {group.categories.map((category) => (
                                   <li key={category.href}>

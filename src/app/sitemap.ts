@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { ALBUMS_HREF, getAlbums, getAllCategories, getCategoryAlbums } from "@/lib/albums";
+import { ALBUMS_HREF, getAlbums, getAllCategories, getCategoryAlbums, getSelection } from "@/lib/albums";
 import { absoluteUrl, photoUrl, videoSitemapEntry } from "@/lib/seo";
 import type { Photo } from "@/lib/types";
 import { getVideos, VIDEOS_HREF } from "@/lib/videos";
@@ -27,6 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     page("/", 1, "weekly", albums.map((a) => a.cover)),
     page(ALBUMS_HREF, 0.9, "weekly", albums.map((a) => a.cover)),
     page("/matchs", 0.8, "weekly", albums.map((a) => a.cover)),
+    page("/selection", 0.8, "monthly", getSelection().map((s) => s.photo)),
     ...getAllCategories()
       .filter((c) => c.albumCount)
       .map((c) => page(c.href, c.parent ? 0.7 : 0.8, "weekly", getCategoryAlbums(c).map((a) => a.cover))),

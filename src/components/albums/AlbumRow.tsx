@@ -33,6 +33,7 @@ export function AlbumRow({ album, showCategory = true }: { album: Album; showCat
               {album.match.home}
               <span className="mx-2 font-mono text-[0.75rem] tracking-[0.18em] text-flamingo uppercase">vs</span>
               {album.match.away}
+              {album.match.level ? <span className="text-taupe"> · {album.match.level}</span> : null}
             </>
           ) : (
             album.title

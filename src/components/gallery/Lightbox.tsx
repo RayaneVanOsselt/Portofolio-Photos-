@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Close, Download, Expand, Heart, Share, Shrink, ZoomIn, ZoomOut } from "@/components/ui/Icons";
 import { PhotoPicture } from "@/components/ui/PhotoPicture";
+import { siteConfig } from "@/config/site";
 import { useAnimatedDialog } from "@/hooks/useAnimatedDialog";
 import { formatBytes, pad, publicPath } from "@/lib/utils";
 import type { GalleryItem } from "./Gallery";
@@ -113,7 +114,8 @@ export function Lightbox({ items, favorite, permalink, index, onClose, onChange 
   const item = items[shownIndex];
   if (!item) return null;
   const { photo } = item;
-  const exifLine = photo.exif ? [photo.exif.camera, photo.exif.lens, photo.exif.focal, photo.exif.aperture, photo.exif.shutter, photo.exif.iso].filter(Boolean).join("  ·  ") : "";
+  // Réglages de prise de vue seulement : le boîtier et l'objectif ne sont jamais affichés.
+  const exifLine = photo.exif ? [photo.exif.focal, photo.exif.aperture, photo.exif.shutter, photo.exif.iso].filter(Boolean).join("  ·  ") : "";
   const requestHref = `/contact/?photo=${encodeURIComponent(`n°${shownIndex + 1} — ${item.title ?? photo.alt}`)}&lien=${encodeURIComponent(open ? permalink(shownIndex) : "")}`;
   const neighbours = count > 1 ? [items[(shownIndex + 1) % count], items[(shownIndex - 1 + count) % count]] : [];
   // Sans propriété d'affichage : chaque bouton précise la sienne (grid, flex, hidden…).
@@ -284,7 +286,10 @@ export function Lightbox({ items, favorite, permalink, index, onClose, onChange 
           <div id="lightbox-caption" className="min-w-0">
             {item.title ? <p className="truncate text-[0.9375rem] font-medium text-linen md:hidden">{item.title}</p> : null}
             <p className="truncate t-small text-taupe">{item.context ?? photo.alt}</p>
-            {exifLine ? <p className="mt-1.5 hidden truncate t-mono text-ash sm:block">{exifLine}</p> : null}
+            <p className="mt-1.5 truncate t-mono text-ash">
+              <span className="text-flamingo">©</span> Merci de créditer <span className="text-linen/85">{siteConfig.credit.handle}</span>
+              {exifLine ? <span className="hidden md:inline">{"  ·  "}{exifLine}</span> : null}
+            </p>
             {photo.credit ? (
               <p className="mt-1 t-mono text-ash">
                 Photo temporaire —{" "}

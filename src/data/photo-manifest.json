@@ -22812,5 +22812,18 @@
         "bytes": 185395
       }
     }
+  ],
+  "site/about": [
+    {
+      "file": "rayane-photographe-sportif-au-bord-du-terrain.jpg",
+      "src": "/images/site/about/rayane-photographe-sportif-au-bord-du-terrain.jpg",
+      "width": 1320,
+      "height": 2141,
+      "alt": "Rayane photographe sportif au bord du terrain",
+      "color": "#080808",
+      "blurDataURL": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAgCdASoKABAAA4BaJQBdgCPwxCMfUSi+AAD+7OkfCZBThtC9qNOS0XtiZLfO/npQhSfsuQEigyOyPADALdKpkVgtgAxjYJODdTvl2F3zb7bxQE5gAA==",
+      "hash": "305f56d44a561b3e",
+      "source": "public/images/site/about/rayane-photographe-sportif-au-bord-du-terrain.jpg"
+    }
   ]
 }

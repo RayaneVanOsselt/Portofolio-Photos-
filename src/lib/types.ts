@@ -11,7 +11,7 @@ export type Photo = {
   color?: string;
   /** Mini-aperçu flou (généré par `npm run photos`). */
   blurDataURL?: string;
-  /** Réglages de prise de vue (lus par `npm run photos`), sans aucune donnée GPS. */
+  /** Réglages de prise de vue (lus par `npm run photos`), sans aucune donnée GPS ; boîtier et objectif retirés avant publication. */
   exif?: { camera?: string; lens?: string; focal?: string; aperture?: string; shutter?: string; iso?: string; date?: string };
   /** Crédit — uniquement pour les photos temporaires. */
   credit?: { name: string; url: string };
@@ -134,6 +134,10 @@ export type MatchInput = {
 
 /** Fiche de match résolue (logos compris). Un champ vide n'est jamais affiché. */
 export type MatchInfo = Omit<MatchInput, "homeClub" | "awayClub"> & {
+  /** Équipe commune aux deux camps, en toutes lettres (« Messieurs 1 », « Dames 1 »), retirée des noms. */
+  level?: string;
+  /** Noms tels qu'écrits dans src/data/albums.ts (« Daring H1 », « Leo H1 ») : mots-clés de recherche. */
+  original: [string, string];
   homeCrest: Crest | null;
   awayCrest: Crest | null;
 };
