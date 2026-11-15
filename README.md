@@ -68,6 +68,8 @@ Les matchs sont **triés automatiquement par date**, du plus récent au plus anc
 
 ### Ajouter un match
 
+> **Le guide et le sommaire de toutes vos photos** sont dans **`Dossier photos/_LISEZ-MOI.md`** : règles de rangement, et pour chaque match son dossier, son nombre de photos et son adresse sur le site. Ce fichier se met à jour tout seul à chaque `npm run dev` et à chaque publication.
+
 1. **Déposez les photos** dans `Dossier photos/`, rangées comme le site — `Club/Équipe/AAAA-MM-JJ Équipe A vs Équipe B/`, un dossier par match :
 
    ```
