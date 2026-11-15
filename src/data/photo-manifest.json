@@ -16235,6 +16235,656 @@
       }
     }
   ],
+  "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve": [
+    {
+      "file": "IMG_8764.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8764.jpg",
+      "width": 740,
+      "height": 1024,
+      "alt": "IMG 8764",
+      "color": "#080808",
+      "blurDataURL": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAADwAQCdASoMABAAA4BaJbACdADdKFn5zgAA/u6nUnDl7w1i/gcKJkABIzlSJvWyQ/Uua1JxZgvu/XZN/KJpoeJqmpQx0Opc0ZciNtOHyaR5InYVWOAE8qpwPZDe55avUoZABiz4eAAAAA==",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "220 mm",
+        "aperture": "f/5",
+        "shutter": "1/640 s",
+        "iso": "ISO 8000",
+        "date": "2026-11-14"
+      },
+      "hash": "73a92f156f48edce",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8764.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-01.jpg",
+        "bytes": 158637
+      }
+    },
+    {
+      "file": "IMG_8773.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8773.jpg",
+      "width": 1024,
+      "height": 683,
+      "alt": "IMG 8773",
+      "color": "#080818",
+      "blurDataURL": "data:image/webp;base64,UklGRnAAAABXRUJQVlA4IGQAAAAwAgCdASoQAAsAA4BaJbACdAEPAr0gFmrOkAD+9q3l29G1YV7FnbQsjj/DZDrjlrm28Y18qAd3bAq+IMmqqn0h9tzG2PTBznOx6lTqXGmcX+nAc6XQwLFaXvquHlTv7S2LOAAA",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "300 mm",
+        "aperture": "f/5.6",
+        "shutter": "1/640 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "51235fe4c708d0cf",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8773.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-02.jpg",
+        "bytes": 147967
+      }
+    },
+    {
+      "file": "IMG_8775.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8775.jpg",
+      "width": 695,
+      "height": 1024,
+      "alt": "IMG 8775",
+      "color": "#281808",
+      "blurDataURL": "data:image/webp;base64,UklGRmwAAABXRUJQVlA4IGAAAAAwAgCdASoLABAAA4BaJbACdAD0ScmT05afgAD+8SN5FR2NkSgljRGWMGO62EylocOlQHTyuFLKioBeyoSmSa6HuFezc5iosxs6b9NGvIqvdz0uUP3v6MHVBPJofrMwAAA=",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "75 mm",
+        "aperture": "f/4",
+        "shutter": "1/500 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "5dfcead70b11d9dd",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8775.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-03.jpg",
+        "bytes": 228852
+      }
+    },
+    {
+      "file": "IMG_8776.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8776.jpg",
+      "width": 663,
+      "height": 1024,
+      "alt": "IMG 8776",
+      "color": "#080808",
+      "blurDataURL": "data:image/webp;base64,UklGRnoAAABXRUJQVlA4IG4AAABQAgCdASoKABAAA4BaJbACdAEe2L/Zqx6SsoAA/u0NGTDW2qqzwD+CZwRFpHX4Kj6d3pB24WdA/2aXRe3yM9yrclIaX+tDK2np4S5bK81GOnGbZvP1+LyHrFDenvrgpEb+qthd7+BxGERPpz0AAA==",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "300 mm",
+        "aperture": "f/5.6",
+        "shutter": "1/500 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "1dc5b31879220bd0",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8776.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-04.jpg",
+        "bytes": 176260
+      }
+    },
+    {
+      "file": "IMG_8777.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8777.jpg",
+      "width": 683,
+      "height": 1024,
+      "alt": "IMG 8777",
+      "color": "#98a838",
+      "blurDataURL": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAAAQAgCdASoLABAAA4BaJbACdAEQ0Zny8oogAP6jeD0Xcz7QqCkIfXwA3rZTn7HpsmyBSjN0FjI2yGFZeg4p260byImnLrrJ3Y2731TqttdhFjC2ozhGa0QvbAA=",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "180 mm",
+        "aperture": "f/6.3",
+        "shutter": "1/500 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "d4d02a27d9201726",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8777.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-05.jpg",
+        "bytes": 153328
+      }
+    },
+    {
+      "file": "IMG_8784.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8784.jpg",
+      "width": 1024,
+      "height": 657,
+      "alt": "IMG 8784",
+      "color": "#080808",
+      "blurDataURL": "data:image/webp;base64,UklGRnAAAABXRUJQVlA4IGQAAAAQAgCdASoQAAoAA4BaJbACdAEfA3XO+iVgAP74ji/2dS7HMxE3+L3rxZR/MczQNdspNP91d+imS+D8ejfqWSquYNUutLrEHYnm/53VxqCOXQM3gGQ+9syZnkxPap6oTmGnEAAA",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "210 mm",
+        "aperture": "f/5.6",
+        "shutter": "1/800 s",
+        "iso": "ISO 8000",
+        "date": "2026-11-14"
+      },
+      "hash": "4882ab18fa4be05c",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8784.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-06.jpg",
+        "bytes": 175037
+      }
+    },
+    {
+      "file": "IMG_8787.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8787.jpg",
+      "width": 1024,
+      "height": 660,
+      "alt": "IMG 8787",
+      "color": "#080808",
+      "blurDataURL": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAAAQAgCdASoQAAoAA4BaJbACsAERHks59VVgAP70r5S2D1m8Sik3wGctR3XjSk8ir1bODdycU0mJ8xWac9NWLi+AzkqZonh/yyGTw0SDa1Z2Is1z5Ogol5NPWBtgAA==",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "300 mm",
+        "aperture": "f/5.6",
+        "shutter": "1/800 s",
+        "iso": "ISO 8000",
+        "date": "2026-11-14"
+      },
+      "hash": "0227b39e8b91d6a7",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8787.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-07.jpg",
+        "bytes": 155469
+      }
+    },
+    {
+      "file": "IMG_8790.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8790.jpg",
+      "width": 1024,
+      "height": 737,
+      "alt": "IMG 8790",
+      "color": "#585808",
+      "blurDataURL": "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAAAwAgCdASoQAAwAA4BaJbACdAEfUWws4++EAAD+6SxOQn5mV2YXPg1CAnj2lE6x6Y3K7yKoTs0DhV4/fzZdCH8ICUvFxXdRfQrOjhkHKrfw00OW19FcXogA",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "300 mm",
+        "aperture": "f/5.6",
+        "shutter": "1/800 s",
+        "iso": "ISO 8000",
+        "date": "2026-11-14"
+      },
+      "hash": "73b62721b0a948eb",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8790.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-08.jpg",
+        "bytes": 194071
+      }
+    },
+    {
+      "file": "IMG_8797.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8797.jpg",
+      "width": 682,
+      "height": 1024,
+      "alt": "IMG 8797",
+      "color": "#181818",
+      "blurDataURL": "data:image/webp;base64,UklGRnoAAABXRUJQVlA4IG4AAADwAQCdASoLABAAA4BaJagCdAYxFj7ShmAA/qbLbx/+wfzIiEVlnmOdp2AB3X0xfoSo5a1EDttJc33bRGJpVu0Qu2HwZ87NEnCP6HbO4yE7qYSse5BOLyoTTW7ilwxAGcpMY/wtgQrl31YfccbgAA==",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "110 mm",
+        "aperture": "f/4.5",
+        "shutter": "1/800 s",
+        "iso": "ISO 8000",
+        "date": "2026-11-14"
+      },
+      "hash": "046a3eba65b045e5",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8797.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-09.jpg",
+        "bytes": 283698
+      }
+    },
+    {
+      "file": "IMG_8802.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8802.jpg",
+      "width": 1024,
+      "height": 683,
+      "alt": "IMG 8802",
+      "color": "#585808",
+      "blurDataURL": "data:image/webp;base64,UklGRlgAAABXRUJQVlA4IEwAAAAQAgCdASoQAAsAA4BaJbACdAEf5Mz23SgAAP7y5PxnRhaRH2YMMr3iCN4OeBe3VRaE7/RbN3mdYpq+HGXq8EJ2WO2VkjH54wj8XlAA",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "75 mm",
+        "aperture": "f/6.3",
+        "shutter": "1/800 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "2f62f9d36612d750",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8802.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-10.jpg",
+        "bytes": 217804
+      }
+    },
+    {
+      "file": "IMG_8816.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8816.jpg",
+      "width": 1024,
+      "height": 696,
+      "alt": "IMG 8816",
+      "color": "#282828",
+      "blurDataURL": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAADwAQCdASoQAAsAA4BaJaQAAn/T6z06PlAA/vMpN6UVarXufGuuz98BBV/wwyrrHv7qcusSvs0JGE76xKA9amHfI/CrBa5BRS64YKNQAAA=",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "300 mm",
+        "aperture": "f/5.6",
+        "shutter": "1/800 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "68523bd50386a7d6",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8816.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-11.jpg",
+        "bytes": 187040
+      }
+    },
+    {
+      "file": "IMG_8823.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8823.jpg",
+      "width": 1024,
+      "height": 683,
+      "alt": "IMG 8823",
+      "color": "#080808",
+      "blurDataURL": "data:image/webp;base64,UklGRmwAAABXRUJQVlA4IGAAAADwAQCdASoQAAsAA4BaJbACdAENg1tRSsAA/veavzajmomPs/6Wbu4MfcRyQVkWJm9qIZ0+GFHTcSYnsgged54KS7jKBUcklsxve/0R7h+g3kkB+5z3T9m0y9HNbHIpYAA=",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "155 mm",
+        "aperture": "f/6.3",
+        "shutter": "1/640 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "d6d36ad73ccc5cad",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8823.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-12.jpg",
+        "bytes": 172924
+      }
+    },
+    {
+      "file": "IMG_8829.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8829.jpg",
+      "width": 642,
+      "height": 1024,
+      "alt": "IMG 8829",
+      "color": "#181818",
+      "blurDataURL": "data:image/webp;base64,UklGRmwAAABXRUJQVlA4IGAAAADQAQCdASoKABAAA4BaJbACdADznEEdwAD+9F3w3gKZYLGg7OoliffRuzxSPfK3fbWRiiN0DFoOE0btmK82e1+4b4vLG7N2vyG3Tw5o1AhPbq+cgzHBzPjdBbn128wh4AA=",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "190 mm",
+        "aperture": "f/5",
+        "shutter": "1/640 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "dd083c4fda1eff5f",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8829.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-13.jpg",
+        "bytes": 334003
+      }
+    },
+    {
+      "file": "IMG_8830.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8830.jpg",
+      "width": 1024,
+      "height": 781,
+      "alt": "IMG 8830",
+      "color": "#080808",
+      "blurDataURL": "data:image/webp;base64,UklGRlwAAABXRUJQVlA4IFAAAADwAQCdASoQAAwAA4BaJbACdADx2jLWygAA/vXxsyrpo/Ot2Yy7HCSZGrr1h07fO0l0JhsVm0no3fsM1Vv7EGzXeB9sUKWN16BimAWHKyZAAA==",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "135 mm",
+        "aperture": "f/7.1",
+        "shutter": "1/640 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "0735b15d41a0bc75",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8830.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-14.jpg",
+        "bytes": 249086
+      }
+    },
+    {
+      "file": "IMG_8832.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8832.jpg",
+      "width": 954,
+      "height": 1024,
+      "alt": "IMG 8832",
+      "color": "#080808",
+      "blurDataURL": "data:image/webp;base64,UklGRo4AAABXRUJQVlA4IIIAAADwAgCdASoPABAAA4BaJbACdH8AgmzLTDO8vXHeBLKcQAD9dYk7o5W68BQmPkzg4FuwzuWfsORwACetFQBSk14PxEFbOkg3WzpA8c5634B6ERNFg1hrah/3kEQzIJyOlUmBH/FaUp3Xbhyb0/eSDt/fXCb8PAEauaQc9jvtZTm5AAAA",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "130 mm",
+        "aperture": "f/6.3",
+        "shutter": "1/640 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "c0b89cbbaa3b12ab",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8832.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-15.jpg",
+        "bytes": 237070
+      }
+    },
+    {
+      "file": "IMG_8836.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8836.jpg",
+      "width": 797,
+      "height": 1024,
+      "alt": "IMG 8836",
+      "color": "#080808",
+      "blurDataURL": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAADwAQCdASoMABAAA4BaJbACdAEQE3pjeVgA/tKzLt1FIpLMiljTz7tV3CpRmSGcBI2jVYCbn51t7H/HNL/7cSL16OpNqj9SZp6nz0AyHGDzD5KHS1ePIv1oA4MbeAAA",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "95 mm",
+        "aperture": "f/6.3",
+        "shutter": "1/640 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "a8364cfec4ebe1b4",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8836.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-16.jpg",
+        "bytes": 259427
+      }
+    },
+    {
+      "file": "IMG_8838.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8838.jpg",
+      "width": 1024,
+      "height": 788,
+      "alt": "IMG 8838",
+      "color": "#080808",
+      "blurDataURL": "data:image/webp;base64,UklGRk4AAABXRUJQVlA4IEIAAADQAQCdASoQAAwAA4BaJaQAAujA/FgxeAD++cTtGSllSdBcq6Dv14y2DtVYNf7Q3RbbFavRNH3VTxnbKvIaGigAAAA=",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "75 mm",
+        "aperture": "f/5.6",
+        "shutter": "1/640 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "068ee36dc0ea6d30",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8838.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-17.jpg",
+        "bytes": 134790
+      }
+    },
+    {
+      "file": "IMG_8843.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8843.jpg",
+      "width": 681,
+      "height": 1024,
+      "alt": "IMG 8843",
+      "color": "#080808",
+      "blurDataURL": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAADwAQCdASoLABAAA4BaJbAAAl25D/XQYAAA/vkYYSaomagJ651jYgHb6z/ylOfZfI93iqfOIMSzlCoGfncFthYOzw/xMid40J6f/+L/Eo60w/G+MjgAAA==",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "205 mm",
+        "aperture": "f/5.6",
+        "shutter": "1/640 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "d74164a4c8e76b31",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8843.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-18.jpg",
+        "bytes": 163927
+      }
+    },
+    {
+      "file": "IMG_8844.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8844.jpg",
+      "width": 1024,
+      "height": 832,
+      "alt": "IMG 8844",
+      "color": "#080808",
+      "blurDataURL": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAAAQAgCdASoQAA0AA4BaJYwC7AEfht5wngsgAP73h7X5TqDu9o/3lyJ9bNfuZxjGFOmHnCTy8OAzn0lKL0FKNZnZSyfToRF3jcf57IafcgPO7+ZIAAA=",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "300 mm",
+        "aperture": "f/5.6",
+        "shutter": "1/640 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "996fa14b673e801a",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8844.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-19.jpg",
+        "bytes": 160606
+      }
+    },
+    {
+      "file": "IMG_8847.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8847.jpg",
+      "width": 655,
+      "height": 1024,
+      "alt": "IMG 8847",
+      "color": "#181818",
+      "blurDataURL": "data:image/webp;base64,UklGRn4AAABXRUJQVlA4IHIAAAAwAgCdASoKABAAA4BaJbACdADclrH9oBBEAAD+qurQqrUt2INS1nb56/HV9Sy3/sHbDXxLpfp0Q+WFBJY2V1woT8X7Mx0uNVMYa3BZJRnvOxlKoqM8GjdRrUtUqX7nqraWns1jHWq0BrG17WGdxNwJIAA=",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "300 mm",
+        "aperture": "f/7.1",
+        "shutter": "1/640 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "62c7e1413faf350f",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8847.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-20.jpg",
+        "bytes": 172019
+      }
+    },
+    {
+      "file": "IMG_8849.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8849.jpg",
+      "width": 1024,
+      "height": 642,
+      "alt": "IMG 8849",
+      "color": "#687808",
+      "blurDataURL": "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAADQAQCdASoQAAoAA4BaJbACdAD0FTLcAAD+5gL9Ic1XbhsUrKeyYOY1lhWNaj7RK/vFg2xdMNumqApNzUqYkbWAEPVUFUKiVjEfra0ohijzppGgLkiuAAAA",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "75 mm",
+        "aperture": "f/5.6",
+        "shutter": "1/640 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "934ca0b77dd12fa7",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8849.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-21.jpg",
+        "bytes": 296586
+      }
+    },
+    {
+      "file": "IMG_8852.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8852.jpg",
+      "width": 1024,
+      "height": 640,
+      "alt": "IMG 8852",
+      "color": "#887808",
+      "blurDataURL": "data:image/webp;base64,UklGRlYAAABXRUJQVlA4IEoAAADwAQCdASoQAAoAA4BaJbACdAEVrPKsaQAA+wV8okW6vK2sUFU9D5XMAnMKrMQ/eckK60mlHfqPQm991vwa3og7Edb0Cbxfx/2kAA==",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "75 mm",
+        "aperture": "f/6.3",
+        "shutter": "1/640 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "eb7fa21c5d5b7a0d",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8852.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-22.jpg",
+        "bytes": 267647
+      }
+    },
+    {
+      "file": "IMG_8853.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8853.jpg",
+      "width": 1024,
+      "height": 737,
+      "alt": "IMG 8853",
+      "color": "#080808",
+      "blurDataURL": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAACwAQCdASoQAAwAA4BaJbACdADzuIcAAP7xrW9F6GAzpTbKNkqlTMFvY0KLwo22o/hxm46sWK3gWRKkTMnr/nN/F7CDLBfIoYbVjfrpeP55t3a4ORzYYAVHiDAAAA==",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "130 mm",
+        "aperture": "f/6.3",
+        "shutter": "1/640 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "08b148243996c814",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8853.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-23.jpg",
+        "bytes": 238804
+      }
+    },
+    {
+      "file": "IMG_8857.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8857.jpg",
+      "width": 1024,
+      "height": 675,
+      "alt": "IMG 8857",
+      "color": "#787808",
+      "blurDataURL": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAADwAQCdASoQAAsAA4BaJbACdAEOjYDl5QAA/vG0wwYGLWLWEeW3NstLHNGZATCBqJj0PhP/6s4ACBNZRXa2KCJI2jsPAxgVa6FDYCD/ra0uCIFiAAA=",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "75 mm",
+        "aperture": "f/6.3",
+        "shutter": "1/640 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "af93fe92360f97f6",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8857.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-24.jpg",
+        "bytes": 258738
+      }
+    },
+    {
+      "file": "IMG_8867.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8867.jpg",
+      "width": 891,
+      "height": 1024,
+      "alt": "IMG 8867",
+      "color": "#585808",
+      "blurDataURL": "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAAAQAgCdASoOABAAA4BaJbACdAEf3aSh7aOUAP7PgdgMBo4Nuf6P9CfxXVRb6XITNu+hCMIGTq3i4QWMmrD3aWMpw0S5h196bIayNkv9I+n9lHo4YwnPTygA",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "75 mm",
+        "aperture": "f/8",
+        "shutter": "1/640 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "6a63536544e431e9",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8867.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-25.jpg",
+        "bytes": 285178
+      }
+    },
+    {
+      "file": "IMG_8887.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8887.jpg",
+      "width": 683,
+      "height": 1024,
+      "alt": "IMG 8887",
+      "color": "#080808",
+      "blurDataURL": "data:image/webp;base64,UklGRnoAAABXRUJQVlA4IG4AAAAQAgCdASoLABAAA4BaJbACdADhlEnwTx9AAP73hQFWiysbU0OYfZifv8khPM7/59yFcwUHmMT31q5O7gXXXodgOWSVgBSTVojflX0IVdhX0Sq/z2TOqg8/OH+X56AObu41e1S0Jz6qoU44FQAAAA==",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "85 mm",
+        "aperture": "f/5.6",
+        "shutter": "1/640 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "f2dd63644642c437",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8887.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-26.jpg",
+        "bytes": 208940
+      }
+    },
+    {
+      "file": "IMG_8889.jpg",
+      "src": "/images/albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/IMG_8889.jpg",
+      "width": 1024,
+      "height": 683,
+      "alt": "IMG 8889",
+      "color": "#181818",
+      "blurDataURL": "data:image/webp;base64,UklGRoIAAABXRUJQVlA4IHYAAAAQAgCdASoQAAsAA4BaJbACdFQAAzxGhq64AP7p/1AKGsOGdtIy2RNPNiiVMSitdUs+rrTt6nEyyMV5xMCOtURF+Rqwj+FIwu9xYRAowtDTU0wgmGBgCGXXfugMcbQMjaWs6YsdYjh304+cHtrVKz+uiTjt3AAA",
+      "exif": {
+        "camera": "Canon EOS R100",
+        "lens": "RF75-300mm F4-5.6",
+        "focal": "75 mm",
+        "aperture": "f/4.5",
+        "shutter": "1/640 s",
+        "iso": "ISO 6400",
+        "date": "2026-11-14"
+      },
+      "hash": "0cf2879f0479ee4d",
+      "source": "Dossier photos/RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve/IMG_8889.jpg",
+      "download": {
+        "path": "albums/rwdm/2026-2027/14-11-2026-rwdm-habay-la-neuve/telechargement/rayvo-captures0808-2026-11-14-rwdm-habay-la-neuve-27.jpg",
+        "bytes": 212876
+      }
+    }
+  ],
   "albums/rwdm/2026-2027/29-08-2026-rwdm-flenu": [
     {
       "file": "IMG_4993.jpg",

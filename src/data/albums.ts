@@ -395,6 +395,14 @@ export const albumTree: CategoryInput[] = [
         title: "Saison 2026-2027",
         albums: [
           {
+            // Date lue dans les photos (EXIF : samedi 14/11, 20 h 28 → 23 h 02) ; dossier d'origine « RWDM Photo 15:11:26 ».
+            slug: "14-11-2026-rwdm-habay-la-neuve",
+            date: "2026-11-14",
+            match: { home: "RWDM", away: "Habay-la-Neuve", score: [1, 1] },
+            source: "RWDM/Saison 2026-2027/2026-11-14 RWDM vs Habay-la-Neuve",
+            cover: "IMG_8790.jpg",
+          },
+          {
             slug: "03-10-2026-union-sg-b-rwdm",
             date: "2026-10-03",
             match: { home: "Union SG B", away: "RWDM" },
