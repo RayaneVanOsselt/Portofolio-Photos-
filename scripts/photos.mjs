@@ -87,7 +87,16 @@ const WEBP_MAX_WITH_DOWNLOAD = 640;
  * toujours plus fin que l'AVIF affiché ; ~18 % plus léger qu'en qualité 86 (23/10/2026).
  */
 const DOWNLOAD_QUALITY = 82;
-const SETTINGS = { avif: { widths: AVIF, chroma: AVIF_CHROMA }, webp: WEBP, download: { quality: DOWNLOAD_QUALITY } };
+/**
+ * Petites photos (côté le plus long ≤ 1 280 px, ex. un export Lightroom en 1 024 px) :
+ * affichées agrandies sur les grands écrans, la moindre perte se voit. Leur AVIF pleine
+ * taille et leur JPEG à télécharger sont donc encodés plus finement, couleurs complètes
+ * (4:4:4, utile sur les maillots rouges). Mesuré le 15/11/2026 sur 27 photos en 1 024 px :
+ * AVIF q72 ≈ 41 dB (q55 4:2:0 : 35 dB) pour 94 Ko ; JPEG q92 ≈ 47 dB pour 192 Ko,
+ * toujours plus léger que l'export d'origine. Les photos en 2 048 px ne sont pas concernées.
+ */
+const FINE = { maxSide: 1280, avif: { quality: 72, chroma: "4:4:4" }, download: { quality: 92, chroma: "4:4:4" } };
+const SETTINGS = { avif: { widths: AVIF, chroma: AVIF_CHROMA }, webp: WEBP, download: { quality: DOWNLOAD_QUALITY }, fine: FINE };
 /** GitHub Pages : 1 Go par site publié (photos + vidéos + pages). */
 const SITE_LIMIT = 1024 * 1024 * 1024;
 /** Pages, scripts, images de partage, logos (mesuré : ~35 Mo en octobre 2026). */
@@ -314,12 +323,23 @@ async function processPhoto({ full, key, file, download }) {
     };
   }
 
+  // Petite photo : la version pleine taille (la dernière largeur) et le téléchargement passent en réglage fin.
+  const fine = Math.max(meta.width, meta.height) <= FINE.maxSide;
+  const avifWidths = widthsFor(AVIF, meta.width);
   const jobs = [
-    ...widthsFor(AVIF, meta.width).map(({ width, quality }) => ({
-      kind: "avif",
-      path: `${base}-${width}.avif`,
-      make: (img) => img.resize({ width, withoutEnlargement: true }).avif({ quality, effort: 4, chromaSubsampling: AVIF_CHROMA }),
-    })),
+    ...avifWidths.map(({ width, quality }, i) =>
+      fine && i === avifWidths.length - 1
+        ? {
+            kind: "fine",
+            path: `${base}-${width}.avif`,
+            make: (img) => img.resize({ width, withoutEnlargement: true }).avif({ quality: FINE.avif.quality, effort: 4, chromaSubsampling: FINE.avif.chroma }),
+          }
+        : {
+            kind: "avif",
+            path: `${base}-${width}.avif`,
+            make: (img) => img.resize({ width, withoutEnlargement: true }).avif({ quality, effort: 4, chromaSubsampling: AVIF_CHROMA }),
+          },
+    ),
     ...widthsFor(download ? WEBP.filter((v) => v.width <= WEBP_MAX_WITH_DOWNLOAD) : WEBP, meta.width).map(({ width, quality }) => ({
       kind: "webp",
       path: `${base}-${width}.webp`,
@@ -328,11 +348,11 @@ async function processPhoto({ full, key, file, download }) {
   ];
   if (download) {
     jobs.push({
-      kind: "download",
+      kind: fine ? "fine" : "download",
       path: download.path,
       make: (img) =>
         img
-          .jpeg({ quality: DOWNLOAD_QUALITY, mozjpeg: true })
+          .jpeg(fine ? { quality: FINE.download.quality, mozjpeg: true, chromaSubsampling: FINE.download.chroma } : { quality: DOWNLOAD_QUALITY, mozjpeg: true })
           .withIccProfile("srgb")
           .withExif({ IFD0: { Artist: siteConfig.name, Copyright: `© ${siteConfig.name}` } }),
     });
