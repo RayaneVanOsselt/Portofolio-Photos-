@@ -123,6 +123,15 @@ export const albumTree: CategoryInput[] = [
         title: "Dames 1",
         albums: [
           {
+            // Originaux pleine résolution (392 Mo) ramenés à 2 048 px (26,6 Mo) ; copies sur le Bureau,
+            // « Portofolio Photos - Originaux pleine résolution ». EXIF : dimanche 15/11, 12 h 42 → 14 h 33.
+            slug: "15-11-2026-daring-d1-namur-d1",
+            date: "2026-11-15",
+            match: { home: "Daring D1", away: "Namur D1" },
+            source: "Daring/Dames 1/2026-11-15 Daring D1 vs Namur D1",
+            cover: "IMG_8935.JPG",
+          },
+          {
             slug: "30-05-2026-daring-d1-lara-d1",
             date: "2026-05-30",
             match: { home: "Daring D1", away: "Lara D1" },
