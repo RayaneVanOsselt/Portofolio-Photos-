@@ -177,7 +177,7 @@ async function sourceAlbums() {
         if (files.length) groups.push({ key: `${key}/${chapter.slug}`, files });
       }
       await noteUnsupported(dir);
-      albums.push({ key, dir, groups, album, download: isDownloadEnabled(album, chain, siteConfig.downloads.photos) });
+      albums.push({ key, dir, groups, album, chain, download: isDownloadEnabled(album, chain, siteConfig.downloads.photos) });
     }
     for (const child of category.children ?? []) await walk(child, chain);
   };
@@ -437,6 +437,70 @@ async function walkFiles(dir) {
   return out;
 }
 
+// ------------------------------------------------------- guide du dossier
+
+/** Adresse publique du site (liens du sommaire) : celle de la publication, sinon le domaine du site. */
+const PUBLIC_SITE = /localhost|127\.0\.0\.1/.test(siteConfig.url) ? "https://rayvocaptures0808.be" : siteConfig.url;
+const SPORT_TITLES = { hockey: "Hockey", football: "Football", rugby: "Rugby" };
+const GUIDE = join(SOURCE_DIR, "_LISEZ-MOI.md");
+
+/**
+ * « Dossier photos/_LISEZ-MOI.md » : les règles de rangement et le sommaire de tous les
+ * albums (dossier → nombre de photos → adresse sur le site), réécrit à chaque
+ * `npm run photos` (donc à chaque `npm run dev` et à chaque publication) s'il a changé.
+ */
+async function writeGuide(sources) {
+  const count = (source) => source.groups.reduce((n, g) => n + g.files.length, 0);
+  const totalPhotos = sources.reduce((n, s) => n + count(s), 0);
+  const roots = [...new Map(sources.map((s) => [s.chain[0], []])).keys()];
+  const sports = [...new Set(roots.map((root) => root.sport))];
+  const lines = [
+    "# Dossier photos — à lire",
+    "",
+    "> Fichier mis à jour automatiquement à chaque `npm run dev` et à chaque publication du site. Inutile de le modifier à la main.",
+    "",
+    "## Comment ranger un nouveau match",
+    "",
+    "1. **Exporter depuis Lightroom** : JPEG, *Redimensionner → Grand côté 2048 px*, qualité 90 à 100. Jamais les originaux en pleine résolution : ils restent sur le Bureau, dans « Portofolio Photos - Originaux pleine résolution ».",
+    "2. **Créer le dossier du match ici**, rangé comme le site : `Club/Équipe/AAAA-MM-JJ Équipe A vs Équipe B`",
+    "   - exemple : `Daring/Dames 1/2026-11-15 Daring D1 vs Namur D1` ;",
+    "   - la date en premier, au format AAAA-MM-JJ : les matchs se classent tout seuls par date ;",
+    "   - jamais de « : » ni de « / » dans un nom, et pas d'espace à la fin ;",
+    "   - les photos directement dans le dossier du match. Un sous-dossier devient un « chapitre » sur le site (ex. `Belgique` et `Pays-Bas`).",
+    "3. **Ajouter l'album au site** : demander à Claude « ajoute l'album … », ou coller la fiche que `npm run photos` propose dans `src/data/albums.ts`.",
+    "4. **Ne rien déposer à la racine du projet** ni dans un autre dossier « Dossier photos » : seul celui-ci est lu.",
+    "",
+    "Les versions web (AVIF, WebP, JPEG à télécharger) sont fabriquées automatiquement dans `public/_photos/` : ne pas y toucher.",
+    "",
+    `## Sommaire — ${sources.length} albums · ${totalPhotos} photos`,
+    "",
+    `Chaque ligne : le dossier du match → le nombre de photos → l'album sur le site (${PUBLIC_SITE}).`,
+  ];
+  for (const sport of sports) {
+    lines.push("", `### ${SPORT_TITLES[sport] ?? sport}`);
+    for (const root of roots.filter((r) => r.sport === sport)) {
+      const mine = sources.filter((s) => s.chain[0] === root).sort((a, b) => b.album.date.localeCompare(a.album.date));
+      const clubFolders = [...new Set(mine.map((s) => s.album.source.split("/")[0]))];
+      lines.push("", `**${root.title}** — dossier ${clubFolders.map((f) => `\`${f}/\``).join(", ")}`);
+      const teams = [...new Set(mine.map((s) => s.chain.slice(1).map((c) => c.title).join(" · ")))];
+      for (const team of teams) {
+        if (team) lines.push(`- ${team}`);
+        for (const source of mine.filter((s) => s.chain.slice(1).map((c) => c.title).join(" · ") === team)) {
+          const n = count(source);
+          const folder = source.album.source.split("/").at(-1);
+          const chapters = source.groups.length > 1 ? `, ${source.groups.length} chapitres` : "";
+          lines.push(`${team ? "  " : ""}- \`${folder}\` — ${n ? `${n} photo${n > 1 ? "s" : ""}${chapters}` : "photos à venir"} → ${PUBLIC_SITE}/${source.key}/`);
+        }
+      }
+    }
+  }
+  const loose = await unmappedFolders(sources);
+  if (loose.length) lines.push("", "### ⚠ Dossiers pas encore reliés à un album", "", ...loose.map((dir) => `- \`${dir}\``));
+  const text = `${lines.join("\n")}\n`;
+  const before = existsSync(GUIDE) ? await readFile(GUIDE, "utf8") : "";
+  if (before !== text) await writeFile(GUIDE, text);
+}
+
 // ------------------------------------------------------------------ main
 
 const started = Date.now();
@@ -512,6 +576,7 @@ await writeFile(SETTINGS_FILE, `${JSON.stringify({ ...SETTINGS, photos: generate
 
 const sorted = Object.fromEntries(Object.keys(manifest).sort(byName).map((k) => [k, manifest[k]]));
 await writeFile(MANIFEST, `${JSON.stringify(sorted, null, 2)}\n`);
+await writeGuide(sources);
 
 // ---------------------------------------------------------------- rapport
 
