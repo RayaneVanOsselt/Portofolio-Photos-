@@ -4,12 +4,14 @@ import { publicPath } from "@/lib/utils";
 
 /**
  * Animation d'entrée : rideau à l'identité de la marque, joué une seule fois
- * par visite (première page ouverte), en CSS pur — voir `.intro` dans globals.css.
+ * par visite, en CSS pur — voir `.intro` dans globals.css.
  *
  * Le script de <head> (layout) pose `data-intro` sur <html> avant le premier
- * affichage, seulement si l'animation n'a pas encore été vue pendant la visite
- * et si le visiteur n'a pas demandé à réduire les animations. Sans cet
- * attribut (ou sans JavaScript), le rideau n'est jamais affiché.
+ * affichage, seulement si la visite commence par l'ACCUEIL, si l'animation n'a
+ * pas encore été vue et si le visiteur n'a pas demandé à réduire les animations.
+ * Arrivé directement sur un album (lien Instagram, Google), on voit les photos
+ * tout de suite : le rideau retardait l'affichage de ~2 s (mesuré le 21/11/2026).
+ * Sans cet attribut (ou sans JavaScript), le rideau n'est jamais affiché.
  */
 export function IntroCurtain() {
   return (
@@ -17,7 +19,7 @@ export function IntroCurtain() {
       <div className="intro-content">
         <div className="intro-brand">
           {/* eslint-disable-next-line @next/next/no-img-element -- fichiers de marque déjà optimisés (npm run brand) */}
-          <img className="intro-mark" src={publicPath(brand.mark.src)} width={brand.mark.width} height={brand.mark.height} alt="" />
+          <img className="intro-mark" src={publicPath(brand.mark.src)} width={brand.mark.width} height={brand.mark.height} alt="" fetchPriority="high" />
           <span className="intro-line">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="intro-name" src={publicPath(brand.wordmark.src)} width={brand.wordmark.width} height={brand.wordmark.height} alt="" />
@@ -30,5 +32,8 @@ export function IntroCurtain() {
   );
 }
 
+/** Adresse de l'accueil (sous-dossier de publication compris) : seule page où le rideau est joué. */
+const HOME = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/`;
+
 /** Script de <head> : décide, avant le premier affichage, si le rideau est joué. */
-export const INTRO_SCRIPT = `try{var d=document.documentElement;if(!sessionStorage.getItem("rayvo:intro")&&!matchMedia("(prefers-reduced-motion: reduce)").matches){d.setAttribute("data-intro","");sessionStorage.setItem("rayvo:intro","1");setTimeout(function(){d.removeAttribute("data-intro")},4200)}}catch(e){}`;
+export const INTRO_SCRIPT = `try{var d=document.documentElement,p=location.pathname;if((p===${JSON.stringify(HOME)}||p===${JSON.stringify(`${HOME}index.html`)})&&!sessionStorage.getItem("rayvo:intro")&&!matchMedia("(prefers-reduced-motion: reduce)").matches){d.setAttribute("data-intro","");sessionStorage.setItem("rayvo:intro","1");setTimeout(function(){d.removeAttribute("data-intro")},4200)}}catch(e){}`;

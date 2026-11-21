@@ -65,10 +65,30 @@ export function flexFor(photo: Photo) {
   return `${ratio(photo).toFixed(4)} 1 0%`;
 }
 
-/** Attribut `sizes` adapté à la part de largeur occupée par l'image. */
+/**
+ * Attribut `sizes` adapté à la part de largeur occupée par l'image.
+ * Sur mobile, les rangées s'empilent (pleine largeur), sauf deux portraits côte à côte
+ * et les images isolées, réduites à 86 % (voir .gallery-row dans globals.css).
+ */
 export function sizesFor(kind: RowKind, photo: Photo, row: Photo[]) {
   const total = row.reduce((sum, p) => sum + ratio(p), 0);
   const share = kind === "solo" ? (isPortrait(photo) ? 0.42 : 0.62) : ratio(photo) / total;
   const desktop = Math.round(Math.min(1680, 1680 * share));
-  return `(min-width: 1776px) ${desktop}px, (min-width: 768px) ${Math.round(share * 100)}vw, 100vw`;
+  const sideBySide = row.length === 2 && row.every(isPortrait);
+  const mobile = sideBySide ? `${Math.round(share * 100)}vw` : kind === "solo" ? "86vw" : "100vw";
+  return `(min-width: 1776px) ${desktop}px, (min-width: 768px) ${Math.round(share * 100)}vw, ${mobile}`;
+}
+
+/** Hauteur des rangées de la planche (même valeurs que .mosaic dans globals.css). */
+const MOSAIC_ROW = { base: 150, sm: 210, xl: 270 };
+/** Une vignette s'élargit pour finir sa rangée : marge d'agrandissement prévue. */
+const MOSAIC_GROW = 1.3;
+
+/**
+ * Attribut `sizes` d'une vignette de la planche : sa largeur réelle (hauteur de rangée × format),
+ * et non une fraction de l'écran — le téléphone télécharge la version de la bonne taille.
+ */
+export function mosaicSizes(photo: Photo) {
+  const width = (rowHeight: number) => `${Math.round(ratio(photo) * rowHeight * MOSAIC_GROW)}px`;
+  return `(min-width: 1280px) ${width(MOSAIC_ROW.xl)}, (min-width: 640px) ${width(MOSAIC_ROW.sm)}, ${width(MOSAIC_ROW.base)}`;
 }
