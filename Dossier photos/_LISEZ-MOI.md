@@ -15,7 +15,7 @@
 
 Les versions web (AVIF, WebP, JPEG à télécharger) sont fabriquées automatiquement dans `public/_photos/` : ne pas y toucher.
 
-## Sommaire — 25 albums · 1019 photos
+## Sommaire — 26 albums · 1133 photos
 
 Chaque ligne : le dossier du match → le nombre de photos → l'album sur le site (https://rayvocaptures0808.be).
 
@@ -54,6 +54,8 @@ Chaque ligne : le dossier du match → le nombre de photos → l'album sur le si
   - `2026-10-04 White Star D1 vs Louvain-la-Neuve D1` — 57 photos → https://rayvocaptures0808.be/albums/louvain-la-neuve/dames-1/04-10-2026-white-star-d1-louvain-la-neuve-d1/
 
 **Uccle Sport** — dossier `Uccle Sport/`
+- U19G1
+  - `2026-11-21 Uccle Sport U19G1 vs Victory U19G1` — 114 photos → https://rayvocaptures0808.be/albums/uccle-sport/u19g1/21-11-2026-uccle-sport-u19g1-victory-u19g1/
 - U19B1
   - `2026-10-17 Uccle Sport U19B1 vs Pingouin U19B1` — 54 photos → https://rayvocaptures0808.be/albums/uccle-sport/u19b1/17-10-2026-uccle-sport-u19b1-pingouin-u19b1/
 
