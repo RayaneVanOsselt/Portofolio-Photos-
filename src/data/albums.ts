@@ -281,6 +281,19 @@ export const albumTree: CategoryInput[] = [
           },
         ],
       },
+      {
+        slug: "u19g1",
+        title: "U19G1",
+        albums: [
+          {
+            slug: "21-11-2026-uccle-sport-u19g1-victory-u19g1",
+            date: "2026-11-21",
+            match: { home: "Uccle Sport U19G1", away: "Victory U19G1" },
+            source: "Uccle Sport/U19G1/2026-11-21 Uccle Sport U19G1 vs Victory U19G1",
+            cover: "IMG_9520.jpg",
+          },
+        ],
+      },
     ],
   },
   {
