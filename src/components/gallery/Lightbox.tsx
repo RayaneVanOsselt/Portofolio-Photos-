@@ -35,6 +35,10 @@ export function Lightbox({ items, favorite, permalink, index, onClose, onChange 
   const dialogRef = useAnimatedDialog(open, onClose, 400);
   // Garde la dernière image affichée pendant l'animation de fermeture.
   const [shownIndex, setShownIndex] = useState(index ?? 0);
+  // Photo de la scène chargée seulement une fois la visionneuse ouverte : une <img> dans un
+  // <dialog> fermé est téléchargée quand même (~100 Ko de perdus à chaque album ouvert).
+  const [used, setUsed] = useState(false);
+  if (open && !used) setUsed(true);
   const [zoom, setZoom] = useState<{ x: number; y: number } | null>(null);
   const [direction, setDirection] = useState<1 | -1>(1);
   const swipeStart = useRef<{ x: number; y: number } | null>(null);
@@ -230,15 +234,17 @@ export function Lightbox({ items, favorite, permalink, index, onClose, onChange 
               data-direction={direction}
               style={{ transform: zoom ? "scale(2.2)" : undefined, transformOrigin: zoom ? `${zoom.x}% ${zoom.y}%` : "50% 50%" }}
             >
-              <PhotoPicture
-                photo={photo}
-                sizes={STAGE_SIZES}
-                eager
-                draggable={false}
-                className="absolute inset-0 h-full w-full object-contain"
-                // Mini-aperçu flou à l'emplacement exact de la photo, le temps qu'elle arrive.
-                style={photo.blurDataURL ? { backgroundImage: `url("${photo.blurDataURL}")`, backgroundSize: "contain", backgroundPosition: "center", backgroundRepeat: "no-repeat" } : undefined}
-              />
+              {used ? (
+                <PhotoPicture
+                  photo={photo}
+                  sizes={STAGE_SIZES}
+                  eager
+                  draggable={false}
+                  className="absolute inset-0 h-full w-full object-contain"
+                  // Mini-aperçu flou à l'emplacement exact de la photo, le temps qu'elle arrive.
+                  style={photo.blurDataURL ? { backgroundImage: `url("${photo.blurDataURL}")`, backgroundSize: "contain", backgroundPosition: "center", backgroundRepeat: "no-repeat" } : undefined}
+                />
+              ) : null}
             </div>
           </div>
 

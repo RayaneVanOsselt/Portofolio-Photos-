@@ -193,8 +193,11 @@ export function Footer() {
 
       {/* Signature surdimensionnée — purement décorative */}
       <div aria-hidden className="pointer-events-none mt-[clamp(3.5rem,6vw,6rem)] select-none overflow-hidden">
-        <p className="container-wide font-display text-[clamp(4.5rem,0.5rem+19vw,24rem)] leading-[0.74] font-extrabold tracking-[-0.03em] whitespace-nowrap text-ink-soft uppercase [font-stretch:125%]">
-          {siteConfig.logo.primary.replace(/\.$/, "")}
+        {/* Texte posé en CSS (::before) : un motif, pas un contenu — les outils d'accessibilité ne le lisent pas comme du texte peu contrasté. */}
+        <p
+          data-text={siteConfig.logo.primary.replace(/\.$/, "")}
+          className="container-wide font-display text-[clamp(4.5rem,0.5rem+19vw,24rem)] leading-[0.74] font-extrabold tracking-[-0.03em] whitespace-nowrap text-ink-soft uppercase [font-stretch:125%] before:content-[attr(data-text)]"
+        >
           <span className="text-flamingo/80">.</span>
         </p>
       </div>

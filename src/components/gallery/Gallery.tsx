@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Check, Download, GridIcon, Heart, RowsIcon } from "@/components/ui/Icons";
 import { useFavorites } from "@/hooks/useFavorites";
 import { PhotoImage } from "@/components/ui/PhotoImage";
-import { composeGallery, flexFor, sizesFor, type GalleryRow } from "@/lib/gallery-layout";
+import { composeGallery, flexFor, mosaicSizes, sizesFor, type GalleryRow } from "@/lib/gallery-layout";
 import type { Photo } from "@/lib/types";
 import { pad } from "@/lib/utils";
 import { ArchiveDialog } from "./ArchiveDialog";
@@ -251,7 +251,7 @@ export function Gallery({ id, items, label, priorityCount = 0, defaultView = "ed
                       <TileButton item={item} index={index} {...tile}>
                         <PhotoImage
                           photo={item.photo}
-                          sizes="(min-width: 1280px) 30vw, (min-width: 640px) 40vw, 60vw"
+                          sizes={mosaicSizes(item.photo)}
                           priority={index < priorityCount}
                           className="rounded-[var(--radius-xs)]"
                         />

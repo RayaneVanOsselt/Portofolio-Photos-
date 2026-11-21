@@ -20,7 +20,8 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
                 </span>
               ) : (
                 <>
-                  <Link href={item.path} className="link-underline transition-colors hover:text-linen">
+                  {/* 24 px de haut au minimum : une cible confortable au doigt (WCAG 2.5.8). */}
+                  <Link href={item.path} className="link-underline inline-flex min-h-6 items-center transition-colors hover:text-linen">
                     {item.name}
                   </Link>
                   <span aria-hidden className="text-flamingo">
