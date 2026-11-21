@@ -2,7 +2,7 @@
 
 import type { CSSProperties, Ref } from "react";
 import { preload } from "react-dom";
-import { fallbackUrl, isLocalPhoto, largestUrl, srcSetFor, unsplashUrl } from "@/lib/photo-sources";
+import { AVIF_MEDIA, avifCapped, fallbackUrl, isLocalPhoto, LARGE_MEDIA, largestUrl, srcSetFor, unsplashUrl } from "@/lib/photo-sources";
 import type { Photo } from "@/lib/types";
 
 type Props = {
@@ -38,7 +38,12 @@ const markLoaded = (img: HTMLImageElement | null) => {
 export function PhotoPicture({ photo, sizes, priority = false, eager = false, alt = photo.alt, className, style, draggable, fadeIn = false }: Props) {
   const local = isLocalPhoto(photo.src);
   const avif = local ? srcSetFor(photo, "avif") : undefined;
-  if (priority && avif) preload(largestUrl(photo, "avif"), { as: "image", type: "image/avif", imageSrcSet: avif, imageSizes: sizes, fetchPriority: "high" });
+  // AVIF limité à 1 600 px : sur écran Retina ou très large, c'est le JPEG pleine définition qui s'affiche.
+  const avifMedia = local && avifCapped(photo) ? AVIF_MEDIA : undefined;
+  if (priority && avif) {
+    preload(largestUrl(photo, "avif"), { as: "image", type: "image/avif", imageSrcSet: avif, imageSizes: sizes, fetchPriority: "high", media: avifMedia });
+    if (avifMedia) preload(fallbackUrl(photo), { as: "image", imageSrcSet: srcSetFor(photo, "webp"), imageSizes: sizes, fetchPriority: "high", media: LARGE_MEDIA });
+  }
 
   const img = {
     sizes,
@@ -70,7 +75,7 @@ export function PhotoPicture({ photo, sizes, priority = false, eager = false, al
 
   return (
     <picture className="contents">
-      <source type="image/avif" srcSet={avif} sizes={sizes} />
+      <source type="image/avif" srcSet={avif} sizes={sizes} media={avifMedia} />
       <img alt={alt} {...img} src={fallbackUrl(photo)} srcSet={srcSetFor(photo, "webp")} />
     </picture>
   );

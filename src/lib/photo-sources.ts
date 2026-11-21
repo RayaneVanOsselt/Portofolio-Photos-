@@ -5,8 +5,19 @@
  */
 import type { Photo } from "@/lib/types";
 
-export const AVIF_WIDTHS = [320, 640, 1080, 1600, 2048];
+export const AVIF_WIDTHS = [320, 640, 1080, 1600];
 export const WEBP_WIDTHS = [320, 640, 1080];
+/**
+ * L'AVIF s'arrête à 1 600 px (−120 Mo sur le site, voir scripts/photos.mjs). Il suffit aux
+ * téléphones et aux écrans ordinaires ; les écrans Retina ou très larges, eux, affichent
+ * en grand le JPEG à télécharger : 2 048 px, plus fidèle, simplement un peu plus lourd.
+ * LARGE_MEDIA est exactement le complément d'AVIF_MEDIA.
+ */
+export const AVIF_MEDIA = "(max-width: 640px), (max-width: 1760px) and (max-resolution: 1.5dppx)";
+export const LARGE_MEDIA = "(min-width: 641px) and (min-resolution: 1.51dppx), (min-width: 1761px)";
+
+/** L'AVIF s'arrête avant la pleine définition de la photo, et un JPEG pleine définition existe. */
+export const avifCapped = (photo: Pick<Photo, "width" | "download">) => Boolean(photo.download) && photo.width > AVIF_WIDTHS.at(-1)!;
 /**
  * Photo téléchargeable : WebP jusqu'à 640 px seulement. Au-delà, le repli des
  * navigateurs sans AVIF (~5 % des visiteurs) est le JPEG à télécharger, déjà

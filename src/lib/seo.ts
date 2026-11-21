@@ -50,7 +50,8 @@ export function pageMetadata({ title, description = siteConfig.description, path
   const fullTitle = `${title} | ${siteConfig.name}`;
   const desc = clampDescription(description);
   // Toujours une image de partage : sinon une page qui définit son `openGraph` perd celle du site.
-  const shared = image ?? { url: "/opengraph-image.png", alt: `${siteConfig.name} — ${siteConfig.tagline}` };
+  // Image du site : générée en PNG puis convertie en JPEG à l'export (scripts/finalize-export.mjs).
+  const shared = image ?? { url: "/opengraph-image.jpg", alt: `${siteConfig.name} — ${siteConfig.tagline}` };
   const images = [{ url: absoluteUrl(shared.url), width: 1200, height: 630, alt: shared.alt, type: shared.url.endsWith(".jpg") ? "image/jpeg" : "image/png" }];
   return {
     title: { absolute: fullTitle },
@@ -117,7 +118,7 @@ export function businessJsonLd() {
     description: siteConfig.description,
     url: absoluteUrl("/"),
     logo: absoluteUrl("/apple-icon.png"),
-    image: absoluteUrl("/opengraph-image.png"),
+    image: absoluteUrl("/opengraph-image.jpg"),
     slogan: siteConfig.tagline,
     founder: { "@type": "Person", name: `${siteConfig.owner.firstName} ${siteConfig.owner.lastName}`, jobTitle: "Photographe sportif" },
     knowsAbout: ["Photographie sportive", "Hockey sur gazon", "Rugby", "Football", "Photographie de match", "Portrait d'équipe"],

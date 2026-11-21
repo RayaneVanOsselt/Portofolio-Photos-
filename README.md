@@ -103,9 +103,9 @@ Les matchs sont **triés automatiquement par date**, du plus récent au plus anc
 
 | Usage | Fichiers | Détail |
 | --- | --- | --- |
-| Affichage | AVIF 320 · 640 · 1080 · 1600 · 2048 px | qualité croissante avec la taille (50 → 58), couleurs en 4:2:0 ; ~30 % plus léger que le WebP |
+| Affichage | AVIF 320 · 640 · 1080 · 1600 px | qualité croissante avec la taille (50 → 57), couleurs en 4:2:0 ; ~30 % plus léger que le WebP. Écrans Retina ou très larges : le JPEG à télécharger (2048 px) s'affiche à la place, même définition (pas d'AVIF 2048 : −120 Mo) |
 | Repli | WebP 320 · 640 px | navigateurs sans AVIF (~5 % des visiteurs) et vignettes ; en grand, ces navigateurs reçoivent le JPEG à télécharger (plus fin). WebP 1080 px en plus pour une galerie non téléchargeable |
-| Téléchargement | JPEG 2048 px, qualité 82 (mozjpeg), sRGB | nom propre : `rayvo-captures0808-2026-10-18-daring-h1-oree-h1-07.jpg` ; auteur et copyright inscrits ; sert aussi d'image pour Google |
+| Téléchargement | JPEG 2048 px, qualité 82 (mozjpeg), sRGB | nom propre : `rayvo-captures0808-2026-10-18-daring-h1-oree-h1-07.jpg` ; auteur et copyright inscrits ; sert aussi de grande image sur les écrans Retina et d'image pour Google |
 
 Aucune métadonnée privée n'est publiée (ni GPS, ni numéro de série du boîtier) ; les réglages de prise de vue (boîtier, objectif, focale, ouverture, vitesse, ISO) sont affichés dans la visionneuse. Le traitement est **incrémental** : une photo dont le contenu n'a pas changé n'est jamais réencodée (y compris sur GitHub, grâce au cache de la publication), et les fichiers générés d'une photo retirée sont supprimés. Le script signale aussi les fichiers illisibles, les formats non pris en charge (RAW, HEIC : exportez en JPEG) et les doublons, et affiche la **place restante** sur GitHub Pages, en nombre de photos (voir « Poids du site », §10).
 
@@ -285,7 +285,7 @@ npm run build      # → dossier out/, le site prêt à publier
 
 Ensuite, chaque mise à jour de la branche `main` publie automatiquement le site (onglet **Actions**, workflow « Publier le site »). Adresse : <https://rayvocaptures0808.be> (domaine personnalisé ; sans lui, `https://<utilisateur>.github.io/<nom-du-dépôt>/`). Les versions web des photos sont gardées en cache d'une publication à l'autre : seules les photos nouvelles sont encodées (quelques minutes), et une photo déplacée (dossier rangé, album renommé ou changé de catégorie) est recopiée sans réencodage. Un changement de réglages d'encodage réencode tout : compter alors 2 à 3 heures sur GitHub.
 
-**Poids du site — à surveiller.** GitHub Pages limite un site à **1 Go** (au-delà, la publication n'est plus garantie). Chaque photo publiée pèse environ 765 Ko (toutes ses versions comprises) : un album de 100 photos ≈ 75 Mo. `npm run photos` affiche la place restante en nombre de photos, et `npm run build` le poids réel du site (avertissement au-delà de 1 Go). Quand la place vient à manquer, sans changer le code : publier le même dossier `out/` sur **Cloudflare Pages** (gratuit, sans limite de taille totale), ou passer d'anciennes galeries en `downloadEnabled: false` (environ −30 % de poids par photo, mais plus de téléchargement).
+**Poids du site — à surveiller.** GitHub Pages limite un site à **1 Go** (au-delà, la publication n'est plus garantie). Chaque photo publiée pèse environ 625 Ko (toutes ses versions comprises) : un album de 100 photos ≈ 61 Mo. `npm run photos` affiche la place restante en nombre de photos, et `npm run build` le poids réel du site (avertissement au-delà de 1 Go). Quand la place vient à manquer, sans changer le code : publier le même dossier `out/` sur **Cloudflare Pages** (gratuit, sans limite de taille totale), ou passer d'anciennes galeries en `downloadEnabled: false` (environ −30 % de poids par photo, mais plus de téléchargement).
 
 **Domaine personnalisé** (actuellement `rayvocaptures0808.be`) : il se règle dans Settings → Pages → Custom domain ; l'Action adapte automatiquement les adresses du site.
 
