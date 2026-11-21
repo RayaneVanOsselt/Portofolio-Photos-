@@ -8,7 +8,7 @@
  *   - public/images/** : photos des pages (site/home, site/about…) et anciens albums.
  *
  * Pour chaque photo, dans public/_photos/ (généré, non commité) :
- *   - AFFICHAGE : AVIF en 5 largeurs (320 → 2048 px) + WebP en repli (320 → 640 px ;
+ *   - AFFICHAGE : AVIF en 4 largeurs (320 → 1600 px) + WebP en repli (320 → 640 px ;
  *     1080 px si la galerie n'est pas téléchargeable, sinon c'est le JPEG à télécharger
  *     qui sert de grand repli), sans aucune métadonnée (ni boîtier, ni GPS) ;
  *   - TÉLÉCHARGEMENT (galeries autorisées, voir src/lib/downloads.ts) : JPEG haute
@@ -64,8 +64,12 @@ const AVIF = [
   { width: 640, quality: 52 },
   { width: 1080, quality: 55 },
   { width: 1600, quality: 57 },
-  { width: 2048, quality: 58 },
 ];
+/*
+ * Pas d'AVIF 2048 px (retiré le 21/11/2026, −120 Mo) : les écrans qui en ont besoin
+ * (Retina, très larges) affichent le JPEG à télécharger, déjà publié, même définition
+ * et plus fidèle. Même règle côté site (AVIF_MEDIA, src/lib/photo-sources.ts).
+ */
 /**
  * Couleurs en 4:2:0, comme le JPEG et presque toutes les photos du web : ~8 % de moins
  * par AVIF, même netteté (testé le 23/10/2026 sur 41 photos, invisible même zoomé ×3).
@@ -281,6 +285,15 @@ const previousSettings = existsSync(SETTINGS_FILE) ? JSON.parse(await readFile(S
 /** Réglage modifié depuis la dernière génération : ces fichiers sont refaits. */
 const stale = Object.fromEntries(Object.entries(SETTINGS).map(([kind, value]) => [kind, JSON.stringify(previousSettings[kind]) !== JSON.stringify(value)]));
 /**
+ * AVIF et WebP : palier par palier (largeur + qualité). Ajouter ou retirer une largeur
+ * ne refait que celle-là — pas les milliers de fichiers des autres largeurs.
+ */
+const sameRung = (list, { width, quality }) => Array.isArray(list) && list.some((r) => r.width === width && r.quality === quality);
+const staleAvif = (rung) => previousSettings.avif?.chroma !== AVIF_CHROMA || !sameRung(previousSettings.avif?.widths, rung);
+const staleWebp = (rung) => !sameRung(previousSettings.webp, rung);
+stale.avif = AVIF.some(staleAvif);
+stale.webp = WEBP.some(staleWebp);
+/**
  * Fichiers déjà générés, par empreinte : { base, download }. Gardé dans .pipeline.json (donc aussi
  * dans le cache de la publication GitHub) ; à défaut, déduit du manifest précédent. Une photo qui
  * change d'adresse est recopiée depuis son ancien emplacement au lieu d'être réencodée.
@@ -331,17 +344,20 @@ async function processPhoto({ full, key, file, download }) {
       fine && i === avifWidths.length - 1
         ? {
             kind: "fine",
+            stale: stale.fine,
             path: `${base}-${width}.avif`,
             make: (img) => img.resize({ width, withoutEnlargement: true }).avif({ quality: FINE.avif.quality, effort: 4, chromaSubsampling: FINE.avif.chroma }),
           }
         : {
             kind: "avif",
+            stale: staleAvif({ width, quality }),
             path: `${base}-${width}.avif`,
             make: (img) => img.resize({ width, withoutEnlargement: true }).avif({ quality, effort: 4, chromaSubsampling: AVIF_CHROMA }),
           },
     ),
     ...widthsFor(download ? WEBP.filter((v) => v.width <= WEBP_MAX_WITH_DOWNLOAD) : WEBP, meta.width).map(({ width, quality }) => ({
       kind: "webp",
+      stale: staleWebp({ width, quality }),
       path: `${base}-${width}.webp`,
       make: (img) => img.resize({ width, withoutEnlargement: true }).webp({ quality, effort: 4 }),
     })),
@@ -349,6 +365,7 @@ async function processPhoto({ full, key, file, download }) {
   if (download) {
     jobs.push({
       kind: fine ? "fine" : "download",
+      stale: fine ? stale.fine : stale.download,
       path: download.path,
       make: (img) =>
         img
@@ -362,8 +379,8 @@ async function processPhoto({ full, key, file, download }) {
   // jamais un chemin qu'une autre photo occupe désormais (échange de noms).
   const before = generatedBefore[hash];
   const reusable = (job) => {
-    if (!before || stale[job.kind]) return null;
-    const isDownload = job.kind === "download";
+    if (!before || job.stale) return null;
+    const isDownload = job.path === download?.path;
     const path = isDownload ? before.download : `${before.base}${job.path.slice(base.length)}`;
     if (!path || path === job.path) return null;
     if (isDownload ? claimed.downloads.has(path) : claimed.bases.has(before.base)) return null;
@@ -374,7 +391,7 @@ async function processPhoto({ full, key, file, download }) {
   for (const job of jobs) {
     expected.add(job.path);
     const target = join(OUT_DIR, job.path);
-    if (same && !stale[job.kind] && existsSync(target)) continue;
+    if (same && !job.stale && existsSync(target)) continue;
     await mkdir(dirname(target), { recursive: true });
     const from = reusable(job);
     if (from) {
